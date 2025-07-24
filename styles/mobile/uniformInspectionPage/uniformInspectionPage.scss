@@ -1,0 +1,49 @@
+@media screen and (max-width: 1000px) {
+	.uniform-inspection-list-table {
+		grid-template-columns: max-content 1fr repeat(3, 160px) max-content;
+	}
+}
+
+@media screen and (max-width: 850px) {
+	.uniform-inspection-list-table {
+		grid-template-columns: max-content 1fr repeat(2, 160px) max-content;
+
+		p:nth-of-type(4) {
+			display: none;
+		}
+	}
+}
+
+@media screen and (max-width: 800px) {
+	.uniform-inspection-list-table {
+		grid-template-columns: max-content 1fr repeat(2, 110px) max-content;
+	}
+
+	.uniform-inspection-result-page .page-container textarea {
+		width: 100% !important;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.uniform-inspection-list-table {
+		grid-template-columns: max-content 1fr max-content max-content;
+
+		p:nth-of-type(5) {
+			display: none;
+		}
+	}
+}
+
+@media screen and (max-width: 370px) {
+	.uniform-inspection-list-table {
+		grid-template-columns: max-content 1fr max-content;
+
+		p:nth-of-type(3) {
+			display: none;
+		}
+	}
+
+	.uniform-inspection-form .boy-selector label {
+		width: 100%;
+	}
+}

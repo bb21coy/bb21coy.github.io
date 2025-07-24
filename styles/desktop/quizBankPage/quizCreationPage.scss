@@ -1,0 +1,23 @@
+@media screen{
+	.quiz-creation-page .page-container{
+		overflow-x: hidden;
+		overflow-y: auto;
+		margin-top: 3vh;
+		height: 90vh;
+	}
+
+	.quiz-creation-page .page-container button{
+		padding: 2%;
+		background-color: white;
+		height: 4vh;
+	}
+
+	.quiz-creation-page .page-container button:hover{
+		background-color: lightgrey;
+	}
+
+	.quiz-creation-page .question-container{
+		border-top: solid;
+		border-width: thin;
+	}
+}
