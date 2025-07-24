@@ -1,3 +1,1 @@
-// export const BASE_URL = 'http://localhost:3000/api';
-
-export const BASE_URL = 'https://bb21coy.vercel.app/api';
+export const BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000/api' : 'https://bb21coy.vercel.app/api';
