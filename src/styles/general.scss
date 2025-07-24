@@ -1,0 +1,82 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    user-select: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+  
+
+.layout-div {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: white;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(183, 183, 183);
+    border-radius: 10px;
+}
+
+@media screen and (max-width: 250px) {
+    main *, header *, footer *, footer, header {
+        display: none !important;
+    }
+
+    main {
+        background: none !important;
+        margin: 0 !important;
+    }
+
+    main::before {
+        display: block;
+        content: "Your device's viewport is too small to display any content.\A\AWe apologize for the inconvenience.";
+        position: absolute;
+        top: 50%;
+        font-family: sans-serif;
+        font-weight: bold;
+        left: 50%;
+        text-align: center;
+        text-wrap: wrap;
+        white-space: pre-line;
+        transform: translate(-50%, -50%);
+    }
+}
+
+@media screen{
+	button{
+		background-color: white;
+		border: none;
+	}
+
+	button:hover{
+		background-color: lightgrey;
+		border: none;
+	}
+
+	.mastery-selector{
+		display: flex;
+	}
+
+	.mastery-selector button{
+		border: solid;
+		border-style: solid;
+		border-color: darkgrey;
+		border-radius: 5px;
+	}
+}

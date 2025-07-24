@@ -1,0 +1,29 @@
+@media screen{
+	.question-bank-page .page-container{
+		overflow: hidden;
+		display: flex;
+		margin-top: 3vh;
+		height: 85vh;
+	}
+
+	.question-bank-page .page-container button{
+		display: flex;
+		padding: 2%;
+		background-color: white;
+		height: 4vh;
+	}
+
+	.question-bank-page .page-container button:hover{
+		background-color: lightgrey;
+	}
+
+	.question-bank-page .page-container .question-list-page{
+		max-height: 90%;
+		width: 70%;
+		border-style: solid;
+		border-color: darkgrey;
+		border-radius: 5px;
+		padding: 1%;
+		margin: 1%;
+	}
+}
