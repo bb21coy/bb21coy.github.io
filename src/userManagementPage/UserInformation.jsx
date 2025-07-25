@@ -42,7 +42,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 
 	function setRank(e) {
 		setAccountRank(e.target.value !== "NIL" ? e.target.value : null)
-		if (account.account_type == 'Boy') {
+		if (account.account_type === 'Boy') {
 			setAccountPastRank((prev) => {
 				let next = { ...prev }
 				next[accountLevel] = e.target.value
@@ -61,7 +61,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 
 	function setLevel(e) {
 		setAccountLevel(e.target.value)
-		if (account.account_type == 'Boy') {
+		if (account.account_type === 'Boy') {
 			setAccountPastRank((prev) => {
 				let next = { ...prev }
 				next[parseInt(e.target.value)] = accountRank
@@ -83,14 +83,14 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 		let level = null
 		let credentials = null
 		let submit = true
-		if (account.account_type == "Boy") {
+		if (account.account_type === "Boy") {
 			level = accountLevel
 			if (isNaN(parseInt(level))) submit = false
 		} else {
 			credentials = e.target.elements['credentials'].value
-			if (credentials == '') submit = false
+			if (credentials === '') submit = false
 		}
-		if (e.target.elements['account_name'].value == '') submit = false
+		if (e.target.elements['account_name'].value === '') submit = false
 
 		const formData = new FormData(e.target);
 		formData.append('id', account._id);
@@ -132,7 +132,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 					<label htmlFor='name-input'>Name:</label>
 					<input id='name-input' name={"account_name"} defaultValue={account.account_name} placeholder='Enter Name' />
 
-					{accountType == 'Admin' && <>
+					{accountType === 'Admin' && <>
 						<label htmlFor='user-name-input'>User Name:</label>
 						<input id='user-name-input' name={"user_name"} defaultValue={account.user_name} placeholder='Enter User Name' />
 					</>}
@@ -140,7 +140,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 					<label htmlFor='abb-name-input'>Abbreviated Name:</label>
 					<input id='abb-name-input' name={"abbreviated_name"} defaultValue={account.abbreviated_name} placeholder='Enter Abbreviated Name' />
 
-					{accountType == 'Admin' && <>
+					{accountType === 'Admin' && <>
 						<label htmlFor='password-input'>New Password:</label>
 						<input name={"password"} defaultValue={account.password_digest} id='password-input' placeholder='Enter Password' />
 					</>}
@@ -175,7 +175,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						</>}
 					</select>
 
-					{(["Admin", "Officer"].includes(accountType) || appointment == 'CSM') && !accountGraduated && <>
+					{(["Admin", "Officer"].includes(accountType) || appointment === 'CSM') && !accountGraduated && <>
 						<label htmlFor='attendance-appearance'>Attendance Appearance:</label>
 						<select id="attendance-appearance" name='roll_call' defaultValue={accountRollCall ? "Yes" : "No"} onChange={(e) => setAccountRollCall(e.target.value === 'Yes')}>
 							<option value="Yes">Yes</option>
@@ -183,12 +183,12 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						</select>
 					</>}
 
-					{account.account_type == "Boy" && <>
+					{account.account_type === "Boy" && <>
 						<label htmlFor='member-id-input'>Member ID:</label>
 						<input name="member_id" id='member-id-input' defaultValue={account.member_id} placeholder='Enter Member ID' />
 					</>}
 
-					{account.account_type == "Boy" && !accountGraduated && <>
+					{account.account_type === "Boy" && !accountGraduated && <>
 						<label htmlFor='secondary-input'>Secondary:</label>
 						<select id="secondary-input" name='level' onChange={setLevel} defaultValue={account.level}>
 							<option value="5">5</option>
@@ -199,7 +199,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						</select>
 					</>}
 
-					{account.account_type == "Boy" && (() => {
+					{account.account_type === "Boy" && (() => {
 						const level = parseInt(accountLevel);
 						if (!isNaN(level)) {
 							return Array.from({ length: level }, (_, i) => (
@@ -211,7 +211,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						}
 					})()}
 
-					{account.account_type == "Boy" && (() => {
+					{account.account_type === "Boy" && (() => {
 						const level = parseInt(accountLevel);
 						if (!isNaN(level)) {
 							return Array.from({ length: level - 1 }, (_, i) => (
@@ -232,7 +232,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						}
 					})()}
 
-					{account.account_type == "Boy" && <>
+					{account.account_type === "Boy" && <>
 						<label htmlFor='graduated-input'>Graduated:</label>
 						<select id="graduated-input" name='graduated' defaultValue={account.graduated ? "Yes" : "No"} onChange={setGraduated}>
 							<option value="Yes">Yes</option>
@@ -245,7 +245,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						<input type="text" name='appointment' id='appointment-input' disabled defaultValue={account.appointment} />
 					</>}
 
-					{(account.class_1?.	toLowerCase() == "staff" || accountRank == null) && <>
+					{(account.class_1?.toLowerCase() === "staff" || accountRank === null) && <>
 						<label htmlFor='honorific-input'>Honorifics:</label>
 						<select id="honorific-input" name='honorifics' onChange={(e) => setAccountHonorific(e.target.value)} defaultValue={accountHonorific}>
 							<option value="">-</option>
@@ -255,7 +255,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						</select>
 					</>}
 
-					{((account.account_type == "Primer" && account.rank == null) || account.account_type == "Officer") && <>
+					{((account.account_type === "Primer" && account.rank === null) || account.account_type === "Officer") && <>
 						<label htmlFor='class-input'>Class:</label>
 						<select id="class-input" name='class_1' onChange={(e) => setAccountClass(e.target.value)} defaultValue={accountClass} placeholder='Enter Class'>
 							<option value="VAL">VAL</option>
@@ -265,7 +265,7 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 						</select>
 					</>}
 
-					{account.account_type != "Boy" && <>
+					{account.account_type !== "Boy" && <>
 						<label htmlFor='credentials-input'>Credentials (For 32A results):</label>
 						<input name="credentials" defaultValue={account.credentials} id='credentials-input' />
 					</>}

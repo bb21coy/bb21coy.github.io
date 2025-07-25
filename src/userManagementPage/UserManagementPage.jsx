@@ -15,7 +15,6 @@ import { BASE_URL } from '../Constants'
 // To access current users and create new accounts
 const UserManagementPage = () => {
 	const navigate = useNavigate()
-	const [renderPage, setRenderPage] = useState(false)
 	const [load, setLoad] = useState(true);
 	const [pageState, setPageState] = useState("form");
 	const [user, setUser] = useState(null);
@@ -29,13 +28,12 @@ const UserManagementPage = () => {
 			if (response.data.account_type == 'Boy' && response.data.appointment == null) navigate('/home')
 			setAccountType(response.data.account_type)
 			setAppointment(response.data.appointment)
-			setRenderPage(true)
 		})
 		.catch(err => {
 			console.error("Error fetching user information: ", err.response.data);
 			showMessage("Failed to load user information")
 		})
-	}, [])
+	}, [navigate])
 
 	// Show the form to create new accounts
 	function showForm() {
@@ -73,8 +71,6 @@ const UserManagementPage = () => {
 			label.style.display = name.includes(search) ? "block" : "none";
 		})
 	}
-
-	if (!renderPage) return null
 
 	return (
 		<div className='user-management-page'>
