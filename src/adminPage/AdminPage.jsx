@@ -2,27 +2,25 @@ import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError';
 import { DatabaseTable } from './DatabaseTable';
+import AdminUsageAnalytics from './AdminUsageAnalytics';
+import { BASE_URL } from '../Constants';
+import '../styles/adminPage.scss'
+import '../styles/general.scss'
 
 // Only meant for admin to initialise the page
 const AdminPage = () => {
 	const [tableNames, setTableNames] = useState([]);
-	const [tableVisible, setTableVisible] = useState();
+	const [selectedTable, setSelectedTable] = useState();
 	const tableRef = useRef(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [startX, setStartX] = useState(0);
 	const [scrollLeft, setScrollLeft] = useState(0);
 
 	useEffect(() => {
-		axios.post("/application/0/check_session", {}, { withCredentials: true })
-		.then(resp => {
-			if (resp.data.user?.account_type != 'Admin') window.location.href = '/'
-		})
-		.catch(err => handleServerError(err.response.status))
-
-		axios.post('/api/admin/0/get_table_names', {}, { withCredentials: true })
+		axios.get(`${BASE_URL}/admin`, { headers: { 'x-route': '/get_table_names' }, withCredentials: true })
 		.then(resp => {
 			setTableNames(resp.data)
-			setTableVisible(resp.data[0])
+			setSelectedTable(resp.data[0])
 		})
 		.catch(err => handleServerError(err.response.status))
 	}, [])
@@ -53,16 +51,21 @@ const AdminPage = () => {
 		<div className='admin-page'>
 			<div className='admin-tables-list'>
 				<div>
-					{tableNames.map(tableName => (<React.Fragment key={tableName}>
-						<input type='radio' onChange={(e) => setTableVisible(e.target.id.split('-')[2])} id={`db-radio-${tableName}`} name='tables' />
-						<label htmlFor={`db-radio-${tableName}`}>
-							<p>{tableName}</p>
+					<input type="radio" onChange={(e) => setSelectedTable('usage')} id={`db-radio-usage`} name='tables' />
+					<label htmlFor={`db-radio-usage`}>
+						<p>Usage</p>
+					</label>
+					{tableNames.map(tableName => (<React.Fragment key={tableName.info.uuid}>
+						<input type='radio' onChange={(e) => setSelectedTable(e.target.id.split('-')[2])} id={`db-radio-${tableName.info.uuid}`} name='tables' />
+						<label htmlFor={`db-radio-${tableName.info.uuid}`}>
+							<p>{tableName.name}</p>
 						</label>
 					</React.Fragment>))}
 				</div>
 			</div>
 			<div className='page-container' ref={tableRef} onMouseDown={onMouseDown} onMouseLeave={onMouseLeave} onMouseUp={onMouseUp} onMouseMove={onMouseMove} style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
-				<DatabaseTable table_name={tableVisible} />
+				{selectedTable !== "usage" && <DatabaseTable table_name={selectedTable} />}
+				{selectedTable === "usage" && <AdminUsageAnalytics/>}
 			</div>
 		</div>
 	)
