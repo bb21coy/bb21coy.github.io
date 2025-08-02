@@ -32,7 +32,7 @@ const LogInPage = () => {
 				navigate('/home');
 			})
 			.catch(err => {
-				if (err.response.status == 401) showMessage("Incorrect username or password")
+				if (err.response.status === 401) showMessage("Incorrect username or password")
 				else handleServerError(err.response.status)
 			})
 	}

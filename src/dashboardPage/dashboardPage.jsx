@@ -42,7 +42,7 @@ const DashboardPage = () => {
 
     return (
         <div className='dashboard'>
-            <h2>Hello, {!account ? "" : `${(account.account_type != "Admin" && account.rank == null) ? account.honorifics : (account.account_type == "Admin" ? "" : account.rank)} ${account.account_name}`}</h2>
+            <h2>Hello, {!account ? "" : `${(account.account_type !== "Admin" && account.rank === null) ? account.honorifics : (account.account_type == "Admin" ? "" : account.rank)} ${account.account_name}`}</h2>
 
             <div className='dashboard-routes'>
                 {account?.account_type === "Admin" && <DashboardOptions title="Admin Page" icon="gear" url="/admin" />}

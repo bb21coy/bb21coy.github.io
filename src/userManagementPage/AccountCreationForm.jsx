@@ -16,8 +16,8 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 	function setType(e) {
 		setAccountType(e.target.value)
 		document.getElementById('account-type-input').value = e.target.value
-		if (e.target.value == "Primer") setAccountRank('NIL')
-		else if (e.target.value == 'Officer') setAccountRank("NIL")
+		if (e.target.value === "Primer") setAccountRank('NIL')
+		else if (e.target.value === 'Officer') setAccountRank("NIL")
 	}
 
 	// Sends the information from the form to the backend to try and create an account
@@ -26,8 +26,8 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 		e.preventDefault()
 		let submit = true
 
-		if (accountType !== "Boy" && e.target.elements['credentials'].value == '') submit = false
-		if (e.target.elements['user_name'].value == '' || e.target.elements['password'].value == '') submit = false
+		if (accountType !== "Boy" && e.target.elements['credentials'].value === '') submit = false
+		if (e.target.elements['user_name'].value === '' || e.target.elements['password'].value === '') submit = false
 		
 		if (submit) {
 			axios.post(`${BASE_URL}/account`, {
@@ -108,15 +108,15 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 				</select>
 				)}
 
-				{(["Admin", "Officer"].includes(account_type) || appointment == 'CSM') && <>
+				{(["Admin", "Officer"].includes(account_type) || appointment === 'CSM') && <>
 					<label htmlFor='roll-call-input'>Attendance Appearance:</label>
-					<select id="roll-call-input" onChange={(e) => setAccountRollCall(e.target.value == 'Yes')} defaultValue="Yes">
+					<select id="roll-call-input" onChange={(e) => setAccountRollCall(e.target.value === 'Yes')} defaultValue="Yes">
 						<option value="Yes">Yes</option>
 						<option value="No">No</option>
 					</select>
 				</>}
 
-				{((accountClass == "STAFF" || accountRank == "NIL") && accountType == "Officer") && <>
+				{((accountClass === "STAFF" || accountRank === "NIL") && accountType === "Officer") && <>
 					<label htmlFor='honorific-input'>Honorifics:</label>
 					<select id="honorific-input" onChange={(e) => setAccountHonorific(e.target.value)}>
 						<option value="Mr">Mr</option>
@@ -125,7 +125,7 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 					</select>
 				</>}
 
-				{accountType == "Boy" && <>
+				{accountType === "Boy" && <>
 					<label htmlFor='level-input'>Level:</label>
 					<select id="level-input" onChange={(e) => setAccountLevel(e.target.value)} defaultValue="1">
 						<option value="1">Secondary 1</option>
@@ -136,7 +136,7 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 					</select>
 				</>}
 
-				{accountType == "Officer" &&<>
+				{accountType === "Officer" &&<>
 					<label htmlFor='class-input'>Class:</label>
 					<select id="class-input" onChange={(e) => setAccountClass(e.target.value)} defaultValue="VAL">
 						<option value="VAL">VAL</option>

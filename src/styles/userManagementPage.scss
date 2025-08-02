@@ -1,267 +1,54 @@
-@media screen {
-	.user-management-page .page-container {
-		display: flex;
-		flex-direction: column;
-		margin: 20px 30px;
-		gap: 20px;
-		box-sizing: border-box;
+.user-management-page .page-container {
+	display: flex;
+	flex-direction: column;
+	margin: 20px 30px;
+	gap: 20px;
+	box-sizing: border-box;
 
-		.toggle-buttons {
+	.toggle-buttons {
+		display: flex;
+		justify-content: center;
+		gap: 20px;
+
+		input {
+			display: none;
+		}
+
+		label {
+			text-align: center;
+			width: 150px;
+			padding: 5px 20px;
+			background: white;
+			border-radius: 10px;
+			cursor: pointer;
+			color: black;
+			border: 1px solid black;
+			outline: none;
 			display: flex;
 			justify-content: center;
-			gap: 20px;
-
-			input {
-				display: none;
-			}
-
-			label {
-				text-align: center;
-				width: 150px;
-				padding: 5px 20px;
-				background: white;
-				border-radius: 10px;
-				cursor: pointer;
-				color: black;
-				border: 1px solid black;
-				outline: none;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-
-			input:checked + label {
-				background: black;
-				color: white;
-			}
+			align-items: center;
 		}
 
-		.users {
-			display: flex;
-			gap: 20px;
+		input:checked+label {
+			background: black;
+			color: white;
 		}
+	}
 
-		.main-block {
-			flex: 1;
+	.users {
+		display: flex;
+		gap: 20px;
+	}
 
-			.create-account-form {
-				display: flex;
-				flex-direction: column;
-				gap: 20px;
+	.main-block {
+		flex: 1;
 
-				button {
-					margin-left: auto;
-					width: max-content;
-					cursor: pointer;
-					background: black;
-					color: white;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					border: none;
-					outline: none;
-					min-height: unset;
-					border-radius: 10px;
-					padding: 5px 10px;
-				}
-
-				button:hover {
-					background: black;
-				}
-			}
-
-			.create-account-form > div {
-				display: grid;
-				grid-template-columns: 250px 1fr;
-				gap: 10px;
-				align-items: center;
-
-				input, select {
-					border: none;
-					padding: 5px;
-					outline: none;
-					border-bottom: 1px solid black;
-					background: transparent;
-					color: black;
-					border-radius: 0;
-				}
-
-				select {
-					cursor: pointer;
-				}
-			}
-		}
-
-		.users:not(:has(.appointment-holders-list)) {
-			height: 85vh;
-		}
-
-		.users-list {
-			width: 25%;
-			gap: 10px;
+		.create-account-form {
 			display: flex;
 			flex-direction: column;
-
-			> div {
-				display: flex;
-				flex-direction: column;
-				gap: 10px;
-
-				> div {
-					display: flex;
-					gap: 5px;
-				}
-			}
-
-			label[for='search'] {
-				display: flex;
-				gap: 5px;
-				align-items: center;
-			}
-
-			input[type='search'] {
-				border: none;
-				border-bottom: 1px solid black;
-				outline: none;
-				background: transparent;
-				color: black;
-				border-radius: 0;
-				padding: 5px;
-				width: 100%;
-			}
-
-			button {
-				background: black;
-				color: white;
-				border: none;
-				outline: none;
-				border-radius: 10px;
-				padding: 5px 10px;
-				cursor: pointer;
-			}
-
-			p {
-				font-weight: bold;
-				font-size: 18px;
-			}
-
-			input[type='radio'] {
-				display: none;
-			}
-
-			> div:last-of-type {
-				overflow: auto;
-
-				label {
-					padding: 3px 5px;
-					cursor: pointer;
-					border-radius: 10px;
-					color: black;
-				}
-
-				input[type='radio']:checked + label {
-					background: black;
-					color: white;
-				}
-
-				label:hover {
-					background: lightgrey;
-				}
-			}
-		}
-	}
-
-	.user-management-page .page-container *:not(.fa-solid) {
-		font-family: sans-serif;
-	}
-
-	.user-management-page .page-container .user-information {
-		height: 100%;
-		overflow-y: auto;
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
-		
-		form {
-			display: grid;
-			grid-template-columns: 250px 1fr;
-			gap: 10px;
-			align-items: center;
-
-			input, select {
-				border: none;
-				padding: 5px;
-				outline: none;
-				border-bottom: 1px solid black;
-				background: transparent;
-				color: black;
-				border-radius: 0;
-			}
-
-			select {
-				cursor: pointer;
-			}
-
-			select:disabled, input:disabled {
-				cursor: not-allowed;
-			}
-		}
-
-		> div {
-			display: flex;
-			gap: 10px;
-			justify-content: flex-end;
-			flex-wrap: wrap;
-
-			button {
-				background: black;
-				color: white;
-				border: none;
-				outline: none;
-				border-radius: 10px;
-				cursor: pointer;
-				min-height: unset;
-				padding: 5px 10px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				width: max-content;
-			}
-		}
-	}
-
-	.user-management-page .main-block .appointment-holders-list {
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
-
-		form {
-			border: 1px solid black;
-			padding: 20px;
-			border-radius: 10px;
-			display: grid;
-			grid-template-columns: 210px max-content;
 			gap: 20px;
-			align-items: center;
-			width: max-content;
-
-			h3 {
-				grid-column: span 2;
-				font-size: 18px;
-			}
-
-			input, select {
-				border: none;
-				padding: 5px;
-				outline: none;
-				border-bottom: 1px solid black;
-				background: transparent;
-				color: black;
-				border-radius: 0;
-			}
 
 			button {
-				grid-column: span 2;
 				margin-left: auto;
 				width: max-content;
 				cursor: pointer;
@@ -276,51 +63,328 @@
 				border-radius: 10px;
 				padding: 5px 10px;
 			}
+
+			button:hover {
+				background: black;
+			}
 		}
 
-		.appointment-holders-users {
+		.create-account-form>div {
 			display: grid;
-			gap: 20px;
-			grid-template-columns: max-content 300px max-content;
+			grid-template-columns: 250px 1fr;
+			gap: 10px;
 			align-items: center;
 
+			input,
 			select {
-				cursor: pointer;
 				border: none;
-				border-bottom: 1px solid black;
+				padding: 5px;
 				outline: none;
+				border-bottom: 1px solid black;
 				background: transparent;
 				color: black;
 				border-radius: 0;
-				padding: 5px;
 			}
 
-			button {
+			select {
 				cursor: pointer;
-				background: black;
-				color: white;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				border: none;
-				outline: none;
-				min-height: unset;
-				border-radius: 10px;
-				padding: 5px 10px;
-				font-size: 14px;
-			}
-
-			div {
-				display: flex;
-				gap: 10px;
 			}
 		}
 	}
 
-	// Note: Styles below this point are not updated
+	.users:not(:has(.appointment-holders-list)) {
+		height: 85vh;
+	}
 
-	.account-name-popup-content{
-		max-height: 10%;
-		overflow-y: auto;
+	.users-list {
+		width: 25%;
+		gap: 10px;
+		display: flex;
+		flex-direction: column;
+
+		>div {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+
+			>div {
+				display: flex;
+				gap: 5px;
+			}
+		}
+
+		label[for='search'] {
+			display: flex;
+			gap: 5px;
+			align-items: center;
+		}
+
+		input[type='search'] {
+			border: none;
+			border-bottom: 1px solid black;
+			outline: none;
+			background: transparent;
+			color: black;
+			border-radius: 0;
+			padding: 5px;
+			width: 100%;
+		}
+
+		button {
+			background: black;
+			color: white;
+			border: none;
+			outline: none;
+			border-radius: 10px;
+			padding: 5px 10px;
+			cursor: pointer;
+		}
+
+		p {
+			font-weight: bold;
+			font-size: 18px;
+		}
+
+		input[type='radio'] {
+			display: none;
+		}
+
+		>div:last-of-type {
+			overflow: auto;
+
+			label {
+				padding: 3px 5px;
+				cursor: pointer;
+				border-radius: 10px;
+				color: black;
+			}
+
+			input[type='radio']:checked+label {
+				background: black;
+				color: white;
+			}
+
+			label:hover {
+				background: lightgrey;
+			}
+		}
+	}
+}
+
+.user-management-page .page-container *:not(.fa-solid) {
+	font-family: sans-serif;
+}
+
+.user-management-page .page-container .user-information {
+	height: 100%;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+
+	form {
+		display: grid;
+		grid-template-columns: 250px 1fr;
+		gap: 10px;
+		align-items: center;
+
+		input,
+		select {
+			border: none;
+			padding: 5px;
+			outline: none;
+			border-bottom: 1px solid black;
+			background: transparent;
+			color: black;
+			border-radius: 0;
+		}
+
+		select {
+			cursor: pointer;
+		}
+
+		select:disabled,
+		input:disabled {
+			cursor: not-allowed;
+		}
+	}
+
+	>div {
+		display: flex;
+		gap: 10px;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+
+		button {
+			background: black;
+			color: white;
+			border: none;
+			outline: none;
+			border-radius: 10px;
+			cursor: pointer;
+			min-height: unset;
+			padding: 5px 10px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: max-content;
+		}
+	}
+}
+
+.user-management-page .main-block .appointment-holders-list {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+
+	form {
+		border: 1px solid black;
+		padding: 20px;
+		border-radius: 10px;
+		display: grid;
+		grid-template-columns: 210px max-content;
+		gap: 20px;
+		align-items: center;
+		width: max-content;
+
+		h3 {
+			grid-column: span 2;
+			font-size: 18px;
+		}
+
+		input,
+		select {
+			border: none;
+			padding: 5px;
+			outline: none;
+			border-bottom: 1px solid black;
+			background: transparent;
+			color: black;
+			border-radius: 0;
+		}
+
+		button {
+			grid-column: span 2;
+			margin-left: auto;
+			width: max-content;
+			cursor: pointer;
+			background: black;
+			color: white;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: none;
+			outline: none;
+			min-height: unset;
+			border-radius: 10px;
+			padding: 5px 10px;
+		}
+	}
+
+	.appointment-holders-users {
+		display: grid;
+		gap: 20px;
+		grid-template-columns: max-content 300px max-content;
+		align-items: center;
+
+		select {
+			cursor: pointer;
+			border: none;
+			border-bottom: 1px solid black;
+			outline: none;
+			background: transparent;
+			color: black;
+			border-radius: 0;
+			padding: 5px;
+		}
+
+		button {
+			cursor: pointer;
+			background: black;
+			color: white;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: none;
+			outline: none;
+			min-height: unset;
+			border-radius: 10px;
+			padding: 5px 10px;
+			font-size: 14px;
+		}
+
+		div {
+			display: flex;
+			gap: 10px;
+		}
+	}
+}
+
+// Note: Styles below this point are not updated
+
+.account-name-popup-content {
+	max-height: 10%;
+	overflow-y: auto;
+}
+
+@media screen and (max-width: 800px) {
+
+	.user-management-page .page-container .main-block .create-account-form>div,
+	.user-management-page .page-container .user-information form {
+		grid-template-columns: 1fr;
+	}
+
+	.user-management-page:has(.users-list) .main-block,
+	.user-management-page hr {
+		display: none;
+	}
+
+	.user-management-page .users-list {
+		width: 100% !important;
+	}
+
+	.user-management-page .users {
+		height: unset !important;
+		min-height: 300px;
+	}
+
+	.user-management-page .page-container .users-list>div:first-of-type {
+		background: white;
+		position: sticky;
+		top: 0;
+	}
+
+	.user-management-page .back-button {
+		display: flex;
+		gap: 10px;
+		color: black;
+		align-items: center;
+		font-size: 18px;
+		margin-bottom: 10px;
+	}
+
+	.user-management-page .appointment-holders-users {
+		grid-template-columns: max-content 1fr !important;
+
+		div {
+			grid-column: span 2;
+			justify-content: end;
+		}
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.user-management-page .appointment-holders-list form {
+		grid-template-columns: 1fr !important;
+		width: unset !important;
+
+		h3,
+		button {
+			grid-column: span 1 !important;
+		}
+
+		button {
+			margin-left: auto !important;
+		}
 	}
 }
