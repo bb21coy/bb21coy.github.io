@@ -58,56 +58,40 @@
 		white-space: nowrap;
 	}
 
-	textarea {
+	table {
 		width: 100%;
-		padding: 5px;
-		box-sizing: border-box;
-		outline: none;
-		border: 1px solid black;
-		resize: none;
-		height: 100px;
-		font-family: sans-serif;
+		border-collapse: collapse;
 	}
-}
 
-.admin-page .page-container table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-.admin-page .page-container thead th {
-	font-weight: bold;
-	border: 1px solid #ddd;
-	padding: 10px 8px;
-}
-
-.admin-page .page-container thead th:not(.id_column) {
-	min-width: 150px;
-}
-
-.admin-page .page-container tbody tr {
-	border: 1px solid #ddd;
-}
-
-.admin-page .page-container td {
-	padding: 5px 8px;
-	font-size: 13px;
-	border: 1px solid #ddd;
-	max-width: 500px;
-	overflow: hidden;
-
-	input {
-		width: 100%;
-		outline: none;
-		border: 1px solid black;
-		padding: 3px 5px;
-		box-sizing: border-box;
-		background: transparent;
+	thead th {
+		font-weight: bold;
+		border: 1px solid #ddd;
+		padding: 10px 8px;
+		font-size: 14px;
+		text-align: left;
+		background: lightgrey;
+		min-width: 120px;
+		max-width: 200px;
 	}
-}
 
-.admin-page .page-container tbody tr:hover {
-	background-color: #f1f1f1;
+	tbody tr {
+		border: 1px solid #ddd;
+	}
+
+	td {
+		padding: 5px 8px;
+		font-size: 13px;
+		border: 1px solid #ddd;
+		max-width: 500px;
+		overflow: hidden;
+		text-align: left;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	tbody tr:nth-child(even) {
+		background-color: #f1f1f1;
+	}
 }
 
 @media screen and (max-width: 800px) {

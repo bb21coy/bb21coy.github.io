@@ -56,7 +56,7 @@ const AdminPage = () => {
 						<p>Usage</p>
 					</label>
 					{tableNames.map(tableName => (<React.Fragment key={tableName.info.uuid}>
-						<input type='radio' onChange={(e) => setSelectedTable(e.target.id.split('-')[2])} id={`db-radio-${tableName.info.uuid}`} name='tables' />
+						<input type='radio' onChange={(e) => setSelectedTable(tableName.name)} id={`db-radio-${tableName.info.uuid}`} name='tables' />
 						<label htmlFor={`db-radio-${tableName.info.uuid}`}>
 							<p>{tableName.name}</p>
 						</label>
@@ -64,7 +64,7 @@ const AdminPage = () => {
 				</div>
 			</div>
 			<div className='page-container' ref={tableRef} onMouseDown={onMouseDown} onMouseLeave={onMouseLeave} onMouseUp={onMouseUp} onMouseMove={onMouseMove} style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
-				{selectedTable !== "usage" && <DatabaseTable table_name={selectedTable} />}
+				{(selectedTable && selectedTable !== "usage") && <DatabaseTable table_name={selectedTable} />}
 				{selectedTable === "usage" && <AdminUsageAnalytics/>}
 			</div>
 		</div>
