@@ -1,3 +1,5 @@
+import "../styles/notFound.scss";
+
 function NotFound() {
 	return (
 		<div className="not-found">
