@@ -1,58 +1,60 @@
-import { StrictMode } from 'react'
+import React, { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-import Layout from './Layout';
+
+const Layout = React.lazy(() => import('./Layout'));
 // import { HomePage } from './homePage/HomePage'
-import LogInPage from './logInPage/LogInPage'
-import { AttendanceManagementPage } from './attendanceManagementPage/AttendanceManagementPage'
-import { AwardsManagementPage } from './awardsManagementPage/AwardsManagementPage'
-import { ResultPage } from './resultPage/ResultPage'
-import { ResultGenerationPage } from './resultPage/ResultGenerationPage'
-import { AdminPage } from './adminPage/AdminPage'
-import { UniformInspectionPage } from './uniformInspectionPage/UniformInspectionPage'
-import { UniformInspectionResultPage } from './uniformInspectionPage/UniformInspectionResultPage'
-import { UniformInspectionForm } from './uniformInspectionPage/UniformInspectionForm'
-import { UserManagementPage } from './userManagementPage/UserManagementPage'
-import { UserManagementSmallPage } from './userManagementPage/UserManagementSmallPage'
-import { ResetPasswordPage } from './userManagementPage/ResetPasswordPage'
-import NotFound from "./general/NotFound";
-import DashboardPage from "./dashboardPage/dashboardPage";
-import { ParadeNoticePage } from './attendanceManagementPage/ParadeNoticePage';
-import { UserAwards } from './awardsManagementPage/UserAwards';
-import HelpPage from './helpPage/HelpPage';
-import { HomeEditorPage } from './homePage/HomeEditorPage';
-import { UniformInspectionUser } from './uniformInspectionPage/UniformInspectionUser';
+const LogInPage = React.lazy(() => import('./logInPage/LogInPage'));
+const AttendanceManagementPage = React.lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
+const AwardsManagementPage = React.lazy(() => import('./awardsManagementPage/AwardsManagementPage'));
+const ResultPage = React.lazy(() => import('./resultPage/ResultPage'));
+const ResultGenerationPage = React.lazy(() => import('./resultPage/ResultGenerationPage'));
+const AdminPage = React.lazy(() => import('./adminPage/AdminPage'));
+const UniformInspectionPage = React.lazy(() => import('./uniformInspectionPage/UniformInspectionPage'));
+const UniformInspectionResultPage = React.lazy(() => import('./uniformInspectionPage/UniformInspectionResultPage'));
+const UniformInspectionForm = React.lazy(() => import('./uniformInspectionPage/UniformInspectionForm'));
+const UserManagementPage = React.lazy(() => import('./userManagementPage/UserManagementPage'));
+const UserManagementSmallPage = React.lazy(() => import('./userManagementPage/UserManagementSmallPage'));
+const ResetPasswordPage = React.lazy(() => import('./userManagementPage/ResetPasswordPage'));
+const NotFound = React.lazy(() => import("./general/NotFound"));
+const DashboardPage = React.lazy(() => import("./dashboardPage/dashboardPage"));
+const ParadeNoticePage = React.lazy(() => import('./attendanceManagementPage/ParadeNoticePage'));
+const UserAwards = React.lazy(() => import('./awardsManagementPage/UserAwards'));
+const HelpPage = React.lazy(() => import('./helpPage/HelpPage'));
+const HomeEditorPage = React.lazy(() => import('./homePage/HomeEditorPage'));
+const UniformInspectionUser = React.lazy(() => import('./uniformInspectionPage/UniformInspectionUser'));
 
 createRoot(document.body).render(
 	<StrictMode>
 		<Router>
-			<Routes>
-				<Route element={<Layout />}>
-					{/* Temporarily disable home page since its filled with filler data */}
-					{/* <Route path='/' element={<HomePage/>}/> */}
-					<Route path='/log_in' element={<LogInPage />} />
-					<Route path='/admin' element={<AdminPage />} />
-					<Route path='/' element={<LogInPage />} />
-					<Route path='/home' element={<DashboardPage />} />
-					<Route path='/parade_notice' element={<ParadeNoticePage />} />
-					<Route path='/attendance_management' element={<AttendanceManagementPage />} />
-					<Route path='/user_awards' element={<UserAwards />} />
-					<Route path='/awards' element={<AwardsManagementPage />} />
-					<Route path='/generate_result' element={<ResultGenerationPage />} />
-					<Route path='/view_result/:id' element={<ResultPage />} />
-					<Route path='/uniform_inspection_results' element={<UniformInspectionPage />} />
-					<Route path='/view_uniform_inspection/:id' element={<UniformInspectionResultPage />} />
-					<Route path='/uniform_inspection_form' element={<UniformInspectionForm />} />
-					<Route path='/user_inspections' element={<UniformInspectionUser />} />
-					<Route path='/user_management' element={<UserManagementPage />} />
-					<Route path='/user_management/:userId' element={<UserManagementSmallPage />} />
-					<Route path='/reset_password' element={<ResetPasswordPage />} />
-					<Route path='/help' element={<HelpPage />} />
-					<Route path='/home_editor' element={<HomeEditorPage />} />
-
-					<Route path="*" element={<NotFound />} />
-				</Route>
-			</Routes>
+			<Suspense fallback={<div>Loading...</div>}>
+				<Routes>
+					<Route element={<Layout />}>
+						{/* Temporarily disable home page since its filled with filler data */}
+						{/* <Route path='/' element={<HomePage/>}/> */}
+						<Route path='/log_in' element={<LogInPage />} />
+						<Route path='/admin' element={<AdminPage />} />
+						<Route path='/' element={<LogInPage />} />
+						<Route path='/home' element={<DashboardPage />} />
+						<Route path='/parade_notice' element={<ParadeNoticePage />} />
+						<Route path='/attendance_management' element={<AttendanceManagementPage />} />
+						<Route path='/user_awards' element={<UserAwards />} />
+						<Route path='/awards' element={<AwardsManagementPage />} />
+						<Route path='/generate_result' element={<ResultGenerationPage />} />
+						<Route path='/view_result/:id' element={<ResultPage />} />
+						<Route path='/uniform_inspection_results' element={<UniformInspectionPage />} />
+						<Route path='/view_uniform_inspection/:id' element={<UniformInspectionResultPage />} />
+						<Route path='/uniform_inspection_form' element={<UniformInspectionForm />} />
+						<Route path='/user_inspections' element={<UniformInspectionUser />} />
+						<Route path='/user_management' element={<UserManagementPage />} />
+						<Route path='/user_management/:userId' element={<UserManagementSmallPage />} />
+						<Route path='/reset_password' element={<ResetPasswordPage />} />
+						<Route path='/help' element={<HelpPage />} />
+						<Route path='/home_editor' element={<HomeEditorPage />} />
+						<Route path="*" element={<NotFound />} />
+					</Route>
+				</Routes>
+			</Suspense>
 		</Router>
-	</StrictMode>,
-)
+	</StrictMode>
+);
