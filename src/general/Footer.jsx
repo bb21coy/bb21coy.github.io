@@ -1,0 +1,36 @@
+const Footer = () => {
+    return (
+        <footer>
+            <div>
+                <div>
+                    <p>Social Media:</p>
+                    <a href="https://www.instagram.com/bb21coy/" target="_blank" rel="noreferrer" aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>
+                </div>
+                <div>
+                    <p>Affiliated With:</p>
+                    <div>
+                        <a href="https://www.geylangmethodistsec.moe.edu.sg/" target='_blank' rel="noreferrer" aria-label='Geylang Methodist School (Secondary) Website'>
+                            <img src="/images/gm.webp" width="60px" height="60px" alt="Geylang Methodist School (Secondary)" />
+                        </a>
+                        <a href="https://www.cmch.sg/" target='_blank' rel="noreferrer" aria-label='Christalite Methodist Chapel Website'>
+                            <img src="/images/church.png" width="60px" height="60px" alt="Christalite Methodist Chapel" />
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <p>Associated Websites:</p>
+                    <div>
+                        <a href="https://www.bb.org.sg/" target="_blank" rel="noreferrer">BB HQ Website</a>
+                        <a href="https://members.bb.org.sg/cos/o.x?c=/ca3_ca3bbportal/user&func=login" target="_blank" rel="noreferrer">BB Members Portal</a>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <p>Icons by <a href="https://fontawesome.com/" title="Font Awesome" target="_blank" rel="noreferrer">Font Awesome</a></p>
+                <p>Website designed and developed by: Bryan Lee & Dylan Yeo</p>
+            </div>
+        </footer>
+    )
+}
+
+export default Footer

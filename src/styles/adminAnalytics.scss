@@ -1,0 +1,96 @@
+.commit {
+    border: 1px solid black;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    gap: 10px;
+    text-align: left;
+
+    div:first-of-type {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+
+        p:last-of-type {
+            font-size: 14px;
+        }
+    }
+
+    img {
+        width: 30px;
+        border-radius: 50%;
+    }
+
+    div:last-of-type {
+        gap: 10px;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.commit-title {
+    text-align: left;
+    margin: 20px 0;
+}
+
+.vercel-usage {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: start;
+}
+
+.vercel {
+    width: 280px;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid black;
+
+    >p:first-of-type {
+        font-weight: bold;
+    }
+
+    p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    div {
+        display: flex;
+        gap: 10px;
+        font-size: 14px;
+
+        div {
+            width: 100%;
+            flex-direction: column;
+        }
+    }
+
+    .ring {
+        flex-shrink: 0;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+}
+
+.vercel-usage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vercel-timer {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
