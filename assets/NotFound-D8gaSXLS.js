@@ -1,0 +1,1 @@
+import{j as e}from"./index-CmEGY9Xn.js";function t(){return e.jsxs("div",{className:"not-found",children:[e.jsx("img",{src:"images/not-found.webp",alt:"Not Found",width:"200px",height:"200px"}),e.jsx("h2",{children:"Page Not Found"}),e.jsx("p",{children:"Quick, fall back in before the Officer notices!"})]})}export{t as default};
