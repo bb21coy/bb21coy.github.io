@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { ParadeNoticePDF } from './ParadeNoticePDF'
+// import { ParadeNoticePDF } from './ParadeNoticePDF'
 
 const ParadeNoticePage = () => {
     const [nearestParade, setnearestParade] = useState(null)
@@ -23,13 +23,13 @@ const ParadeNoticePage = () => {
 
     return (
         <div className="parade-notice-page">
-            {nearestParade ? 
+            {/* {nearestParade ? 
                 <ParadeNoticePDF parade={nearestParade} />
             : 
                 <div>
                     <p>The Parade Notice has not been released</p>
                 </div>
-            }
+            } */}
         </div>
     )
 

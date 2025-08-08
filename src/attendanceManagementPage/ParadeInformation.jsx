@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 import { handleServerError } from '../general/handleServerError'
-import { ParadeNoticePDF } from './ParadeNoticePDF'
+// import { ParadeNoticePDF } from './ParadeNoticePDF'
 import { ParadeAttendance } from './ParadeAttendance'
 import { ParadeEditor } from './ParadeEditor'
 
@@ -82,7 +82,7 @@ const ParadeInformation = ({accountName, accountType, appointment, id, setPageSt
         )}
       </div>
 
-      {showParadeNotice && <ParadeNoticePDF parade={parade} />}
+      {/* {showParadeNotice && <ParadeNoticePDF parade={parade} />} */}
       {showParadeEditor && <ParadeEditor parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} setPageState={setPageState}/>}
 
       <ParadeAttendance accountName={accountName} appointment={appointment} parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} />
