@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError';
-import { DatabaseTable } from './DatabaseTable';
+import DatabaseTable from './DatabaseTable';
 import AdminUsageAnalytics from './AdminUsageAnalytics';
 import BASE_URL from '../Constants';
 import '../styles/adminPage.scss'

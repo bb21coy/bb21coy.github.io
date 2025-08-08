@@ -65,4 +65,4 @@ DatabaseTable.propTypes = {
 	table_name: PropTypes.string
 }
 
-export { DatabaseTable }
+export default DatabaseTable
