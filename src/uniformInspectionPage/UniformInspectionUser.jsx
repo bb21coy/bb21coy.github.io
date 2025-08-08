@@ -88,4 +88,4 @@ function UniformInspectionUser() {
     )
 }
 
-export { UniformInspectionUser }
+export default UniformInspectionUser

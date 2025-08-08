@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { handleServerError } from './handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 
 const Header = () => {
 	const navigate = useNavigate();
@@ -52,14 +52,14 @@ const Header = () => {
 	}
 
 	const logOut = async () => {
-        try {
-            const response = await axios.post(`${BASE_URL}/auth`, {}, { headers: { "x-route": "/logout" }, withCredentials: true })
-            if (response.data) navigate('/log_in');
-        } catch (err) {
-            console.error("Error logging out:", err);
-            handleServerError(err.response.status)
-        }
-    }
+		try {
+			const response = await axios.post(`${BASE_URL}/auth`, {}, { headers: { "x-route": "/logout" }, withCredentials: true })
+			if (response.data) navigate('/log_in');
+		} catch (err) {
+			console.error("Error logging out:", err);
+			handleServerError(err.response.status)
+		}
+	}
 
 	return (
 		<header>

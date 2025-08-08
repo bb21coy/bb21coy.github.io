@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { PendingTasks } from './pendingTasks'
 import DashboardOptions from './dashboardOptions'
 import { handleServerError } from '../general/handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 import '../styles/dashboardPage.scss'
 
 const DashboardPage = () => {

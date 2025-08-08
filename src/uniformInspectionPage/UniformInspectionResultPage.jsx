@@ -125,4 +125,4 @@ const UniformInspectionResultPage = () => {
 	)
 }
 
-export { UniformInspectionResultPage }
+export default UniformInspectionResultPage

@@ -121,4 +121,4 @@ const UniformInspectionPage = () => {
 	)
 }
 
-export { UniformInspectionPage }
+export default UniformInspectionPage

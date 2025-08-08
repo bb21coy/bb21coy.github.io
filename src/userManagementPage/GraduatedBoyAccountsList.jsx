@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 
 // Display list of Graduated Boy Accounts
 const GraduatedBoyAccountsList = ({ setPageState, load }) => {
@@ -10,11 +10,11 @@ const GraduatedBoyAccountsList = ({ setPageState, load }) => {
 
 	useEffect(() => {
 		axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_graduated_accounts" }, withCredentials: true })
-		.then(resp => setGraduatedBoyList(resp.data))
-		.catch(err => {
-			console.error("Error fetching boys:", err.response.data);
-			handleServerError(err.response.status)
-		})
+			.then(resp => setGraduatedBoyList(resp.data))
+			.catch(err => {
+				console.error("Error fetching boys:", err.response.data);
+				handleServerError(err.response.status)
+			})
 	}, [load])
 
 	return (

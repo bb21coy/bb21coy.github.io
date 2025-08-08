@@ -2,7 +2,7 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { handleServerError, showMessage } from '../general/handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 
 // To manage permissions for appointment holders
 const AppointmentInformation = ({ accountType, appointment, reLoad, boyList, primerList, officerList }) => {
@@ -11,36 +11,36 @@ const AppointmentInformation = ({ accountType, appointment, reLoad, boyList, pri
 
 	function updateAppointmentHolder() {
 		if (accountId === appointment.account_id || accountId == null) return;
-		
+
 		axios.put(`${BASE_URL}/appointment`, { appointment_id: appointment._id, account_id: accountId }, { headers: { 'x-route': '/update_appointment' }, withCredentials: true })
-		.then(() => {
-			reLoad();
-			showMessage("Appointment holder has been updated.", "success");
-		})
-		.catch(err => {
-			console.log(err.response.data);
-			handleServerError(err.response.status);
-		})
+			.then(() => {
+				reLoad();
+				showMessage("Appointment holder has been updated.", "success");
+			})
+			.catch(err => {
+				console.log(err.response.data);
+				handleServerError(err.response.status);
+			})
 	}
 
 	function deleteAppointment() {
 		axios.delete(`${BASE_URL}/appointment?id=${appointment._id}`, { headers: { 'x-route': '/delete_appointment' }, withCredentials: true })
-		.then(() => {
-			reLoad();
-			showMessage("Appointment has been removed.", "success");
-		})
-		.catch(err => {
-			console.error(err.response.data); 
-			handleServerError(err.response.status);
-		})
+			.then(() => {
+				reLoad();
+				showMessage("Appointment has been removed.", "success");
+			})
+			.catch(err => {
+				console.error(err.response.data);
+				handleServerError(err.response.status);
+			})
 	}
-	
+
 	return (
 		<>
 			<label htmlFor={appointment._id}>{appointment.appointment_name}:</label>
 			<select id={appointment._id} defaultValue={appointment.account_id} onChange={(e) => setAccountId(e.target.value)}>
 				<option value={appointment.account_id}>{appointment.account_name}</option>
-				{["Officer", "Admin"].includes(accountType) && (appointment.account_type === 'Officer' ? officerList : (appointment.account_type  === "Primer" ? primerList : boyList)).filter(user => user._id !== appointment.account_id).map(user => (
+				{["Officer", "Admin"].includes(accountType) && (appointment.account_type === 'Officer' ? officerList : (appointment.account_type === "Primer" ? primerList : boyList)).filter(user => user._id !== appointment.account_id).map(user => (
 					<option key={user._id} value={user._id}>{user.account_name}</option>
 				))}
 			</select>
@@ -76,4 +76,4 @@ AppointmentInformation.propTypes = {
 	)
 }
 
-export { AppointmentInformation }
+export default AppointmentInformation

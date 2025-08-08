@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 
 // Display list of all primer Accounts
 const PrimerAccountsList = ({ setPageState, load }) => {
@@ -10,11 +10,11 @@ const PrimerAccountsList = ({ setPageState, load }) => {
 
 	useEffect(() => {
 		axios.get(`${BASE_URL}/account?type=Primer`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
-		.then(resp => setPrimerList(resp.data))
-		.catch(err => {
-			console.error("Error fetching primers:", err.response.data);
-			handleServerError(err.response.status)
-		})
+			.then(resp => setPrimerList(resp.data))
+			.catch(err => {
+				console.error("Error fetching primers:", err.response.data);
+				handleServerError(err.response.status)
+			})
 	}, [load])
 
 	return (

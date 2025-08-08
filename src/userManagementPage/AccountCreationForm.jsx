@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { handleServerError, showMessage } from '../general/handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 
 // To create new accounts
 const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
@@ -28,7 +28,7 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 
 		if (accountType !== "Boy" && e.target.elements['credentials'].value === '') submit = false
 		if (e.target.elements['user_name'].value === '' || e.target.elements['password'].value === '') submit = false
-		
+
 		if (submit) {
 			axios.post(`${BASE_URL}/account`, {
 				account_name: e.target.elements['account_name'].value,
@@ -43,18 +43,18 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 				honorifics: accountType === "Officer" && (accountRank === "NIL" || accountClass === "STAFF") ? accountHonorific : "",
 				roll_call: accountRollCall
 			}, { headers: { "x-route": "/create_account" }, withCredentials: true })
-			.then(() => {
-				showMessage("Account has been created", "success")
-				e.target.elements['account_name'].value = ''
-				e.target.elements['user_name'].value = ''
-				e.target.elements['abbreviated_name'].value = ''
-				e.target.elements['password'].value = ''
-				reLoad()
-			})
-			.catch(err => {
-				console.error("Error creating account:", err.response.data);
-				handleServerError(err.response.status)
-			})
+				.then(() => {
+					showMessage("Account has been created", "success")
+					e.target.elements['account_name'].value = ''
+					e.target.elements['user_name'].value = ''
+					e.target.elements['abbreviated_name'].value = ''
+					e.target.elements['password'].value = ''
+					reLoad()
+				})
+				.catch(err => {
+					console.error("Error creating account:", err.response.data);
+					handleServerError(err.response.status)
+				})
 		} else showMessage("Some fields are missing. Please try again.")
 	}
 
@@ -68,13 +68,13 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 
 				<label htmlFor='user-name-input'>User Name:</label>
 				<input name={"user_name"} placeholder='Enter User Name' id='user-name-input' />
-				
+
 				<label htmlFor='abbreviated-name-input'>Abbreviated Name:</label>
 				<input name={"abbreviated_name"} placeholder='Enter Abbreviated Name' id='abbreviated-name-input' />
 
 				<label htmlFor='password-input'>Password:</label>
 				<input name={'password'} placeholder='Enter Password' autoComplete='new-password' id='password-input' />
-				
+
 				<label htmlFor='account-type-input'>Account Type: </label>
 				<select name="account-type" id="account-type-input" onChange={(e) => setType(e)} defaultValue="Boy">
 					{["Admin", "Officer"].includes(account_type) && <option value="Officer">Officer</option>}
@@ -84,28 +84,28 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 
 				{accountType && <label htmlFor="rank-input">Rank: </label>}
 				{["Officer", "Primer", "Boy"].includes(accountType) && (
-				<select id="rank-input"	onChange={(e) => setAccountRank(e.target.value)} defaultValue={accountType === "Boy" ? "REC" : "NIL"}>
-					{accountType === "Officer" && (<>
-						<option value="NIL">Not Applicable</option>
-						<option value="OCT">OCT</option>
-						<option value="2LT">2LT</option>
-						<option value="LTA">LTA</option>
-					</>)}
-					{accountType === "Primer" && (<>
-						<option value="NIL">Not Applicable</option>
-						<option value="CLT">CLT</option>
-						<option value="SCL">SCL</option>
-					</>)}
-					{accountType === "Boy" && (<>
-						<option value="REC">REC</option>
-						<option value="PTE">PTE</option>
-						<option value="LCP">LCP</option>
-						<option value="CPL">CPL</option>
-						<option value="SGT">SGT</option>
-						<option value="SSG">SSG</option>
-						<option value="WO">WO</option>						
-					</>)}
-				</select>
+					<select id="rank-input" onChange={(e) => setAccountRank(e.target.value)} defaultValue={accountType === "Boy" ? "REC" : "NIL"}>
+						{accountType === "Officer" && (<>
+							<option value="NIL">Not Applicable</option>
+							<option value="OCT">OCT</option>
+							<option value="2LT">2LT</option>
+							<option value="LTA">LTA</option>
+						</>)}
+						{accountType === "Primer" && (<>
+							<option value="NIL">Not Applicable</option>
+							<option value="CLT">CLT</option>
+							<option value="SCL">SCL</option>
+						</>)}
+						{accountType === "Boy" && (<>
+							<option value="REC">REC</option>
+							<option value="PTE">PTE</option>
+							<option value="LCP">LCP</option>
+							<option value="CPL">CPL</option>
+							<option value="SGT">SGT</option>
+							<option value="SSG">SSG</option>
+							<option value="WO">WO</option>
+						</>)}
+					</select>
 				)}
 
 				{(["Admin", "Officer"].includes(account_type) || appointment === 'CSM') && <>
@@ -136,7 +136,7 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 					</select>
 				</>}
 
-				{accountType === "Officer" &&<>
+				{accountType === "Officer" && <>
 					<label htmlFor='class-input'>Class:</label>
 					<select id="class-input" onChange={(e) => setAccountClass(e.target.value)} defaultValue="VAL">
 						<option value="VAL">VAL</option>
@@ -163,4 +163,4 @@ AccountCreationForm.propTypes = {
 	reLoad: PropTypes.func
 }
 
-export { AccountCreationForm }
+export default AccountCreationForm

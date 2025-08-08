@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { AccountCreationForm } from './AccountCreationForm'
-import { AppointmentHoldersList } from './AppointmentHoldersList'
-import { UserInformation } from './UserInformation'
+import AccountCreationForm from './AccountCreationForm'
+import AppointmentHoldersList from './AppointmentHoldersList'
+import UserInformation from './UserInformation'
 import { OfficerAccountsList } from './OfficerAccountsList'
 import { PrimerAccountsList } from './PrimerAccountsList'
 import { BoyAccountsList } from './BoyAccountsList'
 import { GraduatedBoyAccountsList } from './GraduatedBoyAccountsList'
 import "../styles/userManagementPage.scss"
 import { showMessage } from '../general/handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 
 // To access current users and create new accounts
 const UserManagementPage = () => {
@@ -28,15 +28,15 @@ const UserManagementPage = () => {
 		})
 
 		axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
-		.then(response => {
-			if (response.data.account_type === 'Boy' && response.data.appointment === null) navigate('/home')
-			setAccountType(response.data.account_type)
-			setAppointment(response.data.appointment)
-		})
-		.catch(err => {
-			console.error("Error fetching user information: ", err.response.data);
-			showMessage("Failed to load user information")
-		})
+			.then(response => {
+				if (response.data.account_type === 'Boy' && response.data.appointment === null) navigate('/home')
+				setAccountType(response.data.account_type)
+				setAppointment(response.data.appointment)
+			})
+			.catch(err => {
+				console.error("Error fetching user information: ", err.response.data);
+				showMessage("Failed to load user information")
+			})
 	}, [navigate])
 
 	// Show the form to create new accounts
@@ -119,4 +119,4 @@ const UserManagementPage = () => {
 	)
 }
 
-export { UserManagementPage }
+export default UserManagementPage

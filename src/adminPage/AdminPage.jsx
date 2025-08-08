@@ -3,7 +3,7 @@ import axios from 'axios'
 import { handleServerError } from '../general/handleServerError';
 import { DatabaseTable } from './DatabaseTable';
 import AdminUsageAnalytics from './AdminUsageAnalytics';
-import { BASE_URL } from '../Constants';
+import BASE_URL from '../Constants';
 import '../styles/adminPage.scss'
 import '../styles/general.scss'
 
@@ -19,6 +19,7 @@ const AdminPage = () => {
 	useEffect(() => {
 		axios.get(`${BASE_URL}/admin`, { headers: { 'x-route': '/get_table_names' }, withCredentials: true })
 		.then(resp => {
+			console.log(resp.data)
 			setTableNames(resp.data)
 			setSelectedTable(resp.data[0])
 		})
@@ -71,4 +72,4 @@ const AdminPage = () => {
 	)
 }
 
-export { AdminPage }
+export default AdminPage

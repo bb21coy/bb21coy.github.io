@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 import { showMessage, handleServerError } from '../general/handleServerError';
 import '../styles/logInPage.scss'
 

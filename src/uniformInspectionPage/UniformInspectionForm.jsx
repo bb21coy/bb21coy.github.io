@@ -185,4 +185,4 @@ const UniformInspectionForm = () => {
 	)
 }
 
-export { UniformInspectionForm }
+export default UniformInspectionForm

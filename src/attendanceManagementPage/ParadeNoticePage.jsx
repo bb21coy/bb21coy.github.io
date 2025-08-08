@@ -35,4 +35,4 @@ const ParadeNoticePage = () => {
 
 }
 
-export { ParadeNoticePage }
+export default ParadeNoticePage

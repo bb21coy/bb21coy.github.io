@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import HelpPageSectionContent from "./HelpPageSectionContent";
 import axios from "axios";
-import { BASE_URL } from "../Constants";
+import BASE_URL from "../Constants";
 import '../styles/helpPage.scss';
 import { handleServerError } from '../general/handleServerError'
 
@@ -36,12 +36,12 @@ function HelpPage() {
                     <a href="#pending-tasks">Pending Tasks</a>
 
                     {(accountType !== "Boy" || appointment) && <>
-                    <p>User Management</p>
-                    <a href="#create-new-account">Create new account</a>
-                    <a href="#update-existing-account">Update existing account</a>
-                    <a href="#delete-existing-account">Delete existing account</a>
+                        <p>User Management</p>
+                        <a href="#create-new-account">Create new account</a>
+                        <a href="#update-existing-account">Update existing account</a>
+                        <a href="#delete-existing-account">Delete existing account</a>
                     </>}
-                    
+
                     <p>Parade &amp; Attendance</p>
                     {(accountType !== "Boy" || appointment) && <a href="#create-parade">Creating a parade</a>}
                     <a href="#view-existing-parade">Viewing existing parade</a>
@@ -50,28 +50,28 @@ function HelpPage() {
                     <a href="#update-parade-attendance">Update parade attendance</a>
 
                     {(accountType !== "Boy" || appointment) && <>
-                    <p>Awards Management</p>
-                    <a href="#updating-awards-tracker">Updating awards tracker</a>
-                    <a href="#award-requirements">Award requirements</a>
+                        <p>Awards Management</p>
+                        <a href="#updating-awards-tracker">Updating awards tracker</a>
+                        <a href="#award-requirements">Award requirements</a>
 
-                    <p>Results Generation</p>
-                    <a href="#generate-32a-results">Generating 32A results</a>
+                        <p>Results Generation</p>
+                        <a href="#generate-32a-results">Generating 32A results</a>
                     </>}
 
                     {accountType !== "Boy" && <>
-                    <p>Uniform Inspection</p>
-                    <a href="#viewing-inspection-results">Viewing inspection results</a>
-                    <a href="#conducting-inspection">Conducting inspection</a>
+                        <p>Uniform Inspection</p>
+                        <a href="#viewing-inspection-results">Viewing inspection results</a>
+                        <a href="#conducting-inspection">Conducting inspection</a>
                     </>}
 
                     {accountType === "Boy" && <>
-                    <p>Boys&apos; Awards</p>
-                    <a href="#viewing-boys-awards">Viewing Boys&#39; Awards</a>
+                        <p>Boys&apos; Awards</p>
+                        <a href="#viewing-boys-awards">Viewing Boys&#39; Awards</a>
                     </>}
 
                     {accountType === "Admin" && <>
-                    <p>Developer</p>
-                    <a href="#developer">Developer Guide</a>
+                        <p>Developer</p>
+                        <a href="#developer">Developer Guide</a>
                     </>}
                 </div>
             </div>

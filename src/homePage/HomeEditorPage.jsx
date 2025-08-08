@@ -35,4 +35,4 @@ function HomeEditorPage() {
     )
 }
 
-export { HomeEditorPage }
+export default HomeEditorPage

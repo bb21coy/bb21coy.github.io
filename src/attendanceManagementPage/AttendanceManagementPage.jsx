@@ -43,4 +43,4 @@ const AttendanceManagementPage = () => {
   )
 }
 
-export { AttendanceManagementPage }
+export default AttendanceManagementPage

@@ -57,4 +57,4 @@ const AwardsManagementPage = () => {
 	)
 }
 
-export { AwardsManagementPage }
+export default AwardsManagementPage

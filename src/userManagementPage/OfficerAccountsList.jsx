@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 
 // Display list of all officer Accounts
 const OfficerAccountsList = ({ setPageState, load }) => {
@@ -10,11 +10,11 @@ const OfficerAccountsList = ({ setPageState, load }) => {
 
 	useEffect(() => {
 		axios.get(`${BASE_URL}/account?type=Officer`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
-		.then(resp => setOfficerList(resp.data))
-		.catch(err => {
-			console.error("Error fetching officers:", err.response.data);
-			handleServerError(err.response.status)
-		})
+			.then(resp => setOfficerList(resp.data))
+			.catch(err => {
+				console.error("Error fetching officers:", err.response.data);
+				handleServerError(err.response.status)
+			})
 	}, [load])
 
 	return (

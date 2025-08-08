@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from "react-router-dom"
-import { AccountCreationForm } from './AccountCreationForm'
-import { UserInformation } from './UserInformation'
+import AccountCreationForm from './AccountCreationForm'
+import UserInformation from './UserInformation'
 
 // To access current users and create new accounts
 // This page should only be visible for mobile screens
@@ -41,4 +41,4 @@ const UserManagementSmallPage = () => {
     )
 }
 
-export { UserManagementSmallPage }
+export default UserManagementSmallPage

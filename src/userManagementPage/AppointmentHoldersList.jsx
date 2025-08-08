@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { handleServerError, showMessage } from '../general/handleServerError'
-import { AppointmentInformation } from './AppointmentInformation';
-import { BASE_URL } from '../Constants';
+import AppointmentInformation from './AppointmentInformation';
+import BASE_URL from '../Constants';
 
 // To manage permissions for appointment holders
 const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
@@ -15,25 +15,25 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 
 	useEffect(() => {
 		axios.get(`${BASE_URL}/appointment`, { headers: { 'x-route': '/get_appointments' }, withCredentials: true })
-		.then(resp => {
-			setAppointments(resp.data)
-		})
-		.catch(resp => {
-			console.error("Error fetching appointments:", resp.data);
-			handleServerError(resp.response.status)
-		})
+			.then(resp => {
+				setAppointments(resp.data)
+			})
+			.catch(resp => {
+				console.error("Error fetching appointments:", resp.data);
+				handleServerError(resp.response.status)
+			})
 
 		axios.get(`${BASE_URL}/account?type=Boy`, { headers: { 'x-route': '/get_accounts_by_type' }, withCredentials: true })
-		.then(resp => setBoyList(resp.data))
-		.catch(resp => handleServerError(resp.response.status))
-		
+			.then(resp => setBoyList(resp.data))
+			.catch(resp => handleServerError(resp.response.status))
+
 		axios.get(`${BASE_URL}/account?type=Primer`, { headers: { 'x-route': '/get_accounts_by_type' }, withCredentials: true })
-		.then(resp => setPrimerList(resp.data))
-		.catch(resp => handleServerError(resp.response.status))
+			.then(resp => setPrimerList(resp.data))
+			.catch(resp => handleServerError(resp.response.status))
 
 		axios.get(`${BASE_URL}/account?type=Officer`, { headers: { 'x-route': '/get_accounts_by_type' }, withCredentials: true })
-		.then(resp => setOfficerList(resp.data))
-		.catch(resp => handleServerError(resp.response.status))
+			.then(resp => setOfficerList(resp.data))
+			.catch(resp => handleServerError(resp.response.status))
 	}, [load])
 
 	function createAppointment(e) {
@@ -41,16 +41,16 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 		if (!e.target.checkValidity()) return showMessage("Please fill in all fields")
 
 		const formData = new FormData(e.target);
-		
+
 		axios.post(`${BASE_URL}/appointment`, formData, { headers: { "x-route": "/create_appointment" }, withCredentials: true })
-		.then(() => {
-			reLoad()
-			showMessage("Appointment has been created.", "success")
-		})
-		.catch(err => {
-			console.error(err.response.data); 
-			handleServerError(err.response.status);
-		})
+			.then(() => {
+				reLoad()
+				showMessage("Appointment has been created.", "success")
+			})
+			.catch(err => {
+				console.error(err.response.data);
+				handleServerError(err.response.status);
+			})
 	}
 
 	return (
@@ -68,7 +68,7 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 
 				<label htmlFor='name'>Appointment Name:</label>
 				<input placeholder='Enter Appointment Name' type='text' id='name' autoComplete='off' required name='appointment_name' />
-				
+
 				<label htmlFor='account-type'>Account Type: </label>
 				<select id="account-type" defaultValue={""} required onChange={e => setAccountType(e.target.value)} name='account_type'>
 					<option value="" disabled hidden>Select Account Type</option>
@@ -76,7 +76,7 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 					<option value="Primer">Primer</option>
 					<option value="Boy">Boy</option>
 				</select>
-		
+
 				{accountType && <>
 					<label htmlFor='holder'>Appointment Holder:</label>
 					<select id="holder" defaultValue={""} required name='account_id'>
@@ -86,7 +86,7 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 						))}
 					</select>
 				</>}
-			
+
 				<button>Add New Appointment</button>
 			</form>}
 		</div>
@@ -99,4 +99,4 @@ AppointmentHoldersList.propTypes = {
 	reLoad: PropTypes.func.isRequired
 }
 
-export { AppointmentHoldersList }
+export default AppointmentHoldersList

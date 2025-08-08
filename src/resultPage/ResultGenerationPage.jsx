@@ -292,4 +292,4 @@ const ResultGenerationPage = () => {
   )
 }
 
-export { ResultGenerationPage }
+export default ResultGenerationPage

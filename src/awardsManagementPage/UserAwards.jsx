@@ -53,4 +53,4 @@ const UserAwards = () => {
     )
 }
 
-export { UserAwards }
+export default UserAwards

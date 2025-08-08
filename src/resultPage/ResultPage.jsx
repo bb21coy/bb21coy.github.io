@@ -377,4 +377,4 @@ const ResultPage = () => {
   // )
 }
 
-export { ResultPage }
+export default ResultPage

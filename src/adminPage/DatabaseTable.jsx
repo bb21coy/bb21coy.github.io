@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError';
-import { BASE_URL } from '../Constants';
+import BASE_URL from '../Constants';
 
 const EXCLUDED_COLUMNS = ['createdAt', 'updatedAt', '__v'];
 const DatabaseTable = ({ table_name }) => {

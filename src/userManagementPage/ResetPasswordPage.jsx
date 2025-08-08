@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 import axios from 'axios'
 import { handleServerError, showMessage } from '../general/handleServerError'
 import '../styles/resetPasswordPage.scss'
@@ -59,4 +59,4 @@ const ResetPasswordPage = () => {
 	)
 }
 
-export { ResetPasswordPage }
+export default ResetPasswordPage

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import axios from 'axios'
-import { BASE_URL } from '../Constants'
+import BASE_URL from '../Constants'
 import { handleServerError, showMessage } from '../general/handleServerError'
 
 // To view users information and delete user accounts
@@ -18,26 +18,26 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 	useEffect(() => {
 		setAccount(null)
 		axios.get(`${BASE_URL}/account/?id=${userId}`, { headers: { "x-route": "/get_account" }, withCredentials: true })
-		.then(resp => {
-			setAccount(resp.data)
-			setAccountRank(resp.data.rank ?? null)
-			setAccountLevel(resp.data.level)
-			setAccountClass(resp.data.class_1)
-			setAccountGraduated(resp.data.graduated)
-			setAccountHonorific(resp.data.honorifics)
-			setAccountRollCall(resp.data.roll_call)
-			setAccountPastRank((prev) => {
-				let next = { ...prev }
-				for (let i = 1; i <= 5; i++) {
-					next[i] = resp.data[`rank${i}`]
-				}
-				return next
+			.then(resp => {
+				setAccount(resp.data)
+				setAccountRank(resp.data.rank ?? null)
+				setAccountLevel(resp.data.level)
+				setAccountClass(resp.data.class_1)
+				setAccountGraduated(resp.data.graduated)
+				setAccountHonorific(resp.data.honorifics)
+				setAccountRollCall(resp.data.roll_call)
+				setAccountPastRank((prev) => {
+					let next = { ...prev }
+					for (let i = 1; i <= 5; i++) {
+						next[i] = resp.data[`rank${i}`]
+					}
+					return next
+				})
 			})
-		})
-		.catch(err => {
-			console.error(err.response.data);
-			handleServerError(err.response.status);
-		})
+			.catch(err => {
+				console.error(err.response.data);
+				handleServerError(err.response.status);
+			})
 	}, [userId])
 
 	function setRank(e) {
@@ -97,30 +97,30 @@ const UserInformation = ({ accountType, appointment, userId, showForm, reLoad })
 
 		if (submit) {
 			axios.put(`${BASE_URL}/account`, formData, { headers: { 'x-route': '/update_account' }, withCredentials: true })
-			.then(() => {
-				showMessage("Account has been updated", "success")
-				reLoad()
-			})
-			.catch(resp => {
-				console.error(resp.response.data); 
-				handleServerError(resp.response.status);
-			})
+				.then(() => {
+					showMessage("Account has been updated", "success")
+					reLoad()
+				})
+				.catch(resp => {
+					console.error(resp.response.data);
+					handleServerError(resp.response.status);
+				})
 		}
 		else showMessage("Please fill in all fields first")
 	}
 
 	function deleteAccount(e) {
 		axios.delete(`${BASE_URL}/account?id=${account._id}`, { headers: { "x-route": "/delete_account" }, withCredentials: true })
-		.then(() => {
-			showMessage("Account has been deleted", "success")
-			showForm()
-			reLoad()
-		})
-		.catch(resp => {
-			reLoad()
-			console.error(resp.response.data); 
-			handleServerError(resp.response.status)
-		})
+			.then(() => {
+				showMessage("Account has been deleted", "success")
+				showForm()
+				reLoad()
+			})
+			.catch(resp => {
+				reLoad()
+				console.error(resp.response.data);
+				handleServerError(resp.response.status)
+			})
 	}
 
 	return (
@@ -287,4 +287,4 @@ UserInformation.propTypes = {
 	reLoad: PropTypes.func
 }
 
-export { UserInformation }
+export default UserInformation

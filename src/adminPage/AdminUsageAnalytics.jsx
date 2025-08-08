@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/adminAnalytics.scss"
 import { handleServerError } from "../general/handleServerError";
-import { BASE_URL } from "../Constants";
+import BASE_URL from "../Constants";
 
 const AdminUsageAnalytics = () => {
     const [frontendCommits, setFrontendCommits] = useState([]);
@@ -15,8 +15,8 @@ const AdminUsageAnalytics = () => {
             try {
                 const resp = await axios.get(`https://api.github.com/repos/bb21coy/bb21coy.github.io/commits?per_page=5&sha=master`, { headers: { authorization: process.env.GITHUB_TOKEN } });
                 const resp1 = await axios.get(`https://api.github.com/repos/bb21coy/bb-website-v3/commits?per_page=5&sha=main`, { headers: { authorization: process.env.GITHUB_TOKEN } });
-                const resp2 = await axios.get(`${BASE_URL}/admin`, { headers: { "x-route": "/vercel_usage" }, withCredentials: true });   
-                
+                const resp2 = await axios.get(`${BASE_URL}/admin`, { headers: { "x-route": "/vercel_usage" }, withCredentials: true });
+
                 console.log(resp2.data);
                 setVercelUsage(resp2.data);
 
@@ -64,14 +64,14 @@ const AdminUsageAnalytics = () => {
         <>
             <div className="vercel-usage-header">
                 <h3 className="commit-title">Vercel Usage</h3>
-                <span className="vercel-timer" style={{ background: `conic-gradient(#ff5733 0deg ${refreshTimer / 60 * 360}deg, #ccc ${refreshTimer / 60 * 360}deg 360deg)`}}></span>
+                <span className="vercel-timer" style={{ background: `conic-gradient(#ff5733 0deg ${refreshTimer / 60 * 360}deg, #ccc ${refreshTimer / 60 * 360}deg 360deg)` }}></span>
             </div>
             <div className="vercel-usage">
                 {vercelUsage.map((item, index) => (
                     <div key={index} className="vercel">
                         <p>{item.title}</p>
                         <div>
-                            <span className="ring" style={{ background: `conic-gradient(#ff5733 0deg ${item.value / item.limit * 360}deg, #ccc ${item.value / item.limit * 360}deg 360deg)`}}></span>
+                            <span className="ring" style={{ background: `conic-gradient(#ff5733 0deg ${item.value / item.limit * 360}deg, #ccc ${item.value / item.limit * 360}deg 360deg)` }}></span>
                             <div>
                                 <p>{item.value}/{item.limit}</p>
                                 <p>{(item.value / item.limit * 100).toFixed(2)}%</p>
