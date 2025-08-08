@@ -22,7 +22,7 @@ function HelpPageSteps({ steps }) {
                     <span>{currentStep + 1}</span>
                     <p>{steps[currentStep].name}</p>
                 </div>
-                <div style={{ backgroundImage: `url(images/${steps[currentStep].image}`}} />
+                <div style={{ backgroundImage: `url(${steps[currentStep].image}`}} />
             </div>
             <div aria-label="Next Step">
                 <i className="fa-solid fa-chevron-right" onClick={handleNextStep}></i>

@@ -59,7 +59,7 @@ const DashboardPage = () => {
                 <DashboardOptions title="Parade & Attendance" icon="file" url="/attendance_management" />
 
                 {(account?.account_type !== "Boy" || account?.appointment !== null) && <>
-                    <DashboardOptions title="Awards Management" url="/awards" image="images/awards_tracker.webp" />
+                    <DashboardOptions title="Awards Management" url="/awards" image="awards_tracker.webp" />
                     <DashboardOptions title="Results Generation" icon="file-invoice" url="/generate_result" />
                 </>}
 

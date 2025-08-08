@@ -10,10 +10,10 @@ const Footer = () => {
                     <p>Affiliated With:</p>
                     <div>
                         <a href="https://www.geylangmethodistsec.moe.edu.sg/" target='_blank' rel="noreferrer" aria-label='Geylang Methodist School (Secondary) Website'>
-                            <img src="/images/gm.webp" width="60px" height="60px" alt="Geylang Methodist School (Secondary)" />
+                            <img src="gm.webp" width="60px" height="60px" alt="Geylang Methodist School (Secondary)" />
                         </a>
                         <a href="https://www.cmch.sg/" target='_blank' rel="noreferrer" aria-label='Christalite Methodist Chapel Website'>
-                            <img src="/images/church.png" width="60px" height="60px" alt="Christalite Methodist Chapel" />
+                            <img src="church.png" width="60px" height="60px" alt="Christalite Methodist Chapel" />
                         </a>
                     </div>
                 </div>

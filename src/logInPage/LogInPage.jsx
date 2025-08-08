@@ -38,7 +38,7 @@ const LogInPage = () => {
 	}
 
 	return (
-		<div className='log-in-page' style={{ 'background': 'url("/images/slide 2.webp") center/cover no-repeat' }}>
+		<div className='log-in-page' style={{ 'background': 'url("slide 2.webp") center/cover no-repeat' }}>
 			<form className='log-in-form' onSubmit={submitForm} noValidate>
 				<h2>BB 21<sup>st</sup> Portal</h2>
 

@@ -68,7 +68,7 @@ const Header = () => {
 					<i className="fa-solid fa-bars"></i>
 				</button>
 
-				<img src="/images/coy logo.webp" alt='BB Logo' width={"90px"} height={"90px"} onClick={() => { navigate('/home') }} />
+				<img src="coy logo.webp" alt='BB Logo' width={"90px"} height={"90px"} onClick={() => { navigate('/home') }} />
 			</div>
 
 			<div data-state={navigationViewable} style={{ height: (40 * buttons) + "px" }} data-header-type={loggedIn ? "home" : "public"}>
@@ -170,7 +170,7 @@ const Header = () => {
 
 						{(user.account_type !== "Boy" || user.appointment !== null) && <>
 							<button onClick={() => navigate('/awards')} className={currentPage === '#/awards' ? 'active' : ''}>
-								<img src="images/awards_tracker.webp" alt="Awards Management Icon" />
+								<img src="awards_tracker.webp" alt="Awards Management Icon" />
 								Awards Management
 							</button>
 							<button onClick={() => navigate('/generate_result')} className={currentPage === '#/generate_result' ? 'active' : ''}>
