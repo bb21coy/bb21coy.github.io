@@ -10,34 +10,34 @@ const AdminUsageAnalytics = () => {
     const [vercelUsage, setVercelUsage] = useState([]);
     const [refreshTimer, setRefreshTimer] = useState(60);
 
-    useEffect(() => {
-        const init = async () => {
-            try {
-                const resp = await axios.get(`https://api.github.com/repos/bb21coy/bb21coy.github.io/commits?per_page=5&sha=master`, { headers: { authorization: process.env.GITHUB_TOKEN } });
-                const resp1 = await axios.get(`https://api.github.com/repos/bb21coy/bb-website-v3/commits?per_page=5&sha=main`, { headers: { authorization: process.env.GITHUB_TOKEN } });
-                const resp2 = await axios.get(`${BASE_URL}/admin`, { headers: { "x-route": "/vercel_usage" }, withCredentials: true });
+    const init = async () => {
+        try {
+            const resp = await axios.get(`https://api.github.com/repos/bb21coy/bb21coy.github.io/commits?per_page=5&sha=main`);
+            const resp1 = await axios.get(`https://api.github.com/repos/bb21coy/bb-website-v3/commits?per_page=5&sha=main`);
+            const resp2 = await axios.get(`${BASE_URL}/admin`, { headers: { "x-route": "/vercel_usage" }, withCredentials: true });
 
-                console.log(resp2.data);
-                setVercelUsage(resp2.data);
+            console.log(resp2.data);
+            setVercelUsage(resp2.data);
 
-                const filteredCommits = resp.data.map(item => ({
-                    commit: item.commit,
-                    committer: item.committer
-                }));
-                setFrontendCommits(filteredCommits);
+            const filteredCommits = resp.data.map(item => ({
+                commit: item.commit,
+                committer: item.committer
+            }));
+            setFrontendCommits(filteredCommits);
 
-                const filteredCommits1 = resp1.data.map(item => ({
-                    commit: item.commit,
-                    committer: item.committer
-                }));
-                setBackendCommits(filteredCommits1);
-            } catch (err) {
-                console.error(err);
-                handleServerError(err?.response?.status);
-            }
-
+            const filteredCommits1 = resp1.data.map(item => ({
+                commit: item.commit,
+                committer: item.committer
+            }));
+            setBackendCommits(filteredCommits1);
+        } catch (err) {
+            console.error(err);
+            handleServerError(err?.response?.status);
         }
 
+    }
+
+    useEffect(() => {
         init();
 
         const interval = setInterval(() => {
@@ -49,13 +49,7 @@ const AdminUsageAnalytics = () => {
 
     useEffect(() => {
         if (refreshTimer === 0) {
-            axios.get(`${BASE_URL}/admin`, { headers: { "x-route": "/vercel_usage" }, withCredentials: true })
-                .then(resp => setVercelUsage(resp.data))
-                .catch(err => {
-                    console.error(err);
-                    handleServerError(err?.response?.status);
-                })
-
+            init();
             setRefreshTimer(60);
         }
     }, [refreshTimer]);

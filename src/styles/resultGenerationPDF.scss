@@ -1,0 +1,111 @@
+#pdf-template {
+    position: relative;
+    width: 210mm;
+    min-height: 296mm;
+    padding: 5mm 10mm;
+    box-sizing: border-box;
+    margin: 0;
+    display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+    flex-direction: column;
+
+    .header {
+        padding: 0;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        border-bottom: 1px solid black;
+
+        div:first-of-type p {
+            font-size: 10px;
+        }
+
+        p {
+            font-size: 7px;
+        }
+
+        .verse {
+            margin-left: auto;
+            display: block;
+            text-align: right;
+        }
+    }
+
+    .title {
+        text-align: center;
+        margin-top: 2%;
+        font-weight: bold;
+        font-size: 24px;
+    }
+
+    .results {
+        display: grid;
+        margin: 0 40px;
+        margin-top: 30px;
+        grid-template-columns: max-content 1fr;
+        gap: 5px 10px;
+        font-size: 12px;
+        justify-content: right;
+
+        p:nth-child(odd) {
+            text-align: right;
+        }
+    }
+
+    .table {
+        margin-top: 30px;
+        display: grid;
+        grid-template-columns: 80px 1fr 150px 150px;
+
+        p {
+            padding: 8px;
+            font-size: 11px;
+            border-top: 1px solid black;
+            border-left: 1px solid black;
+            text-align: center;
+
+            &:nth-child(2n+2) {
+                text-align: left;
+            }
+
+            &:nth-child(-n+4) {
+                text-align: center;
+                background: #B8D5D9;
+                font-weight: bold;
+            }
+
+            &:nth-child(4n) {
+                border-right: 1px solid black;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            &:nth-last-child(-n+4) {
+                border-bottom: 1px solid black;
+            }
+        }
+    }
+
+    .signature {
+        border-top: 1px solid black;
+        padding-top: 3px;
+        width: 120px;
+        overflow: visible;
+        top: 80%;
+        font-size: 12px;
+        position: absolute;
+        white-space: nowrap;
+    }
+
+    footer {
+        margin-top: auto;
+        border-top: 1px solid #d3d3d3;
+        flex-direction: row;
+        background: none;
+        color: black;
+        justify-content: space-between;
+        padding: 0;
+        font-size: 9px;
+        padding-top: 3px;
+    }
+}

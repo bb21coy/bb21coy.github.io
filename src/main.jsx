@@ -24,7 +24,6 @@ import HelpPage from './helpPage/HelpPage';
 import HomeEditorPage from './homePage/HomeEditorPage';
 import UniformInspectionUser from './uniformInspectionPage/UniformInspectionUser';
 
-
 createRoot(document.body).render(
 	<StrictMode>
 		<Router>

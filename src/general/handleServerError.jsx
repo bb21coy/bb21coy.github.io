@@ -3,6 +3,8 @@
 function handleServerError(status) {
 	if (status === 401) {
 		showMessage("Unable to verify user. Please login again.");
+	} else if (status === 404) {
+		showMessage("The requested resource was not found.");
 	} else if (status === 406) {
 		showMessage('One of the fields provided is incorrect! \nPlease try again.')
 	} else if (status === 306) {

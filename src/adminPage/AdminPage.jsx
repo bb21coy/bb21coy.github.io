@@ -19,7 +19,6 @@ const AdminPage = () => {
 	useEffect(() => {
 		axios.get(`${BASE_URL}/admin`, { headers: { 'x-route': '/get_table_names' }, withCredentials: true })
 		.then(resp => {
-			console.log(resp.data)
 			setTableNames(resp.data)
 			setSelectedTable(resp.data[0])
 		})
