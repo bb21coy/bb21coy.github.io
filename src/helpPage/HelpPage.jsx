@@ -12,7 +12,7 @@ function HelpPage() {
     useEffect(() => {
         async function init() {
             try {
-                const account = await axios.get(`${BASE_URL}/auth`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
+                const account = await axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
                 setAccountType(account.data.account_type);
                 setAppointment(account.data.appointment);
             } catch (err) {
