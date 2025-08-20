@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 import { handleServerError } from '../general/handleServerError'
+import BASE_URL from '../Constants'
+import '../styles/uniformInspectionPage.scss'
 
 // To facilitate uniform inspection by officers / primers
 const UniformInspectionPage = () => {
-	const [inspections, setInspections] = useState();
+	const navigate = useNavigate()
+	const [inspections, setInspections] = useState([]);
+	const [boys, setBoys] = useState([]);
 	const [filters, setFilters] = useState({sec1: true, sec2: true, sec3: true, sec4: true, sec5: true})
 
-	// If there is no ongoing session go back to log in page
-	axios.post("/application/0/check_session", {}, {
-		withCredentials: true
-	})
-	.then(response => {
-		if (response.data.user?.account_type == 'Boy') window.location.href = '/home'
-	})
-	.catch(() => { window.location.href = '/' })
-
 	useEffect(() => {
-		axios.post('/api/uniform_inspection/0/get_inspections', {}, {
-			withCredentials: true  // Include credentials (cookies)
-		})
+		const controller = new AbortController();
+    	const signal = controller.signal;
+
+		axios.get(`${BASE_URL}/uniform_inspection`, { headers: { 'x-route': '/get_inspection_summary' }, withCredentials: true, signal })
 		.then(resp => {
-			setInspections(resp.data)
+			setInspections(resp.data.summary);
+			setBoys(resp.data.boys);
 		})
-		.catch(resp => handleServerError(resp.response.status))
-	}, [])
+		.catch(err => {
+			if (!axios.isCancel(err)) {
+				console.error("Error fetching uniform inspections:", err?.response?.message);
+				handleServerError(err?.response?.status);
+			}
+		})
+
+		return () => controller.abort();
+	}, [navigate])
 
 	function uniformInspectionForm() {
-		window.location.href = '/uniform_inspection_form'
+		navigate('/uniform_inspection_form')
 	}
 
 	function filter() {
@@ -56,7 +61,6 @@ const UniformInspectionPage = () => {
 					<div>
 						<label htmlFor="search">
 							<i className='fa-solid fa-magnifying-glass'></i>
-							Search
 						</label>
 						<input type="search" id="search" name="search" placeholder="Search Boy" onInput={filter} />
 					</div>
@@ -76,7 +80,6 @@ const UniformInspectionPage = () => {
 				</div>
 
 				<h2>Latest Uniform Inspection</h2>
-				{inspections != null ? (
 				<div className='uniform-inspection-list-table'>
 					<p>No.</p>
 					<p>Name</p>
@@ -85,9 +88,10 @@ const UniformInspectionPage = () => {
 					<p>Assessor</p>
 					<p>Records</p>
 
-					
-					{inspections['boys'].map((boy, index) => {
-						if (inspections[boy.id] == null) {
+					{boys.map((boy, index) => {
+						const inspection = inspections.find(inspection => inspection.boy._id === boy._id);
+
+						if (!inspection) {
 							return (
 								<div key={boy.account_name} data-sec={"sec" + boy.level}>
 									<p>{index + 1}</p>
@@ -98,22 +102,21 @@ const UniformInspectionPage = () => {
 									<p>-</p>
 								</div>
 							)
-						}
-						else {
+						} else {
+							const formattedDate = inspection.assessedDate.split('T')[0];
 							return (
-								<div key={inspections[boy.id].id} id={inspections[boy.id].id} data-sec={"sec" + boy.level}>
+								<div key={boy._id} id={boy._id} data-sec={"sec" + boy.level}>
 									<p>{index + 1}</p>
 									<p>{boy.account_name}</p>
-									<p>{inspections[boy.id].total_score}</p>
-									<p>{inspections[boy.id].date}</p>
-									<p>{inspections[inspections[boy.id].assessor_id].account_name}</p>
-									<p aria-label='View Uniform Inspection Record'><a href={'/view_uniform_inspection/' + inspections[boy.id].id}><i className='fa-solid fa-up-right-from-square'></i></a></p>
+									<p>{inspection.score}</p>
+									<p>{formattedDate}</p>
+									<p>{inspection.assessor.account_name}</p>
+									<p aria-label='View Uniform Inspection Record'><i onClick={() => navigate(`/view_uniform_inspection/${inspection._id}`)} className='fa-solid fa-up-right-from-square'></i></p>
 								</div>
 							)
 						}
 					})}
-				</div>) : (
-				<p>No Uniform Inspections Available</p>)}
+				</div>
 				
 				<button onClick={uniformInspectionForm} id='conduct-inspection-button'>Conduct Inspection</button>
 			</div>
