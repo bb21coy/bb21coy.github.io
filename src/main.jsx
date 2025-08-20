@@ -42,7 +42,7 @@ createRoot(document.body).render(
 					<Route path='/awards' element={<AwardsManagementPage />} />
 					<Route path='/generate_result' element={<ResultGenerationPage />} />
 					<Route path='/view_result/:id' element={<ResultPage />} />
-					<Route path='/uniform_inspection_results' element={<UniformInspectionPage />} />
+					<Route path='/uniform_inspection' element={<UniformInspectionPage />} />
 					<Route path='/view_uniform_inspection/:id' element={<UniformInspectionResultPage />} />
 					<Route path='/uniform_inspection_form' element={<UniformInspectionForm />} />
 					<Route path='/user_inspections' element={<UniformInspectionUser />} />
