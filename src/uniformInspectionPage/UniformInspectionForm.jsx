@@ -1,73 +1,50 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError'
+import BASE_URL from '../Constants'
 
 // To facilitate uniform inspection by Officers / Primers
 const UniformInspectionForm = () => {
 	const [boyAccounts, setBoyAccounts] = useState([]); 			// All Boys
 	const [boys, setBoys] = useState([]); 							// Selected Boys
-	const [components, setComponents] = useState([]);				// Sections (Haircut, Haversack, etc)
-	const [componentFields, setComponentFields] = useState({}) 		// Section Fields
+	const [components, setComponents] = useState([]);				// Sections
 	const [selectedContents, setSelectedContents] = useState({});	// Checked Fields Per Section Per Boy
 	const [currentForm, setCurrentForm] = useState();				// Selected Boy ID else undefined
 	const [sectionCollapse, setSectionCollapse] = useState(false)   // Name List Section Collapse State
 	const [remarks, setRemarks] = useState({})						// Remarks Per Section Per Boy
 
-	// If there is no ongoing session go back to log in page
-	axios.post("/application/0/check_session", {}, {
-		withCredentials: true
-	})
-	.then(response => {
-		if (response.data.user?.account_type == 'Boy') window.location.href = '/home'
-	})
-	.catch(() => { window.location.href = '/' })
-
 	useEffect(() => {
-		axios.post('/api/uniform_inspection/0/get_component_fields', {}, { withCredentials: true })
-		.then(resp => {
-			setComponents(resp.data['components'])
-			setComponentFields(resp.data)
-		})
-		.catch(error => console.error(error))
+		axios.get(`${BASE_URL}/uniform_inspection`, { headers: { "x-route": "/get_inspection_components" }, withCredentials: true })
+			.then(resp => {
+				console.log(resp.data)
+				setComponents(resp.data)
+			})
+			.catch(error => console.error(error))
 
-		axios.post('/api/account/0/get_accounts_by_type', { 'account_type': 'Boy' }, { withCredentials: true })
-		.then(resp => setBoyAccounts(resp.data))
-		.catch(resp => handleServerError(resp.response.status))
+		axios.get(`${BASE_URL}/account?type=Boy`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
+			.then(resp => setBoyAccounts(resp.data))
+			.catch(resp => handleServerError(resp.response.status))
 	}, [])
 
 	function selectBoy() {
 		let boyAccountSelector = document.querySelectorAll('.boy-account-selector:checked')
 		let accounts = Array.from(boyAccountSelector, account => account.id)
-		
+
 		setSelectedContents(prevContents => {
-			let updatedContents = { ...prevContents };
-	
-			accounts.forEach(account => {
-				if (!updatedContents[account]) {
-					updatedContents[account] = Object.fromEntries(
-						components.map(component => [
-							component.id,
-							Object.fromEntries(componentFields[component.component_name].map(field => [field.id, false]))
-						])
-					);
-				}
+			const updatedContents = { ...prevContents };
+			accounts.map(account => {
+				if (!updatedContents[account]) updatedContents[account] = [];
 			});
-	
 			return updatedContents;
 		});
 
-		axios.post('/api/account/0/get_accounts_by_ids', { 'boy_ids': accounts }, { withCredentials: true })
-		.then(resp => {
-			setBoys(resp.data)
-			setCurrentForm(resp.data[0].id)
-			for (let component in components) {
-				let fieldSelector = document.getElementsByClassName(component + '-field-selector')
-				for (let field of fieldSelector) {
-					field.checked = selectedContents[resp.data[0].id][component][field.id]
-				}
-			}
+		let boys = []
+		boyAccountSelector.forEach(account => {
+			const acc = boyAccounts.find(boy => boy._id == account.id)
+			boys.push(acc)
 		})
-		.catch(resp => handleServerError(resp.response?.status))
+
+		setBoys(boys)
 	}
 
 	function selectField(e) {
@@ -95,7 +72,7 @@ const UniformInspectionForm = () => {
 
 			const remarkInput = document.getElementsByTagName('textarea')
 			Array.from(remarkInput).forEach(input => {
-				input.value = selectedContents[boyId]?.[component.id]?.['remark'] ?? ''	
+				input.value = selectedContents[boyId]?.[component.id]?.['remark'] ?? ''
 			})
 		})
 	}
@@ -119,10 +96,10 @@ const UniformInspectionForm = () => {
 			'boys': boys,
 			'remarks': remarks
 		}, { withCredentials: true })
-		.then(() => {
-			window.location.href = '/uniform_inspection_results'
-		})
-		.catch(resp => handleServerError(resp.response?.status))
+			.then(() => {
+				window.location.href = '/uniform_inspection_results'
+			})
+			.catch(resp => handleServerError(resp.response?.status))
 	}
 
 	return (
@@ -131,11 +108,7 @@ const UniformInspectionForm = () => {
 				<label htmlFor='boy-selector'>Inspecting:</label>
 				<select id='boy-selector' onChange={e => setForm(e)} value={currentForm ? currentForm : ''}>
 					<option value='' disabled={true}>Select a boy</option>
-					{boys.map((boy) => {
-						return (
-							<option key={boy.id} value={boy.id}>{boy.rank} {boy.account_name}</option>
-						)
-					})}
+					{boys.map(boy => <option key={boy._id} value={boy._id}>{boy.rank} {boy.account_name}</option>)}
 				</select>
 			</div>
 
@@ -143,41 +116,36 @@ const UniformInspectionForm = () => {
 				<h2>Uniform Inspection</h2>
 				<div>
 					<p>Pick the boys to inspect:</p>
-					<i className='fa-solid fa-chevron-right' onClick={() => setSectionCollapse(!sectionCollapse)} style={{transform: !sectionCollapse ? 'rotate(90deg)' : 'rotate(0deg)'}}></i>
+					<i className='fa-solid fa-chevron-right' onClick={() => setSectionCollapse(!sectionCollapse)} style={{ transform: !sectionCollapse ? 'rotate(90deg)' : 'rotate(0deg)' }}></i>
 				</div>
 
-				<div className='boy-selector' style={{height: sectionCollapse ? 0 : 'max-content'}}>
-					{boyAccounts.map((boyAccount) => {
-						return (
-							<React.Fragment key={boyAccount.id}>
-								<input type='checkbox' className='boy-account-selector' id={boyAccount.id} onChange={selectBoy}></input>
-								<label htmlFor={boyAccount.id}>
-									<p>Sec {boyAccount.level} {boyAccount.rank} {boyAccount.account_name}</p>
-								</label>
-							</React.Fragment>
-						)
-					})}
+				<div className='boy-selector' style={{ height: sectionCollapse ? 0 : 'max-content' }}>
+					{boyAccounts.map((boyAccount) => (
+						<React.Fragment key={boyAccount._id}>
+							<input type='checkbox' className='boy-account-selector' id={boyAccount._id} onChange={selectBoy}></input>
+							<label htmlFor={boyAccount._id}>
+								<p>Sec {boyAccount.level} {boyAccount.rank} {boyAccount.account_name}</p>
+							</label>
+						</React.Fragment>
+					))}
 				</div>
-				
+
 				<form onSubmit={submitInspection}>
-					{currentForm != null && components.map((component) => {
-						return (
-							<div key={component.id}>
-								<h3>{component.component_name}</h3>
-								<ul>
-								{componentFields[component.component_name].map((field) => {
-									return (
-										<li key={field.id}>
-											<input type='checkbox' className={`${component.id}-field-selector ${field.description.toLowerCase().includes("missing") ? "field-missing" : ""}`} id={`${field.id}-field`} name={component.id} onChange={selectField} defaultChecked={selectedContents[currentForm][component.id][field.id]}></input>
-											<label htmlFor={`${field.id}-field`}>{field.description}</label>
-										</li>
-									)
-								})}
-								</ul>
-								<textarea name={`${component.component_name}-remarks`} placeholder='Remarks (Optional)' value={remarks[currentForm]?.[component.id]} onChange={(e) => setRemarks({...remarks, [currentForm]: {...remarks[currentForm], [component.id]: e.target.value}})}></textarea>
-							</div>
-						)
-					})}
+					{currentForm != null && components.map(component => (
+						<div key={component._id}>
+							<h3>{component.component_name}</h3>
+							<ul>
+								{component.components_fields.map(field => (
+									// defaultChecked={selectedContents[currentForm][component._id][field._id]}
+									<li key={field._id}>
+										<input type='checkbox' className={`${component._id}-field-selector ${field.field_description.toLowerCase().includes("missing") ? "field-missing" : ""}`} id={`${field._id}-field`} name={component._id} onChange={selectField}></input>
+										<label htmlFor={`${field._id}-field`}>{field.field_description}</label>
+									</li>
+								))}
+							</ul>
+							<textarea name={`${component.component_name}-remarks`} placeholder='Remarks (Optional)' value={remarks[currentForm]?.[component.id]} onChange={(e) => setRemarks({ ...remarks, [currentForm]: { ...remarks[currentForm], [component.id]: e.target.value } })}></textarea>
+						</div>
+					))}
 					<button>Finish Inspection</button>
 				</form>
 			</div>
