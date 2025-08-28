@@ -31,9 +31,9 @@ const AccountCreationForm = ({ account_type, appointment, reLoad }) => {
 
 		if (submit) {
 			axios.post(`${BASE_URL}/account`, {
-				account_name: e.target.elements['account_name'].value,
-				user_name: e.target.elements['user_name'].value,
-				abbreviated_name: e.target.elements['abbreviated_name'].value,
+				account_name: e.target.elements['account_name'].value || "",
+				user_name: e.target.elements['user_name'].value || "",
+				abbreviated_name: e.target.elements['abbreviated_name'].value || "",
 				password: e.target.elements['password'].value,
 				account_type: accountType,
 				rank: accountRank === "NIL" ? "" : accountRank,

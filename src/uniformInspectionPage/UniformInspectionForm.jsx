@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 import { handleServerError } from '../general/handleServerError'
 import BASE_URL from '../Constants'
 
 // To facilitate uniform inspection by Officers / Primers
 const UniformInspectionForm = () => {
+	const navigate = useNavigate()
 	const [boyAccounts, setBoyAccounts] = useState([]); 			// All Boys
 	const [boys, setBoys] = useState([]); 							// Selected Boys
 	const [components, setComponents] = useState([]);				// Sections
@@ -15,11 +17,8 @@ const UniformInspectionForm = () => {
 
 	useEffect(() => {
 		axios.get(`${BASE_URL}/uniform_inspection`, { headers: { "x-route": "/get_inspection_components" }, withCredentials: true })
-			.then(resp => {
-				console.log(resp.data)
-				setComponents(resp.data)
-			})
-			.catch(error => console.error(error))
+			.then(resp => setComponents(resp.data))
+			.catch(error => handleServerError(error.response.status))
 
 		axios.get(`${BASE_URL}/account?type=Boy`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
 			.then(resp => setBoyAccounts(resp.data))
@@ -48,32 +47,12 @@ const UniformInspectionForm = () => {
 	}
 
 	function selectField(e) {
-		let fieldSelector = document.getElementsByClassName(e.target.name + '-field-selector')
-		let data = {}
-		for (let field of fieldSelector) {
-			data[field.id.split("-")[0]] = field.checked
-		}
-		selectedContents[currentForm][e.target.name] = data
-		setSelectedContents(selectedContents)
-	}
-
-	function setForm(e) {
-		const boyId = e.target.value
-		setCurrentForm(boyId)
-
-		if (!selectedContents[boyId]) return
-
-		components.forEach(component => {
-			const fieldSelectors = document.getElementsByClassName(`${component.id}-field-selector`)
-			Array.from(fieldSelectors).forEach(field => {
-				const fieldKey = field.id.split("-")[0];
-				field.checked = selectedContents[boyId]?.[component.id]?.[fieldKey] ?? false
-			})
-
-			const remarkInput = document.getElementsByTagName('textarea')
-			Array.from(remarkInput).forEach(input => {
-				input.value = selectedContents[boyId]?.[component.id]?.['remark'] ?? ''
-			})
+		setSelectedContents(prev => {
+			const updated = { ...prev };
+			const id = e.target.id;
+			const arr = updated[currentForm] ? [...updated[currentForm]] : [];
+			updated[currentForm] = arr.includes(id) ? arr.filter(item => item !== id) : [...arr, id];
+			return updated;
 		})
 	}
 
@@ -83,30 +62,26 @@ const UniformInspectionForm = () => {
 		const confirmed = window.confirm("Are you sure you have finished inspecting? Ensure that all boys selected have been inspected before submission.")
 		if (!confirmed) return
 
-		let data = {}
-		let date = new Date();
-		const formattedDate = date.toLocaleDateString('en-GB');
-		boys.map((boy) => {
-			data[boy.id] = (selectedContents[boy.id])
-		})
+		const result = {};
+		const allKeys = new Set([...Object.keys(selectedContents), ...Object.keys(remarks)]);
+		allKeys.forEach(key => {
+			result[key] = {
+				fields: fields[key] || [],
+				remarks: remarks[key] || {}
+			};
+		});
 
-		axios.post('/api/uniform_inspection/0/create_uniform_inspection', {
-			'selectedContents': data,
-			'date': formattedDate,
-			'boys': boys,
-			'remarks': remarks
-		}, { withCredentials: true })
-			.then(() => {
-				window.location.href = '/uniform_inspection_results'
-			})
-			.catch(resp => handleServerError(resp.response?.status))
+		// const formattedDate = date.toLocaleDateString('en-GB');
+		axios.post('/api/uniform_inspection/0/create_uniform_inspection', { data: result }, { withCredentials: true })
+		.then(() => navigate('/uniform_inspection_results'))
+		.catch(resp => handleServerError(resp.response?.status))
 	}
 
 	return (
 		<div className='uniform-inspection-form'>
 			<div className='form-selection'>
 				<label htmlFor='boy-selector'>Inspecting:</label>
-				<select id='boy-selector' onChange={e => setForm(e)} value={currentForm ? currentForm : ''}>
+				<select id='boy-selector' onChange={e => setCurrentForm(e.target.value)} value={currentForm ? currentForm : ''}>
 					<option value='' disabled={true}>Select a boy</option>
 					{boys.map(boy => <option key={boy._id} value={boy._id}>{boy.rank} {boy.account_name}</option>)}
 				</select>
@@ -135,15 +110,14 @@ const UniformInspectionForm = () => {
 						<div key={component._id}>
 							<h3>{component.component_name}</h3>
 							<ul>
-								{component.components_fields.map(field => ( 
-									// defaultChecked={selectedContents[currentForm][component._id][field._id]}
-									<li key={field._id}>
-										<input type='checkbox' className={`${component._id}-field-selector ${field.field_description.toLowerCase().includes("missing") ? "field-missing" : ""}`} id={`${field._id}-field`} name={component._id} onChange={selectField}></input>
-										<label htmlFor={`${field._id}-field`}>{field.field_description}</label>
+								{component.components_fields.map(field => (
+									<li key={`${field._id}-${currentForm}`}>
+										<input type='checkbox' className={`${component._id}-field-selector ${field.field_description.toLowerCase().includes("missing") ? "field-missing" : ""}`} id={`${field._id}`} name={component._id} onChange={(e) => selectField(e)} defaultChecked={selectedContents[currentForm].includes(field._id)}></input>
+										<label htmlFor={`${field._id}`}>{field.field_description}</label>
 									</li>
 								))}
 							</ul>
-							<textarea name={`${component.component_name}-remarks`} placeholder='Remarks (Optional)' value={remarks[currentForm]?.[component.id]} onChange={(e) => setRemarks({ ...remarks, [currentForm]: { ...remarks[currentForm], [component.id]: e.target.value } })}></textarea>
+							<textarea key={`${currentForm}-${component._id}`} name={`${component.component_name}-remarks`} placeholder='Remarks (Optional)' defaultValue={remarks[currentForm]?.[component._id]} onChange={(e) => setRemarks(prev => ({ ...prev, [currentForm]: { ...prev[currentForm], [component._id]: e.target.value } }))}></textarea>
 						</div>
 					))}
 					<button>Finish Inspection</button>
