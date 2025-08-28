@@ -135,7 +135,7 @@ const UniformInspectionForm = () => {
 						<div key={component._id}>
 							<h3>{component.component_name}</h3>
 							<ul>
-								{component.components_fields.map(field => (
+								{component.components_fields.map(field => ( 
 									// defaultChecked={selectedContents[currentForm][component._id][field._id]}
 									<li key={field._id}>
 										<input type='checkbox' className={`${component._id}-field-selector ${field.field_description.toLowerCase().includes("missing") ? "field-missing" : ""}`} id={`${field._id}-field`} name={component._id} onChange={selectField}></input>
