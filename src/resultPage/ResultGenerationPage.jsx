@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { handleServerError, showMessage } from '../general/handleServerError'
 import ResultPage from './ResultPage'
-import '../styles/ResultGenerationPage.scss'
+import '../styles/resultGenerationPage.scss'
 import BASE_URL from '../Constants'
 
 // To manually create 32A results
