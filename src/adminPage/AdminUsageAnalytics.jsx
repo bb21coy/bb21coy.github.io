@@ -12,8 +12,8 @@ const AdminUsageAnalytics = () => {
 
     const init = async () => {
         try {
-            const resp = await axios.get(`https://api.github.com/repos/bb21coy/bb21coy.github.io/commits?per_page=5&sha=main`);
-            const resp1 = await axios.get(`https://api.github.com/repos/bb21coy/bb-website-v3/commits?per_page=5&sha=main`);
+            const resp = await axios.get(`https://api.github.com/repos/bb21coy/bb21coy.github.io/commits?per_page=5&sha=frontend`);
+            const resp1 = await axios.get(`https://api.github.com/repos/bb21coy/bb21coy.github.io/commits?per_page=5&sha=backend`);
             const resp2 = await axios.get(`${BASE_URL}/admin`, { headers: { "x-route": "/vercel_usage" }, withCredentials: true });
 
             console.log(resp2.data);
