@@ -22,10 +22,7 @@ const UniformInspectionPage = () => {
 			setBoys(resp.data.boys);
 		})
 		.catch(err => {
-			if (!axios.isCancel(err)) {
-				console.error("Error fetching uniform inspections:", err?.response?.message);
-				handleServerError(err?.response?.status);
-			}
+			if (!axios.isCancel(err)) handleServerError(err?.response?.status);
 		})
 
 		return () => controller.abort();
@@ -111,7 +108,7 @@ const UniformInspectionPage = () => {
 									<p>{inspection.score}</p>
 									<p>{formattedDate}</p>
 									<p>{inspection.assessor.account_name}</p>
-									<p aria-label='View Uniform Inspection Record'><i onClick={() => navigate(`/view_uniform_inspection/${inspection._id}`)} className='fa-solid fa-up-right-from-square'></i></p>
+									<p aria-label='View Uniform Inspection Record'><i onClick={() => navigate(`/view_uniform_inspection/${boy._id}`)} className='fa-solid fa-up-right-from-square'></i></p>
 								</div>
 							)
 						}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { handleServerError } from '../general/handleServerError'
+import { handleServerError, showMessage } from '../general/handleServerError'
 import BASE_URL from '../Constants'
 
 // To facilitate uniform inspection by Officers / Primers
@@ -66,14 +66,17 @@ const UniformInspectionForm = () => {
 		const allKeys = new Set([...Object.keys(selectedContents), ...Object.keys(remarks)]);
 		allKeys.forEach(key => {
 			result[key] = {
-				fields: fields[key] || [],
+				fields: selectedContents[key] || [],
 				remarks: remarks[key] || {}
 			};
 		});
 
 		// const formattedDate = date.toLocaleDateString('en-GB');
-		axios.post('/api/uniform_inspection/0/create_uniform_inspection', { data: result }, { withCredentials: true })
-		.then(() => navigate('/uniform_inspection_results'))
+		axios.post(`${BASE_URL}/uniform_inspection`, result, { headers: { "x-route": "/create_uniform_inspection" }, withCredentials: true })
+		.then(() => {
+			showMessage("Uniform Inspection submitted successfully", 'success')
+			navigate('/uniform_inspection_results')
+		})
 		.catch(resp => handleServerError(resp.response?.status))
 	}
 

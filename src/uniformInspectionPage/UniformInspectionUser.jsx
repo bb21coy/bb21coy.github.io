@@ -1,37 +1,27 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { handleServerError } from "../general/handleServerError";
+import BASE_URL from "../Constants";
+import '../styles/uniformInspectionUser.scss'
 
 function UniformInspectionUser() {
     const [inspectionList, setInspectionList] = useState([]);
     const [selectedInspection, setSelectedInspection] = useState();
-    const [checked, setChecked] = useState([]);
-    const [remarks, setRemarks] = useState({});
+    const [components, setComponents] = useState([]);
 
     useEffect(() => {
-        axios.post("/application/0/check_session", {}, { withCredentials: true })
-        .then(response => {
-            if (response.data.user?.account_type != 'Boy') window.location.href = '/home'
+        axios.get(`${BASE_URL}/uniform_inspection`, { headers: { "x-route": "/get_inspection_components" }, withCredentials: true })
+			.then(resp => setComponents(resp.data))
+			.catch(resp => handleServerError(resp.response.status))
 
-            axios.get("/api/uniform_inspection/0/get_user_inspection_results", { withCredentials: true })
-            .then(resp => setInspectionList(resp.data))
-            .catch(resp => handleServerError(resp.response?.status))
-        })
-        .catch(() => window.location.href = '/')
+		axios.get(`${BASE_URL}/uniform_inspection`, { headers: { "x-route": "/get_user_inspection" }, withCredentials: true })
+			.then(resp => setInspectionList(resp.data))
+			.catch(resp => handleServerError(resp.response.status))
     }, []);
 
     const getInspection = (id) => {
-        axios.post(`/api/uniform_inspection/0/get_user_inspection_results_simplified`, { inspection_id: id })
-        .then(resp => {
-            let remarks = {}
-            resp.data.remarks.map(remark => {
-                remarks[remark.component_id] = remark
-            })
-            setRemarks(remarks)
-            setSelectedInspection(resp.data)
-            setChecked(Array.from(resp.data.checked).map(field => `${field.component_field_id}`))
-        })
-        .catch(resp => handleServerError(resp.response?.status))
+		const obj = inspectionList.find(item => item._id === id);
+		setSelectedInspection(obj);
     }
 
     return (
@@ -42,11 +32,11 @@ function UniformInspectionUser() {
                 <section>
                     <div>
                         {inspectionList.length > 0 ? inspectionList.map(inspection => (
-                        <React.Fragment key={inspection.id}>
-                            <input type="radio" name="inspection_selection" id={inspection.id} onChange={() => getInspection(inspection.id)} />
-                            <label htmlFor={inspection.id}>
-                                <p title="Inspection Date">{inspection?.date}</p>
-                                <p title="Inspection Score">{inspection?.total_score}</p>
+                        <React.Fragment key={inspection._id}>
+                            <input type="radio" name="inspection_selection" id={inspection._id} onChange={() => getInspection(inspection._id)} />
+                            <label htmlFor={inspection._id}>
+                                <p title="Inspection Date">{inspection.assessedDate.split('T')[0]}</p>
+                                <p title="Inspection Score">{inspection.score}</p>
                             </label>
                         </React.Fragment>)) : <p>No inspection results</p>}
                     </div>
@@ -59,25 +49,25 @@ function UniformInspectionUser() {
                         <>
                             <div>
                                 <p>Date</p>
-                                <p>{selectedInspection?.details?.date}</p>
+                                <p>{selectedInspection.assessedDate.split('T')[0]}</p>
                                 <p>Assessor</p>
-                                <p>{selectedInspection?.details?.assessor_name}</p>
+                                <p>{selectedInspection.assessor?.rank} {selectedInspection.assessor.account_name}</p>
                                 <p>Score</p>
-                                <p>{selectedInspection?.details?.total_score}</p>
+                                <p>{selectedInspection.score}</p>
                             </div>
                             
-                            {selectedInspection?.headings.map(heading => (
-                                <div key={heading.id}>
-                                    <h3>{heading?.component_name}</h3>
+                            {components.map(component => (
+                                <div key={component._id}>
+                                    <h3>{component.component_name}</h3>
                                     <ul>
-                                    {Array.from(selectedInspection?.subheadings).filter(subheading => subheading.uniform_component_id == heading.id).map(subheading => (
-                                        <li key={`${heading.id}-${subheading.id}`}>
-                                            <input type="checkbox" disabled id={`sub-${subheading.id}`} checked={checked.includes(`${subheading.id}`)} className={`${subheading.description.toLowerCase().includes("missing") ? "field-missing" : ""}`} />
-                                            <label htmlFor={`sub-${subheading.id}`}>{subheading?.description}</label>
-                                        </li>
-                                    ))}
+                                        {component.components_fields.map(field => (
+                                            <li key={`${component._id}-${field._id}`}>
+                                                <input type="checkbox" disabled id={`sub-${field._id}`} checked={selectedInspection.fields.includes(`${field._id}`)} className={`${field.field_description.toLowerCase().includes("missing") ? "field-missing" : ""}`} />
+                                                <label htmlFor={`sub-${field._id}`}>{field.field_description}</label>
+                                            </li>
+                                        ))}
                                     </ul>
-                                    <textarea name={`${heading?.component_name}-remarks`} placeholder='Components Remarks (if any)' defaultValue={remarks[heading.id]?.remarks ?? 'No Remarks Given'} disabled></textarea>
+                                    <textarea name={`${component.component_name}-remarks`} placeholder='Components Remarks (if any)' defaultValue={selectedInspection.remarks[component._id] ?? 'No Remarks Given'} disabled></textarea>
                                 </div>
                             ))}
                         </>
