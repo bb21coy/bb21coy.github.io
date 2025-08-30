@@ -93,6 +93,26 @@ module.exports = async (req, res) => {
                         table_name = 'Appointment';
                         break;
                     }
+                    case 'uniform_inspections': {
+                        table_name = 'UniformInspections';
+                        break;
+                    }
+                    case 'uniform_components': {
+                        table_name = 'ComponentField';
+                        break;
+                    }
+                    case 'uniform_categories': {
+                        table_name = 'UniformComponent';
+                        break;
+                    }
+                    case 'masteries': {
+                        table_name = 'Masteries';
+                        break;
+                    }
+                    case 'awards': {
+                        table_name = 'Awards';
+                        break;
+                    }
                 }
 
                 const Model = mongoose.model(table_name);
@@ -103,7 +123,7 @@ module.exports = async (req, res) => {
             case 'GET /vercel_usage': {
                 if (!checkAuthenication(authorization, res, ["Admin"])) return res.status(401).json({ message: 'Unauthorized' });
 
-                const resp = await axios.get(`https://vercel.com/api/usage-summary?teamId=dylans-projects-b00aa3d7`, {
+                const resp = await axios.get(`https://vercel.com/api/usage-summary?teamId=bb21coys-projects`, {
                     headers: {
                         Authorization: `Bearer ${process.env.VERCEL_TOKEN}`
                     }

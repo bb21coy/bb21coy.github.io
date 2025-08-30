@@ -45,6 +45,15 @@ const UniformInspectionsSchema = new mongoose.Schema(
                 },
                 message: 'Invalid assessor account type',
             },
+        },
+        remarks: {
+            type: Object,
+            default: null
+        },
+        fields: {
+            default: null,
+            type: [Schema.Types.ObjectId],
+            ref: 'UniformComponents'
         }
     },
     {
