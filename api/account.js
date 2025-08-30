@@ -1,34 +1,10 @@
-const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
 const { connectToDatabase } = require('../mongoose.js');
+const { checkAuthentication, decodeJWT } = require('../functions.js');
 const User = require('../models/users.js');
-const Token = require('../models/token.js');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 dotenv.config({ quiet: true });
-
-const decodeJWT = async (token, res, sendResponse = true) => {
-    try {
-        if (!token) throw new Error('Missing authorization token');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (!decoded) throw new Error('Invalid token');
-
-        if (decoded.exp < Date.now() / 1000) throw new Error('Token expired');
-        const used = await Token.findOne({ token });
-        if (used) throw new Error('Token already used');
-
-        return decoded;
-    } catch (error) {
-        if (sendResponse && res) return res.status(401).json({ message: error.message });
-        return null;
-    }
-};
-
-const checkAuthorization = (tokenType, res, allowed = ["Admin", "Officer", "Primer", "Boy"]) => {
-    if (!tokenType) return res.status(400).json({ message: 'Missing token type' });
-    if (!allowed.includes(tokenType)) return res.status(403).json({ message: 'Invalid token type' });
-    return null;
-};
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*';
@@ -81,32 +57,20 @@ module.exports = async (req, res) => {
             }
 
             case 'GET /get_accounts_by_type': {
-                const decoded = await decodeJWT(authorization, res, false);
-                if (!decoded || decoded.error) return;
-
-                const user = await User.findById(decoded.id);
-                if (!user) return res.status(404).json({ message: 'User not found' });
-
-                const authError = checkAuthorization(user.account_type, res, ["Admin", "Officer", "Primer"]);
-                if (authError) return;
+                const auth = await checkAuthentication(authorization, res, ["Admin", "Officer", "Primer"], includeAppt = true);
+                if (!auth) return res.status(401).json({ message: 'Unauthorized' })
 
                 const type = req.query?.type;
                 if (!type) return res.status(400).json({ message: 'Missing type' });
-                if (!["Admin", "Officer", "Primer", "Boy"].includes(type)) return res.status(400).json({ message: 'Invalid type' });
+                if (!["Officer", "Primer", "Boy"].includes(type)) return res.status(400).json({ message: 'Invalid type' });
 
                 const users = await User.find({ account_type: type }).select('-password');
                 return res.status(200).json(users);
             }
 
             case 'GET /get_graduated_accounts': {
-                const decoded = await decodeJWT(authorization, res, false);
-                if (!decoded || decoded.error) return;
-
-                const user = await User.findById(decoded.id);
-                if (!user) return res.status(404).json({ message: 'User not found' });
-
-                const authError = checkAuthorization(user.account_type, res, ["Admin", "Officer", "Primer"]);
-                if (authError) return;
+                const auth = await checkAuthentication(authorization, res, ["Admin", "Officer", "Primer"], includeAppt = true);
+                if (!auth) return res.status(401).json({ message: 'Unauthorized' })
 
                 const users = await User.find({ graduated: true }).select('-password');
                 return res.status(200).json(users);
@@ -128,14 +92,8 @@ module.exports = async (req, res) => {
             }
 
             case 'PUT /update_account': {
-                const decoded = await decodeJWT(authorization, res, false);
-                if (!decoded || decoded.error) return;
-
-                const user = await User.findById(decoded.id);
-                if (!user) return res.status(404).json({ message: 'User not found' });
-
-                const authError = checkAuthorization(user.account_type, res, ["Admin", "Officer", "Primer"]);
-                if (authError) return;
+                const auth = await checkAuthentication(authorization, res, ["Admin", "Officer", "Primer"], includeAppt = true);
+                if (!auth) return res.status(401).json({ message: 'Unauthorized' })
 
                 if (!req.body.id) return res.status(400).json({ message: 'Missing user ID' });
 
@@ -158,14 +116,8 @@ module.exports = async (req, res) => {
             }
 
             case 'POST /create_account': {
-                const decoded = await decodeJWT(authorization, res, false);
-                if (!decoded || decoded.error) return;
-
-                const user = await User.findById(decoded.id);
-                if (!user) return res.status(404).json({ message: 'User not found' });
-
-                const authError = checkAuthorization(user.account_type, res, ["Admin", "Officer"]);
-                if (authError) return;
+                const auth = await checkAuthentication(authorization, res, ["Admin", "Officer", "Primer"], includeAppt = true);
+                if (!auth) return res.status(401).json({ message: 'Unauthorized' })
 
                 let { account_name, user_name, abbreviated_name, password, account_type, rank, level, class1, credentials, honorifics, roll_call } = req.body || {};
                 

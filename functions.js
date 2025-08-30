@@ -34,7 +34,9 @@ const checkAuthentication = async (authorization, res, allowed = ["Admin", "Offi
     if (!user) return false;
 
     const tokenType = user.account_type;
-    if ((!allowed.includes(tokenType) && includeAppt && user.appointment) || !tokenType) return false;
+    const isAllowedRole = allowed.includes(tokenType);
+    const isAllowedByAppt = includeAppt && Boolean(user.appointment);
+    if (!(isAllowedRole || isAllowedByAppt)) return false;
     
     return true;
 };
