@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
+const { Types } = require('mongoose');
 const { connectToDatabase } = require('../mongoose.js');
 const User = require('../models/users.js');
 const Token = require('../models/token.js');
@@ -56,25 +57,9 @@ module.exports = async (req, res) => {
         switch (routeKey) {
             case 'GET /get_appointments': {
                 await decodeJWT(authorization, res);
-                const appointments = await Appointment.find();
-                const updatedAppointments = [];
+                const appointments = await Appointment.find({}).populate("account_id", '_id account_name');
 
-                for (let appointment of appointments) {
-                    const user = await User.findById(appointment.account_id, '_id account_name');
-                    if (user) {
-                        const updatedAppointment = {
-                            ...appointment.toObject(),
-                            account_name: user.account_name,
-                            account_id: user._id
-                        };
-
-                        updatedAppointments.push(updatedAppointment);
-                    } else {
-                        updatedAppointments.push(appointment);
-                    }
-                }
-
-                return res.status(200).json(updatedAppointments);
+                return res.status(200).json(appointments);
             }
 
             case 'POST /create_appointment': {
@@ -113,7 +98,7 @@ module.exports = async (req, res) => {
                 const appointment = await Appointment.findById(appointment_id);
                 if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
 
-                await Appointment.updateOne({ _id: appointment_id }, { account_id });
+                await Appointment.updateOne({ _id: new Types.ObjectId(appointment_id) }, { $set: { account_id } });
                 return res.status(200).json({ message: 'Appointment updated successfully' });
             }
 

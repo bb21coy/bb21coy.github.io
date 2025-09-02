@@ -15,7 +15,8 @@ const AppointmentSchema = new mongoose.Schema(
             required: true
         },
         account_id: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
             required: true
         }
     },
