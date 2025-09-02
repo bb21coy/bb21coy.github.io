@@ -151,6 +151,7 @@
         .badge-list {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
+            overflow-x: auto;
 
             div {
                 padding: 5px 10px;
@@ -360,6 +361,57 @@
                 content: "Sec 4";
                 font-weight: bold;
                 font-size: 24px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .resource-page {
+        flex-direction: column;
+        gap: 10px;
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            background: white;
+            padding-bottom: 10px;
+            max-width: none;
+            width: 100%;
+            border: none;
+
+            label {
+                width: 100px;
+            }
+        }
+
+        .content {
+            table {
+                table-layout: auto;
+                overflow-x: auto;
+                display: block;
+
+                td, th {
+                    min-width: 200px;
+                }
+            }
+
+            iframe {
+                height: 300px;
+            }
+
+            .custom-image-250 {
+                width: 200px;
+            }
+
+            .badges {
+                flex-direction: column;
+            }
+
+            .badge-explanation img {
+                width: 100px;
             }
         }
     }
