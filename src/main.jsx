@@ -1,6 +1,6 @@
 import React, { StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 import Layout from './Layout';
 // import { HomePage } from './homePage/HomePage'
@@ -23,6 +23,7 @@ import UserAwards from './awardsManagementPage/UserAwards';
 import HelpPage from './helpPage/HelpPage';
 import HomeEditorPage from './homePage/HomeEditorPage';
 import UniformInspectionUser from './uniformInspectionPage/UniformInspectionUser';
+import ResourcePage from './resourcePage/ResourcePage';
 
 createRoot(document.body).render(
 	<StrictMode>
@@ -51,6 +52,7 @@ createRoot(document.body).render(
 					<Route path='/reset_password' element={<ResetPasswordPage />} />
 					<Route path='/help' element={<HelpPage />} />
 					<Route path='/home_editor' element={<HomeEditorPage />} />
+					<Route path='/resources' element={<ResourcePage />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 			</Routes>

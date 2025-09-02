@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
 import { PendingTasks } from './pendingTasks'
 import DashboardOptions from './dashboardOptions'
 import { handleServerError } from '../general/handleServerError'
@@ -8,7 +7,6 @@ import BASE_URL from '../Constants'
 import '../styles/dashboardPage.scss'
 
 const DashboardPage = () => {
-    const navigate = useNavigate()
     const [userId, setUserId] = useState(null)
     const [paradesAfterToday, setParadesAfterToday] = useState([])
     const [account, setAccount] = useState({ account_name: '', account_type: 'Boy', appointment: null })
@@ -33,7 +31,7 @@ const DashboardPage = () => {
     const logOut = async () => {
         try {
             const response = await axios.post(`${BASE_URL}/auth`, {}, { headers: { "x-route": "/logout" }, withCredentials: true })
-            if (response.data) navigate("/")
+            if (response.data) window.location.href = '/';
         } catch (err) {
             console.error("Error logging out:", err);
             handleServerError(err.response.status)
@@ -64,6 +62,7 @@ const DashboardPage = () => {
                 </>}
 
                 {account?.account_type !== "Boy" && <DashboardOptions title="Uniform Inspection" icon="shirt-long-sleeve" url="/uniform_inspection" />}
+                {account?.account_type === "Boy" && <DashboardOptions title="Resources" icon="book" url="/resources" />}
 
                 <DashboardOptions title="Change Password" icon="rotate-right" url="/reset_password" />
                 <DashboardOptions title="Help" icon="question" url="/help" />

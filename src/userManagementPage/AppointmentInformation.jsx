@@ -39,7 +39,7 @@ const AppointmentInformation = ({ accountType, appointment, reLoad, boyList, pri
 		<>
 			<label htmlFor={appointment._id}>{appointment.appointment_name}:</label>
 			<select id={appointment._id} defaultValue={appointment.account_id} onChange={(e) => setAccountId(e.target.value)}>
-				<option value={appointment.account_id}>{appointment.account_name}</option>
+				<option value={appointment.account_id._id}>{appointment.account_id.account_name}</option>
 				{["Officer", "Admin"].includes(accountType) && (appointment.account_type === 'Officer' ? officerList : (appointment.account_type === "Primer" ? primerList : boyList)).filter(user => user._id !== appointment.account_id).map(user => (
 					<option key={user._id} value={user._id}>{user.account_name}</option>
 				))}

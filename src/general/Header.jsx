@@ -40,7 +40,7 @@ const Header = () => {
 		}
 
 		checkSession();
-		setCurrentPage(window.location.hash);
+		setCurrentPage(window.location.pathname);
 	}, [navigate])
 
 	const toggleUserMenu = () => {
@@ -54,7 +54,12 @@ const Header = () => {
 	const logOut = async () => {
 		try {
 			const response = await axios.post(`${BASE_URL}/auth`, {}, { headers: { "x-route": "/logout" }, withCredentials: true })
-			if (response.data) navigate('/log_in');
+			if (response.data) {
+				setLoggedIn(false);
+				setUser(null);
+				setNavigationViewable(false);
+				navigate('/log_in')
+			};
 		} catch (err) {
 			console.error("Error logging out:", err);
 			handleServerError(err.response.status)
@@ -105,6 +110,9 @@ const Header = () => {
 						{user.account_type !== "Boy" &&
 							<button className="uniform-inspection--button" onClick={() => { navigate('/uniform_inspection_results') }}>Uniform Inspection</button>}
 
+						{(user.account_type === "Boy") &&
+							<button onClick={() => navigate('/user_awards')}>Resources</button>}
+
 						<button onClick={() => { navigate('/reset_password') }}>Reset Log In Information</button>
 						<button onClick={() => { navigate('/help') }}>Help</button>
 						<button className="log-out--button" onClick={logOut}>Log Out</button>
@@ -129,67 +137,73 @@ const Header = () => {
 						<button onClick={() => navigate('/parade_notice')}>Parade Notice</button>
 						<button onClick={() => navigate('/log_in')}>Members Log In</button>
 					</> : <>
-						<button onClick={() => navigate('/home')} className={currentPage === '#/home' ? 'active' : ''}>
+						<button onClick={() => navigate('/home')} className={currentPage === '/home' ? 'active' : ''}>
 							<i className='fa-solid fa-house'></i>
 							Dashboard
 						</button>
 
 						{user.account_type === "Admin" &&
-							<button onClick={() => navigate('/admin')} className={currentPage === '#/admin' ? 'active' : ''}>
+							<button onClick={() => navigate('/admin')} className={currentPage === '/admin' ? 'active' : ''}>
 								<i className='fa-solid fa-gear'></i>
 								Admin Page
 							</button>}
 
 						{(user.account_type !== "Boy" || user.appointment !== null) &&
-							<button onClick={() => navigate('/user_management')} className={currentPage === '#/user_management' ? 'active' : ''}>
+							<button onClick={() => navigate('/user_management')} className={currentPage === '/user_management' ? 'active' : ''}>
 								<i className='fa-solid fa-users'></i>
 								Users Management
 							</button>}
 
 						{(user.account_type === "Officer" || user.appointment?.toLowerCase().includes("tech")) &&
-							<button onClick={() => navigate('/home_editor')} className={currentPage === '#/home_editor' ? 'active' : ''}>
+							<button onClick={() => navigate('/home_editor')} className={currentPage === '/home_editor' ? 'active' : ''}>
 								<i className='fa-solid fa-edit'></i>
 								Home Page Editor
 							</button>}
 
-						<button onClick={() => navigate('/attendance_management')} className={currentPage === '#/attendance_management' ? 'active' : ''}>
+						<button onClick={() => navigate('/attendance_management')} className={currentPage === '/attendance_management' ? 'active' : ''}>
 							<i className='fa-solid fa-file'></i>
 							Parades & Attendance
 						</button>
 
 						{(user.account_type === "Boy") && <>
-							<button onClick={() => navigate('/user_awards')} className={currentPage === '#/user_awards' ? 'active' : ''}>
+							<button onClick={() => navigate('/user_awards')} className={currentPage === '/user_awards' ? 'active' : ''}>
 								<i className='fa-solid fa-award'></i>
 								My Awards
 							</button>
-							<button onClick={() => navigate('/user_inspections')} className={currentPage === '#/user_inspections' ? 'active' : ''}>
+							<button onClick={() => navigate('/user_inspections')} className={currentPage === '/user_inspections' ? 'active' : ''}>
 								<i className='fa-solid fa-shirt-long-sleeve'></i>
 								My Inspection Results
 							</button>
 						</>}
 
 						{(user.account_type !== "Boy" || user.appointment !== null) && <>
-							<button onClick={() => navigate('/awards')} className={currentPage === '#/awards' ? 'active' : ''}>
+							<button onClick={() => navigate('/awards')} className={currentPage === '/awards' ? 'active' : ''}>
 								<img src="awards_tracker.webp" alt="Awards Management Icon" />
 								Awards Management
 							</button>
-							<button onClick={() => navigate('/generate_result')} className={currentPage === '#/generate_result' ? 'active' : ''}>
+							<button onClick={() => navigate('/generate_result')} className={currentPage === '/generate_result' ? 'active' : ''}>
 								<i className='fa-solid fa-file-invoice'></i>
 								Result Generation
 							</button>
 						</>}
 
 						{user.account_type !== "Boy" &&
-							<button onClick={() => navigate('/uniform_inspection_results')} className={currentPage === '#/uniform_inspection_results' ? 'active' : ''}>
+							<button onClick={() => navigate('/uniform_inspection_results')} className={currentPage === '/uniform_inspection_results' ? 'active' : ''}>
 								<i className='fa-solid fa-shirt-long-sleeve'></i>
 								Uniform Inspection
 							</button>}
 
-						<button onClick={() => navigate('/reset_password')} className={currentPage === '#/reset_password' ? 'active' : ''}>
+						{user.account_type === "Boy" &&
+							<button onClick={() => navigate('/resources')} className={currentPage === '/resources' ? 'active' : ''}>
+								<i className='fa-solid fa-book'></i>
+								Resources
+							</button>}
+
+						<button onClick={() => navigate('/reset_password')} className={currentPage === '/reset_password' ? 'active' : ''}>
 							<i className='fa-solid fa-rotate-right'></i>
 							Reset Log In Information
 						</button>
-						<button onClick={() => navigate('/help')} className={currentPage === '#/help' ? 'active' : ''}>
+						<button onClick={() => navigate('/help')} className={currentPage === '/help' ? 'active' : ''}>
 							<i className='fa-solid fa-question'></i>
 							Help
 						</button>

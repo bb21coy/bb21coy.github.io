@@ -16,6 +16,7 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 	useEffect(() => {
 		axios.get(`${BASE_URL}/appointment`, { headers: { 'x-route': '/get_appointments' }, withCredentials: true })
 			.then(resp => {
+				console.log(resp.data)
 				setAppointments(resp.data)
 			})
 			.catch(resp => {
