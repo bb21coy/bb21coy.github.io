@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import Loading from '../general/Loading'
 import { PendingTasks } from './pendingTasks'
 import DashboardOptions from './dashboardOptions'
 import { handleServerError } from '../general/handleServerError'
@@ -10,6 +11,7 @@ const DashboardPage = () => {
     const [userId, setUserId] = useState(null)
     const [paradesAfterToday, setParadesAfterToday] = useState([])
     const [account, setAccount] = useState({ account_name: '', account_type: 'Boy', appointment: null })
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function init() {
@@ -17,6 +19,7 @@ const DashboardPage = () => {
                 const account = await axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
                 setAccount(account.data)
                 setUserId(account.data.id)
+                setLoading(false)
 
                 // const parades = await axios.get(`${BASE_URL}/parades`, { headers: { "x-route": "/get_parades_after_today" }, withCredentials: true })
                 // setParadesAfterToday(parades.data)
@@ -37,6 +40,8 @@ const DashboardPage = () => {
             handleServerError(err.response.status)
         }
     }
+
+    if (loading) return <Loading />
 
     return (
         <div className='dashboard'>

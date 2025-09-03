@@ -24,11 +24,12 @@ import HelpPage from './helpPage/HelpPage';
 import HomeEditorPage from './homePage/HomeEditorPage';
 import UniformInspectionUser from './uniformInspectionPage/UniformInspectionUser';
 import ResourcePage from './resourcePage/ResourcePage';
+import Loading from './general/Loading';
 
 createRoot(document.body).render(
 	<StrictMode>
 		<Router>
-			{/* <Suspense fallback={<div>Loading...</div>}> */}
+			{/* <Suspense fallback={<Loading />}> */}
 			<Routes>
 				<Route element={<Layout />}>
 					{/* Temporarily disable home page since its filled with filler data */}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import Loading from '../general/Loading'
 import { handleServerError, showMessage } from '../general/handleServerError'
 import ResultPage from './ResultPage'
 import '../styles/resultGenerationPage.scss'
@@ -24,6 +25,8 @@ const ResultGenerationPage = () => {
 	const [descriptionHint, setDescriptionHint] = useState();
 	const [descriptionInput, setDescriptionInput] = useState();
 
+	const [loading, setLoading] = useState(true);
+
 	useEffect(() => {
 		const init = async () => {
 			try {
@@ -38,6 +41,7 @@ const ResultGenerationPage = () => {
 
 				resp = await axios.get(`${BASE_URL}/awards`, { headers: { "x-route": "/get_awards" }, withCredentials: true })
 				setAwards(resp.data)
+				setLoading(false)
 			} catch (err) {
 				handleServerError(err.response.status)
 			}
@@ -90,9 +94,10 @@ const ResultGenerationPage = () => {
 		})
 
 		if (pdfLoading) return;
-		console.log(boys)
 		setPdf(true);
 	}
+
+	if (loading) return <Loading />
 
 	return (
 		<div className='result-generation-page'>
