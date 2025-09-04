@@ -29,7 +29,7 @@ module.exports = async (req, res) => {
 
         switch (routeKey) {
             case 'GET /get_awards': {
-                const auth = await checkAuthentication(authorization, res, ["Admin", "Officer", "Primer"], includeAppt = true);
+                const auth = await checkAuthentication(authorization, res, ["Admin", "Officer", "Primer", "Boy"], includeAppt = true);
                 if (!auth) return res.status(401).json({ message: 'Unauthorized' })
                 
                 const awards = await Awards.find({});

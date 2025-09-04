@@ -42,6 +42,7 @@ module.exports = async (req, res) => {
 
             case 'GET /get_own_account': {
                 const decoded = await decodeJWT(authorization, res);
+                if (typeof decoded.status === "function") return;
 
                 const user = await User.findById(decoded.id).select('-password');
                 if (!user) return res.status(404).json({ message: 'User not found' });
