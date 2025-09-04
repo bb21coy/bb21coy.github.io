@@ -1,8 +1,9 @@
 // Displays an error message when the json response from
+
 // the backend is an error
 function handleServerError(status) {
 	if (status === 401) {
-		showMessage("Unable to verify user. Please login again.");
+		showMessage("Your session is invalid or has expired");
 	} else if (status === 400) {
 		showMessage("Please fill in all fields.");
 	} else if (status === 404) {
