@@ -1,47 +1,52 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { handleServerError } from './handleServerError'
-import BASE_URL from '../Constants'
+import { useUser } from './UserContext'
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const Header = () => {
 	const navigate = useNavigate();
-	const [loggedIn, setLoggedIn] = useState(false)
-	const [navigationViewable, setNavigationViewable] = useState(false)
+	const location = useLocation();
+	const { user, setUser, loggedIn, setLoggedIn, navigationViewable, setNavigationViewable } = useUser();
 	const [buttons, setButtons] = useState(2);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const [user, setUser] = useState({});
-	const [currentPage, setCurrentPage] = useState(window.location.hash);
+	const [currentPage, setCurrentPage] = useState(window.location.pathname);
 
 	useEffect(() => {
-		async function checkSession() {
-			try {
-				const response = await axios.get(`${BASE_URL}/auth`, { headers: { "x-route": "/check_session" }, withCredentials: true })
-				if (response.data.valid) {
-					const ownAccount = await axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
-					setUser(ownAccount.data)
-					setLoggedIn(!!ownAccount.data)
-
-					if (response.data) {
-						let count = 4;
-						if (response.data.account_type === "Boy") count += 1
-						if (response.data.account_type === "Admin") count += 1;
-						if ((response.data.account_type !== "Boy") || (response.data.account_type === "Boy" && response.data.appointment !== null)) count += 3
-						if (response.data.account_type !== "Boy") count += 1
-						setButtons(count);
-					}
-				} else {
-					navigate('/log_in');
-				}
-			} catch (err) {
-				console.error("Error checking session:", err);
-				handleServerError(err.response.status);
+		const unsub = onAuthStateChanged(auth, (user) => {
+			if (!user) {
+				if (location.pathname !== "/login") return navigate('/login?next=' + location.pathname);
+			} else {
+				setLoggedIn(!!user);
+				console.log(user);
+				getData(user);
 			}
+		})
+
+		async function getData(user) {
+			const ref = doc(db, "users", user.uid);
+			const snap = await getDoc(ref);
+			const data = snap.data();
+			if (snap.exists()) setUser(data);
+			else return
+
+			let count = 4;
+			if (data.account_type === "Boy") count += 1
+			if (data.account_type === "Admin") count += 1;
+			if ((data.account_type !== "Boy") || (data.account_type === "Boy" && data.appointment !== null)) count += 3
+			if (data.account_type !== "Boy") count += 1
+			setButtons(count);
 		}
 
-		checkSession();
 		setCurrentPage(window.location.pathname);
-	}, [navigate])
+		return () => unsub();
+	}, [navigate, location])
+
+	useEffect(() => {
+		console.log(acsiiArt);
+	}, [])
 
 	const toggleUserMenu = () => {
 		setNavigationViewable(prevState => !prevState);
@@ -53,13 +58,12 @@ const Header = () => {
 
 	const logOut = async () => {
 		try {
-			const response = await axios.post(`${BASE_URL}/auth`, {}, { headers: { "x-route": "/logout" }, withCredentials: true })
-			if (response.data) {
-				setLoggedIn(false);
-				setUser(null);
-				setNavigationViewable(false);
-				navigate('/log_in')
-			};
+			await signOut(auth);
+			localStorage.clear();
+			setLoggedIn(false);
+			setUser({});
+			setNavigationViewable(false);
+			navigate('/login')
 		} catch (err) {
 			console.error("Error logging out:", err);
 			handleServerError(err.response.status)
@@ -217,5 +221,15 @@ const Header = () => {
 		</header>
 	)
 }
+
+const acsiiArt = `
+ mmmmmm    mmmmmm     mmmmm      mmm    
+ ##""""##  ##""""##  #""""##m   #"##    
+ ##    ##  ##    ##        ##     ##    
+ #######   #######       m#"      ##    
+ ##    ##  ##    ##    m#"        ##    
+ ##mmmm##  ##mmmm##  m##mmmmm  mmm##mmm 
+ """""""   """""""   """"""""  """""""" 
+`
 
 export default Header

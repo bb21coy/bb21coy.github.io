@@ -1,41 +1,55 @@
 import { useEffect, useState } from 'react'
-import BASE_URL from '../Constants'
-import axios from 'axios'
-import { handleServerError, showMessage } from '../general/handleServerError'
+import { showMessage } from '../general/handleServerError'
+import { useNavigate } from 'react-router-dom'
+import { useUser } from '../general/UserContext'
 import '../styles/resetPasswordPage.scss'
+import { getAuth, updatePassword, updateEmail, onAuthStateChanged, signOut } from "firebase/auth";
 
 // To allow boys to reset their password
 const ResetPasswordPage = () => {
-	const [account, setAccount] = useState();
+	const auth = getAuth();
+	const [userData, setUserData] = useState(null);
 	const [passwordType, setPasswordType] = useState("password");
 	const [password, setPassword] = useState("");
-	const [username, setUsername] = useState("");
+	const [email, setEmail] = useState();
+	const navigate = useNavigate();
+	const { setLoggedIn, setNavigationViewable, setUser } = useUser();
 
 	useEffect(() => {
-		async function init() {
-			try {
-				const account = await axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
-				setAccount(account.data);
-				setUsername(account.data.user_name);
-			} catch (err) {
-				handleServerError(err.response.status);
-			}
-		}
+		const unsub = onAuthStateChanged(auth, (user) => {
+			if (user) {
+				setUserData(user)
+				setEmail(user.email)
+			};
+		})
 
-		init()
+		return () => unsub();
 	}, [])
 
 	async function editAccount(e) {
 		try {
 			e.preventDefault()
-			if (username === "" || password === "") return showMessage("Please fill in all fields")
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (email === "" || password === "") return showMessage("Please fill in all fields");
+			if (!emailRegex.test(email)) return showMessage("Please enter a valid email address");
+			if (password.length < 6) return showMessage("Password must be at least 6 characters long");
 			if (!e.target.checkValidity()) return;
 
-			await axios.put(`${BASE_URL}/account`, { username, password }, { headers: { "x-route": '/update_username_password' }, withCredentials: true })
+			await updateEmail(auth.currentUser, email);
+			await updatePassword(auth.currentUser, password);
 			showMessage("Account updated successfully", "success")
 		} catch (err) {
 			console.error(err)
-			handleServerError(err.response.status)
+			if (err.code === "auth/email-already-in-use") return showMessage("Email already in use");
+			else if (err.code === "auth/requires-recent-login") {
+				await signOut(auth);
+				showMessage("Reset password requires recent login. Please login again.")
+				setLoggedIn(false);
+				setUser({});
+				setNavigationViewable(false);
+				navigate('/login?next=/reset_password')
+			}
+			else showMessage(err.code)
 		}
 	}
 
@@ -43,9 +57,9 @@ const ResetPasswordPage = () => {
 		<div className='reset-password-page'>
 			<div className='user-information'>
 				<h1>Reset Username and Password</h1>
-				{account != null && <form className="edit-account-form" onSubmit={editAccount} noValidate>
-					<label htmlFor='user_name'>Username:</label>
-					<input className='edit-field' type="text" required defaultValue={account.user_name} id='user_name' autoComplete='username' onChange={(e) => setUsername(e.target.value)}></input>
+				{userData != null && <form className="edit-account-form" onSubmit={editAccount} noValidate>
+					<label htmlFor='email'>Email:</label>
+					<input type="text" required defaultValue={email} id='email' autoComplete='email' onChange={(e) => setEmail(e.target.value)}></input>
 					<span></span>
 
 					<label htmlFor='password'>New Password:</label>

@@ -9,13 +9,13 @@
 		border-right: 1px solid black;
 		margin-right: 10px;
 		width: 20vw;
+		flex-shrink: 0;
 	}
 
 	> div:first-of-type > div {
 		position: sticky;
 		top: 0;
 		height: 95vh;
-		width: 20vw;
 		padding-top: 10px;
 		display: flex;
 		flex-direction: column;

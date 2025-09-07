@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import styles from "./helpPage.module.scss";
 
 function HelpPageSteps({ steps }) {
     const [currentStep, setCurrentStep] = useState(0);
@@ -13,7 +14,7 @@ function HelpPageSteps({ steps }) {
     };
 
     return (
-        <div className="help-page-step">
+        <div className={styles["help-page-step"]}>
             <div aria-label="Previous Step">
                 <i className="fa-solid fa-chevron-left" onClick={handlePrevStep}></i>
             </div>

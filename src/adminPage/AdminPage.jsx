@@ -2,10 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { handleServerError } from '../general/handleServerError';
 import DatabaseTable from './DatabaseTable';
-import AdminUsageAnalytics from './AdminUsageAnalytics';
 import BASE_URL from '../Constants';
 import '../styles/adminPage.scss'
-import '../styles/general.scss'
 
 // Only meant for admin to initialise the page
 const AdminPage = () => {
@@ -65,7 +63,6 @@ const AdminPage = () => {
 			</div>
 			<div className='page-container' ref={tableRef} onMouseDown={onMouseDown} onMouseLeave={onMouseLeave} onMouseUp={onMouseUp} onMouseMove={onMouseMove} style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
 				{(selectedTable && selectedTable !== "usage") && <DatabaseTable table_name={selectedTable} />}
-				{selectedTable === "usage" && <AdminUsageAnalytics/>}
 			</div>
 		</div>
 	)

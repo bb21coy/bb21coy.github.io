@@ -22,6 +22,7 @@ const AwardFileReader = ({ boyIds, boyNames, toggleAttainment }) => {
 				let sheetOfInterest = workbook["Sheets"][sheetName]
 				delete sheetOfInterest['C1']
 				const json = xlsx.utils.sheet_to_json(workbook["Sheets"][sheetName]);
+				console.log(json)
 				let colToAward = {}
 				Object.entries(json[0]).map(([key, award]) => {
 					if (electiveAwards.includes(award) || ipaAwards.includes(award) || spaAwards.includes(award) || foundersAwards.includes(award) || serviceAwards.includes(award)) {

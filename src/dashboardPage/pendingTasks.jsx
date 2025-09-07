@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const PendingTasks = ({ accountType, appointment, userId, paradesAfterToday }) => {
+const PendingTasks = ({ accountType, appointment, userId, paradesAfterToday, styles }) => {
     function daysUntilSaturday() {
         const today = new Date();
         const dayOfWeek = today.getDay();
@@ -9,10 +9,10 @@ const PendingTasks = ({ accountType, appointment, userId, paradesAfterToday }) =
     }
 
     return (
-        <div className="pending-tasks">
+        <div className={styles["pending-tasks"]}>
             <h2>Pending Tasks</h2>
 
-            <div className="tasks">
+            <div className={styles["tasks"]}>
                 {paradesAfterToday.length > 0 && <ol>
                     {/* Check if there is an upcoming parade */}
                     {paradesAfterToday.length > 0 && paradesAfterToday.map(parade => 
@@ -50,7 +50,8 @@ PendingTasks.propTypes = {
     accountType: PropTypes.string,
     appointment: PropTypes.string,
     userId: PropTypes.number,
-    paradesAfterToday: PropTypes.array
+    paradesAfterToday: PropTypes.array,
+    styles: PropTypes.object
 };
 
 export { PendingTasks };

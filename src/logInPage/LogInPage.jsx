@@ -1,54 +1,52 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
-import BASE_URL from '../Constants'
-import { showMessage, handleServerError } from '../general/handleServerError';
-import '../styles/logInPage.scss'
+import { useNavigate, useLocation } from 'react-router-dom';
+import { showMessage } from '../general/handleServerError';
+import styles from './logInPage.module.scss'
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 // To log in, accounts can only be created by existing users
 const LogInPage = () => {
+	const { search } = useLocation()
+	const searchParams = new URLSearchParams(search)
 	const navigate = useNavigate();
-	const [username, setUsername] = useState('');
+	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
 	useEffect(() => {
-		axios.get(`${BASE_URL}/auth`, { headers: { "x-route": "/check_session" }, withCredentials: true })
-			.then(response => {
-				if (response.data.valid) navigate('/home')
-			})
-			.catch(err => {
-				console.log(err.response.data)
-				handleServerError(err.response.data.status)
-			})
+		const unsub = onAuthStateChanged(auth, (user) => {
+			if (user) navigate('/home')
+		})
+
+		return () => unsub();
 	}, [navigate])
 
-	function submitForm(e) {
+	async function submitForm(e) {
 		e.preventDefault()
-		if (!username || !password) return showMessage("Please enter both username and password");
+		if (!email || !password) return showMessage("Please enter both email and password");
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(email)) return showMessage("Please enter a valid email address");
 
-		axios.post(`${BASE_URL}/auth`, { username, password }, { headers: { "x-route": "/login" }, withCredentials: true })
-			.then(resp => {
-				if (resp.data.message) showMessage(resp.data.message, 'success');
-				navigate('/home');
-			})
-			.catch(err => {
-				if (err.response.status === 401) showMessage("Incorrect username or password")
-				else handleServerError(err.response.status)
-			})
+		signInWithEmailAndPassword(auth, email, password)
+		.then(userCredential => {
+			console.log(userCredential);
+			localStorage.setItem('email', email);
+			localStorage.setItem('password', password);
+			if (searchParams.get('next')) navigate(searchParams.get('next'));
+			else navigate('/home');
+		})
+		.catch(() => showMessage("Incorrect username or password"))
 	}
 
 	return (
-		<div className='log-in-page' style={{ 'background': 'url("slide 2.webp") center/cover no-repeat' }}>
-			<form className='log-in-form' onSubmit={submitForm} noValidate>
-				<h2>BB 21<sup>st</sup> Portal</h2>
-
-				<label htmlFor="username">Username:</label>
-				<input type='text' name="username" id='username' placeholder='Enter Username' required autoComplete='username' onChange={e => setUsername(e.target.value)} />
+		<div className={styles.login}>
+			<form onSubmit={submitForm} noValidate>
+				<label htmlFor="email">Email:</label>
+				<input type='email' name="email" id='email' placeholder='Enter Email' required autoComplete='email' onChange={e => setEmail(e.target.value)} />
 
 				<label htmlFor="password">Password:</label>
 				<input type='password' name="password" id='password' placeholder='Enter Password' required autoComplete='current-password' onChange={e => setPassword(e.target.value)} />
-				<br />
-				<button>Log In</button>
+				<button>Login</button>
 			</form>
 		</div>
 	)

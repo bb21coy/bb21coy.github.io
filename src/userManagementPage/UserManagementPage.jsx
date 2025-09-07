@@ -1,42 +1,25 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import AccountCreationForm from './AccountCreationForm'
 import AppointmentHoldersList from './AppointmentHoldersList'
 import UserInformation from './UserInformation'
-import { OfficerAccountsList } from './OfficerAccountsList'
-import { PrimerAccountsList } from './PrimerAccountsList'
-import { BoyAccountsList } from './BoyAccountsList'
-import { GraduatedBoyAccountsList } from './GraduatedBoyAccountsList'
+import UserAccountsList from './UserAccountsList'
 import "../styles/userManagementPage.scss"
-import { showMessage } from '../general/handleServerError'
-import BASE_URL from '../Constants'
+import { useUser } from '../general/UserContext'
 
 // To access current users and create new accounts
 const UserManagementPage = () => {
 	const navigate = useNavigate()
-	const [load, setLoad] = useState(true);
+	const { user } = useUser();
+	const accountType = user.account_type;
+	const appointment = user.appointment;
 	const [pageState, setPageState] = useState("form");
-	const [user, setUser] = useState(null);
+	const [usersList, setUsersList] = useState([])
 	const [pageSize, setPageSize] = useState(window.innerWidth > 800);
-	const [accountType, setAccountType] = useState()
-	const [appointment, setAppointment] = useState()
 
 	useEffect(() => {
-		window.addEventListener("resize", () => {
-			setPageSize(window.innerWidth > 800);
-		})
-
-		axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
-			.then(response => {
-				if (response.data.account_type === 'Boy' && response.data.appointment === null) navigate('/home')
-				setAccountType(response.data.account_type)
-				setAppointment(response.data.appointment)
-			})
-			.catch(err => {
-				console.error("Error fetching user information: ", err.response.data);
-				showMessage("Failed to load user information")
-			})
+		window.addEventListener("resize", () => setPageSize(window.innerWidth > 800))
+		// if (user.account_type === 'Boy' && user.appointment === null) navigate('/home')
 	}, [navigate])
 
 	// Show the form to create new accounts
@@ -49,17 +32,10 @@ const UserManagementPage = () => {
 
 	function showUser(id) {
 		if (pageSize) {
-			setPageState("user")
-			setUser(id)
+			setPageState(id)
 		} else {
 			navigate("/user_management/" + encodeURIComponent(id))
 		}
-	}
-
-	function reLoad() {
-		setLoad((prevLoad) => {
-			return !prevLoad
-		})
 	}
 
 	function filter() {
@@ -73,46 +49,33 @@ const UserManagementPage = () => {
 
 	return (
 		<div className='user-management-page'>
-			<div className='page-container'>
-				<div className='toggle-buttons'>
-					<input type="radio" name="toggle-buttons" id="users" onChange={showForm1} checked={pageState !== "appointments"} />
-					<label htmlFor="users">Users</label>
-					<input type="radio" name="toggle-buttons" id="appt" onChange={showAppointments} checked={pageState === "appointments"} />
-					<label htmlFor="appt">Appointment Holders</label>
-				</div>
+			<div className='toggle-buttons'>
+				<input type="radio" name="toggle-buttons" id="users" onChange={showForm1} checked={pageState !== "appointments"} />
+				<label htmlFor="users">Users</label>
+				<input type="radio" name="toggle-buttons" id="appt" onChange={showAppointments} checked={pageState === "appointments"} />
+				<label htmlFor="appt">Appointments</label>
+			</div>
 
-				<div className='users'>
-					{pageState !== "appointments" && <>
-						<div className='users-list'>
-							<div>
-								<div>
-									<label htmlFor="search">
-										<i className='fa-solid fa-magnifying-glass'></i>
-										Search
-									</label>
-									<input type="search" name="search" id="search" placeholder='Search by Name' onInput={filter} />
-								</div>
-								<button onClick={showForm}>Create New Account</button>
-							</div>
-
-							<div id='all-users'>
-								<p>Current Users</p>
-								{["Admin", "Officer"].includes(accountType) && <OfficerAccountsList setPageState={showUser} load={load} />}
-								{accountType !== "Boy" && <PrimerAccountsList setPageState={showUser} load={load} />}
-								<BoyAccountsList setPageState={showUser} load={load} />
-
-								<p>Graduated Boys</p>
-								<GraduatedBoyAccountsList setPageState={showUser} load={load} />
-							</div>
+			<div className='users'>
+				{pageState !== "appointments" && <>
+					<div className='users-list'>
+						<div>
+							<i className='fa-solid fa-magnifying-glass'></i>
+							<input type="search" id="search" placeholder='Find someone' onInput={filter} />
+							<i onClick={showForm} className='fa-solid fa-user-plus'></i>
 						</div>
-						<hr />
-					</>}
 
-					<div className='main-block'>
-						{pageState === "form" && <AccountCreationForm account_type={accountType} appointment={appointment} reLoad={reLoad} />}
-						{pageState === "appointments" && <AppointmentHoldersList account_type={accountType} load={load} reLoad={reLoad} />}
-						{pageState === "user" && <UserInformation accountType={accountType} appointment={appointment} userId={user} showForm={showForm} reLoad={reLoad} />}
+						<div id='all-users'>
+							<UserAccountsList setUsersList={setUsersList} usersList={usersList} showUser={showUser} pageState={pageState} />
+						</div>
 					</div>
+					<hr />
+				</>}
+
+				<div className='main-block'>
+					{pageState === "form" && <AccountCreationForm account_type={accountType} appointment={appointment} />}
+					{pageState === "appointments" && <AppointmentHoldersList account_type={accountType} />}
+					{pageState !== "form" && pageState !== "appointments" && <UserInformation userInfo={usersList.find(user => user.id === pageState)} showForm={showForm} />}
 				</div>
 			</div>
 		</div>

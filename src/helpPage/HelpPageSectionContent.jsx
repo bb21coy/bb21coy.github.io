@@ -160,10 +160,10 @@ const conducting_inspection_steps = [
     }
 ]
 
-function HelpPageSectionContent({ accountType, appointment }) {
+function HelpPageSectionContent({ accountType, appointment, styles }) {
     return (
-        <div className="help-page-section-content">
-            <section className="help-page-section">
+        <div className={styles["help-page-section-content"]}>
+            <section className={styles["help-page-section"]}>
                 <h2>Overview</h2>
                 
                 <h3 id="website-purpose">Website&apos;s purpose</h3>
@@ -189,7 +189,7 @@ function HelpPageSectionContent({ accountType, appointment }) {
 
                 <h3 id="routes">Routes</h3>
                 <p>Home Page contains the following routes depending on the account type:</p>
-                <div className="help-page-table">
+                <div className={styles["help-page-table"]}>
                     <p></p>
                     <p>Boy (w/o appt)</p>
                     <p>Boy (w/ appt)</p>
@@ -408,7 +408,7 @@ function HelpPageSectionContent({ accountType, appointment }) {
                 <h2>Developer</h2>
 
                 <h3 id='developer'>Developer Guide</h3>
-                <a href='https://github.com/BryanL2303/BB-21st-Portal/blob/ui/ux-redesign/docs/DeveloperGuide.md'>Click here to see the developer guide</a>
+                <a href='https://github.com/BryanL2303/BB-21st-Portal/blob/ui/ux-redesign/docs/DeveloperGuide.md' target="_blank">Click here to see the developer guide</a>
             </section>}
         </div>
     );
@@ -416,7 +416,8 @@ function HelpPageSectionContent({ accountType, appointment }) {
 
 HelpPageSectionContent.propTypes = {
     accountType: PropTypes.string,
-    appointment: PropTypes.string
+    appointment: PropTypes.string,
+    styles: PropTypes.object
 };
 
 export default HelpPageSectionContent

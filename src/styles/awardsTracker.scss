@@ -1,0 +1,88 @@
+@media screen{
+	.award-management-page  .award-tracker {
+        overflow: hidden;
+	}
+
+    .award-management-page  .award-attainment-table {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .award-table {
+            display: grid;
+            grid-template-columns: 210px repeat(var(--columns), 130px);
+            overflow-x: auto;
+            margin-bottom: 10px;
+            max-height: 85vh;
+
+            .boy-header {
+                grid-row: span 2;
+                position: sticky;
+                left: 0;
+                background: white;
+            }
+
+            p {
+                padding: 5px;
+                border: 1px solid black;
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                grid-column: span var(--colspan, 1);
+                grid-row: span var(--rowspan, 1);
+                height: calc(40 * var(--rowspan, 1));
+            }
+
+            .award-header {
+                font-weight: bold;
+            }
+
+            .award-boy {
+                justify-content: start !important;
+                position: sticky;
+                left: 0;
+                background: white;
+                text-align: left;
+            }
+
+            input {
+                accent-color: black;
+            }
+        }
+    }    
+}
+
+.award-tracker {
+    display: grid;
+    grid-template-columns: minmax(20vw, 200px) 1fr;
+    width: 100%;
+    min-height: 300px;
+}
+
+.sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+    padding-right: 10px;
+    border-right: 1px solid black;
+    margin-right: 10px;
+
+	input {
+		display: none;
+
+		& + label {
+			cursor: pointer;
+			outline: none;
+			border-radius: 10px;
+			padding: 5px 10px;
+			color: black;
+			font-size: 14px;
+		}
+
+		&:checked + label {
+			background: black;
+			color: white;
+		}
+	}
+}

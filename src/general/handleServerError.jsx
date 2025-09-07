@@ -22,7 +22,8 @@ const showMessage = (message, type='error') => {
 	newError.classList.add('error');
 	if (type === 'success') newError.classList.add('success');
 	newError.textContent = message;
-	document.querySelector('.error-container').appendChild(newError);
+	const container = document.querySelector('.error-container');
+	if (container) container.appendChild(newError);
 
 	setTimeout(() => newError.remove(), 5000);
 }

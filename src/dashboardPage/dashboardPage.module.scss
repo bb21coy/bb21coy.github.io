@@ -1,14 +1,12 @@
 @media screen {
     .dashboard {
-        box-sizing: border-box;
         margin: 20px 30px;
         display: flex;
         flex-direction: column;
         gap: 20px;
-        font-family: sans-serif;
     }
 
-    .dashboard .dashboard-routes {
+    .dashboard-routes {
         display: flex;
         gap: 20px;
         flex-wrap: wrap;
@@ -18,8 +16,8 @@
             border-radius: 10px;
             border: 1px solid black;
             color: black;
-            width: 120px;
-            height: 100px;
+            width: 140px;
+            height: 110px;
             display: flex;
             text-align: center;
             flex-direction: column;
@@ -53,7 +51,7 @@
         }
     }
 
-    .dashboard .pending-tasks {
+    .pending-tasks {
         padding: 20px;
         border: 1px solid black;
         border-radius: 10px;
@@ -83,7 +81,7 @@
                 flex-direction: column;
                 gap: 20px;
 
-                .fa-party-horn {
+                i {
                     font-size: 45px;
                 }
 

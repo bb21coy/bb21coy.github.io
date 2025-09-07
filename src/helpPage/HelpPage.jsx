@@ -1,30 +1,23 @@
 import { useEffect, useState } from "react";
 import HelpPageSectionContent from "./HelpPageSectionContent";
-import axios from "axios";
-import BASE_URL from "../Constants";
-import '../styles/helpPage.scss';
-import { handleServerError } from '../general/handleServerError'
+import styles from './helpPage.module.scss';
+import Loading from '../general/Loading'
+import { useUser } from '../general/UserContext'
 
 function HelpPage() {
-    const [accountType, setAccountType] = useState(null);
-    const [appointment, setAppointment] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const { user } = useUser();
+    const accountType = user?.account_type ?? null;
+    const appointment = user?.appointment ?? null;
 
     useEffect(() => {
-        async function init() {
-            try {
-                const account = await axios.get(`${BASE_URL}/account`, { headers: { "x-route": "/get_own_account" }, withCredentials: true })
-                setAccountType(account.data.account_type);
-                setAppointment(account.data.appointment);
-            } catch (err) {
-                handleServerError(err.response.status);
-            }
-        }
+        if (user && user.account_name !== null) setLoading(false)
+    }, [user])
 
-        init()
-    }, []);
+    if (loading) return <Loading />
 
     return (
-        <div className="help-page">
+        <div className={styles["help-page"]}>
             <div>
                 <div>
                     <p>Overview</p>
@@ -76,7 +69,7 @@ function HelpPage() {
                 </div>
             </div>
 
-            <HelpPageSectionContent accountType={accountType} appointment={appointment} />
+            <HelpPageSectionContent accountType={accountType} appointment={appointment} styles={styles} />
         </div>
     );
 }
