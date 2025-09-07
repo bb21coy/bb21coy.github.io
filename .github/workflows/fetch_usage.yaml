@@ -1,0 +1,29 @@
+name: Fetch Vercel Usage
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes
+  workflow_dispatch:          # allow manual trigger
+
+jobs:
+  fetch-usage:
+    runs-on: ubuntu-latest
+    env:                      # make secret available as env var
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch usage from Vercel API
+        run: |
+          curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+            "https://vercel.com/api/usage-summary?teamId=bb21coys-projects" \
+            > public/usage.json
+
+      - name: Commit & push JSON
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/usage.json
+          git commit -m "Update usage.json [skip ci]" || echo "No changes"
+          git push
