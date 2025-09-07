@@ -8,13 +8,15 @@ on:
 jobs:
   fetch-usage:
     runs-on: ubuntu-latest
+    env:                      # make secret available as env var
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Fetch usage from Vercel API
         run: |
-          curl -s -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+          curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
             "https://vercel.com/api/usage-summary?teamId=bb21coys-projects" \
             > public/usage.json
 
