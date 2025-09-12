@@ -51,13 +51,13 @@ button {
 }
 
 @media screen and (max-width: 250px) {
-    .layout-div *,
+    .layout *,
     footer,
     header {
         display: none !important;
     }
 
-    .layout-div::before {
+    .layout::before {
         display: flex;
         content: "You are seeing this because your screen is too small";
         justify-content: center;
