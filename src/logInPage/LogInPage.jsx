@@ -28,14 +28,11 @@ const LogInPage = () => {
 		if (!emailRegex.test(email)) return showMessage("Please enter a valid email address");
 
 		signInWithEmailAndPassword(auth, email, password)
-		.then(userCredential => {
-			console.log(userCredential);
-			localStorage.setItem('email', email);
-			localStorage.setItem('password', password);
+		.then(() => {
 			if (searchParams.get('next')) navigate(searchParams.get('next'));
 			else navigate('/home');
 		})
-		.catch(() => showMessage("Incorrect username or password"))
+		.catch(() => showMessage("Incorrect email or password"))
 	}
 
 	return (

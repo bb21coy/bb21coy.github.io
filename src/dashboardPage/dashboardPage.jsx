@@ -8,6 +8,7 @@ import { useUser } from '../general/UserContext'
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from 'react-router-dom'
+import AdminUsageAnalytics from './UsageAnalytics'
 
 const DashboardPage = () => {
     const navigate = useNavigate()
@@ -43,8 +44,6 @@ const DashboardPage = () => {
             <h2>Hello, {!user ? "" : `${(user.account_type !== "Admin" && user.rank === null) ? user.honorifics : (user.account_type == "Admin" ? "" : user.rank)} ${user.account_name}`}</h2>
 
             <div className={styles['dashboard-routes']}>
-                {user.account_type === "Admin" && <DashboardOptions title="Admin Page" icon="gear" url="/admin" />}
-
                 {user.account_type === "Boy" && <>
                     <DashboardOptions title="My Awards" icon="award" url="/user_awards" />
                     <DashboardOptions title="My Inspections Results" icon="shirt-long-sleeve" url="/user_inspections" />
@@ -70,6 +69,8 @@ const DashboardPage = () => {
             </div>
 
             <PendingTasks accountType={user.account_type} appointment={user.appointment} userId={userId} paradesAfterToday={paradesAfterToday} styles={styles} />
+        
+            {user.account_type === "Admin" && <AdminUsageAnalytics></AdminUsageAnalytics>}
         </div>
     )
 }

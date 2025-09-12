@@ -11,7 +11,6 @@ import AttendanceManagementPage from './attendanceManagementPage/AttendanceManag
 import AwardsManagementPage from './awardsManagementPage/AwardsManagementPage';
 import ResultPage from './resultPage/ResultPage';
 import ResultGenerationPage from './resultPage/ResultGenerationPage';
-import AdminPage from './adminPage/AdminPage';
 import UniformInspectionPage from './uniformInspectionPage/UniformInspectionPage';
 import UniformInspectionResultPage from './uniformInspectionPage/UniformInspectionResultPage';
 import UniformInspectionForm from './uniformInspectionPage/UniformInspectionForm';
@@ -38,7 +37,6 @@ createRoot(document.body).render(
 							{/* Temporarily disable home page since its filled with filler data */}
 							{/* <Route path='/' element={<HomePage/>}/> */}
 							<Route path='/login' element={<LogInPage />} />
-							<Route path='/admin' element={<AdminPage />} />
 							<Route path='/' element={<LogInPage />} />
 							<Route path='/home' element={<DashboardPage />} />
 							<Route path='/parade_notice' element={<ParadeNoticePage />} />
