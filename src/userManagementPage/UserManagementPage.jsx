@@ -19,7 +19,7 @@ const UserManagementPage = () => {
 
 	useEffect(() => {
 		window.addEventListener("resize", () => setPageSize(window.innerWidth > 800))
-		// if (user.account_type === 'Boy' && user.appointment === null) navigate('/home')
+		if (user.account_name !== null && user.account_type === 'Boy' && user.appointment === null) navigate('/home')
 	}, [navigate])
 
 	// Show the form to create new accounts
@@ -74,7 +74,7 @@ const UserManagementPage = () => {
 
 				<div className='main-block'>
 					{pageState === "form" && <AccountCreationForm account_type={accountType} appointment={appointment} />}
-					{pageState === "appointments" && <AppointmentHoldersList account_type={accountType} />}
+					{pageState === "appointments" && <AppointmentHoldersList account_type={accountType} usersList={usersList} />}
 					{pageState !== "form" && pageState !== "appointments" && <UserInformation userInfo={usersList.find(user => user.id === pageState)} showForm={showForm} />}
 				</div>
 			</div>

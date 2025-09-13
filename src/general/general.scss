@@ -37,6 +37,17 @@ button {
     }
 }
 
+.offline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+}
+
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import axios from 'axios'
-import { handleServerError, showMessage } from '../general/handleServerError'
+import { showMessage } from '../general/handleServerError'
 import AppointmentInformation from './AppointmentInformation';
-import BASE_URL from '../Constants';
+import { collection, getDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
 
 // To manage permissions for appointment holders
-const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
+const AppointmentHoldersList = ({ account_type, usersList }) => {
 	const [appointments, setAppointments] = useState([])
 	const [boyList, setBoyList] = useState([])
 	const [primerList, setPrimerList] = useState([])
@@ -14,44 +14,48 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 	const [accountType, setAccountType] = useState()
 
 	useEffect(() => {
-		axios.get(`${BASE_URL}/appointment`, { headers: { 'x-route': '/get_appointments' }, withCredentials: true })
-			.then(resp => {
-				console.log(resp.data)
-				setAppointments(resp.data)
-			})
-			.catch(resp => {
-				console.error("Error fetching appointments:", resp.data);
-				handleServerError(resp.response.status)
-			})
+		const unsubscribe = onSnapshot(collection(db, "appointments"), async (querySnapshot) => {
+			if (querySnapshot.empty) return;
 
-		axios.get(`${BASE_URL}/account?type=Boy`, { headers: { 'x-route': '/get_accounts_by_type' }, withCredentials: true })
-			.then(resp => setBoyList(resp.data))
-			.catch(resp => handleServerError(resp.response.status))
+			const firstDoc = querySnapshot.docs[0]; // assuming you only need the first doc
+			const data = firstDoc.data();
 
-		axios.get(`${BASE_URL}/account?type=Primer`, { headers: { 'x-route': '/get_accounts_by_type' }, withCredentials: true })
-			.then(resp => setPrimerList(resp.data))
-			.catch(resp => handleServerError(resp.response.status))
+			const appts = {};
 
-		axios.get(`${BASE_URL}/account?type=Officer`, { headers: { 'x-route': '/get_accounts_by_type' }, withCredentials: true })
-			.then(resp => setOfficerList(resp.data))
-			.catch(resp => handleServerError(resp.response.status))
-	}, [load])
+			for (const [key, ref] of Object.entries(data)) {
+				const refSnap = await getDoc(ref); // fetch each referenced doc
+				if (refSnap.exists()) {
+					appts[key] = { id: refSnap.id, ...refSnap.data() };
+				}
+			}
 
-	function createAppointment(e) {
-		e.preventDefault()
-		if (!e.target.checkValidity()) return showMessage("Please fill in all fields")
+			console.log(appts);
+			setAppointments(appts);
+		});
 
-		const formData = new FormData(e.target);
+		return () => unsubscribe();
+	}, []);
 
-		axios.post(`${BASE_URL}/appointment`, formData, { headers: { "x-route": "/create_appointment" }, withCredentials: true })
-			.then(() => {
-				reLoad()
-				showMessage("Appointment has been created.", "success")
-			})
-			.catch(err => {
-				console.error(err.response.data);
-				handleServerError(err.response.status);
-			})
+	async function createAppointment(e) {
+		try {
+			e.preventDefault()
+
+			const formData = new FormData(e.target);
+			const formJson = Object.fromEntries(formData.entries());
+			if (!formJson.appointment_name) return showMessage("Please fill in all fields")
+			const appointmentRef = doc(db, "appointments", "HJbxljYligJkryXpA7sh");
+			const newApptDoc = doc(db, "users", formJson.account_id);
+
+			await updateDoc(appointmentRef, {
+				[formJson.appointment_name]: newApptDoc
+			});
+
+			showMessage("Appointment has been created", "success")
+			e.target.reset()
+		} catch (err) {
+			console.error(err)
+			showMessage("Failed to create appointment")
+		}
 	}
 
 	return (
@@ -59,12 +63,12 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 			<h2>Appointment Holders</h2>
 
 			<div className='appointment-holders-users'>
-				{appointments.map((appointment) =>
-					<AppointmentInformation accountType={account_type} key={appointment._id} appointment={appointment} boyList={boyList} primerList={primerList} officerList={officerList} reLoad={reLoad} />
+				{Object.entries(appointments).map(([key, appointment], index) =>
+					<AppointmentInformation accountType={account_type} key={index} appointment={appointment} appointment_name={key} boyList={boyList} primerList={primerList} officerList={officerList} />
 				)}
 			</div>
 
-			{(account_type === "Officer" || account_type === "Admin") && <form onSubmit={createAppointment} noValidate>
+			{(["Admin", "Officer"].includes(account_type)) && <form onSubmit={createAppointment} noValidate>
 				<h3>Add Appointment</h3>
 
 				<label htmlFor='name'>Appointment Name:</label>
@@ -82,8 +86,8 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 					<label htmlFor='holder'>Appointment Holder:</label>
 					<select id="holder" defaultValue={""} required name='account_id'>
 						<option value="" disabled hidden>Select Appointment Holder</option>
-						{(accountType === "Officer" ? officerList : (accountType === "Primer" ? primerList : boyList)).map(user => (
-							<option key={user._id} value={user._id}>{user.account_name}</option>
+						{usersList.filter(user => user.account_type === accountType).map(user => (
+							<option key={user.id} value={user.id}>{user.account_name}</option>
 						))}
 					</select>
 				</>}
@@ -96,8 +100,7 @@ const AppointmentHoldersList = ({ account_type, load, reLoad }) => {
 
 AppointmentHoldersList.propTypes = {
 	account_type: PropTypes.string,
-	load: PropTypes.bool.isRequired,
-	reLoad: PropTypes.func.isRequired
+	usersList: PropTypes.array
 }
 
 export default AppointmentHoldersList

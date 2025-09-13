@@ -13,12 +13,6 @@ const UserAccountsList = ({ usersList, setUsersList, showUser, pageState }) => {
 		const ref = collection(db, "users");
 		const unsub = onSnapshot(ref, (snapshot) => {
 			const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-			let newList = [...usersList];
-			const index = newList.indexOf(user.account_type);
-			newList.slice(index);
-			if (user.account_type === "Admin") newList = accountTypes;
-			data.filter(user => newList.includes(user.account_type));
-
 			setUsersList(data)
 		})
 
@@ -28,7 +22,21 @@ const UserAccountsList = ({ usersList, setUsersList, showUser, pageState }) => {
 	return (
 		<>
 			<p>Current Users</p>
-			{usersList.filter(user => user.graduated !== true).filter(user => user.account_type !== "Admin").map(user => (
+			{["Admin", "Officer"].includes(user.account_type) && usersList.filter(user => user.account_type === "Officer").map(user => (
+				<React.Fragment key={user.id}>
+					<input type="radio" name="users-list" id={user.id} onChange={(e) => showUser(user.id)} />
+					<label htmlFor={user.id}>{user.account_type} {user.rank} {user.account_name}</label>
+				</React.Fragment>
+			))}
+
+			{["Admin", "Officer", "Primer"].includes(user.account_type) && usersList.filter(user => user.account_type === "Primer").map(user => (
+				<React.Fragment key={user.id}>
+					<input type="radio" name="users-list" id={user.id} onChange={(e) => showUser(user.id)} />
+					<label htmlFor={user.id}>{user.account_type} {user.rank} {user.account_name}</label>
+				</React.Fragment>
+			))}
+
+			{usersList.filter(user => user.graduated !== true).filter(user => user.account_type === "Boy").map(user => (
 				<React.Fragment key={user.id}>
 					<input type="radio" name="users-list" id={user.id} onChange={(e) => showUser(user.id)} checked={pageState === user.id} />
 					<label htmlFor={user.id}>{user.account_type} Sec {user.level} {user.rank} {user.account_name}</label>
