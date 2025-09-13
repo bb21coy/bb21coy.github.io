@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react'
 import { showMessage } from '../general/handleServerError'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../general/UserContext'
-import '../styles/resetPasswordPage.scss'
+import styles from './resetPasswordPage.module.scss'
 import { getAuth, updatePassword, updateEmail, onAuthStateChanged, signOut } from "firebase/auth";
 
 // To allow boys to reset their password
 const ResetPasswordPage = () => {
 	const auth = getAuth();
-	const [userData, setUserData] = useState(null);
 	const [passwordType, setPasswordType] = useState("password");
 	const [password, setPassword] = useState("");
 	const [email, setEmail] = useState();
@@ -18,7 +17,6 @@ const ResetPasswordPage = () => {
 	useEffect(() => {
 		const unsub = onAuthStateChanged(auth, (user) => {
 			if (user) {
-				setUserData(user)
 				setEmail(user.email)
 			};
 		})
@@ -54,21 +52,19 @@ const ResetPasswordPage = () => {
 	}
 
 	return (
-		<div className='reset-password-page'>
-			<div className='user-information'>
-				<h1>Reset Username and Password</h1>
-				{userData != null && <form className="edit-account-form" onSubmit={editAccount} noValidate>
-					<label htmlFor='email'>Email:</label>
-					<input type="text" required defaultValue={email} id='email' autoComplete='email' onChange={(e) => setEmail(e.target.value)}></input>
-					<span></span>
+		<div className={styles['reset-password-page']}>
+			<h2>Reset Username and Password</h2>
+			<form className="edit-account-form" onSubmit={editAccount} noValidate>
+				<label htmlFor='email'>Email:</label>
+				<input type="text" required defaultValue={email} id='email' autoComplete='email' onChange={(e) => setEmail(e.target.value)}></input>
+				<span></span>
 
-					<label htmlFor='password'>New Password:</label>
-					<input type={passwordType} className='edit-field' required id='password' placeholder='Enter New Password' autoComplete='new-password' onChange={(e) => setPassword(e.target.value)}></input>
-					<i className={`fa-solid ${passwordType === "password" ? "fa-eye" : "fa-eye-slash"}`} onClick={() => setPasswordType(passwordType === 'password' ? 'text' : 'password')}></i>
+				<label htmlFor='password'>New Password:</label>
+				<input type={passwordType} className='edit-field' required id='password' placeholder='Enter New Password' autoComplete='new-password' onChange={(e) => setPassword(e.target.value)}></input>
+				<i className={`fa-solid ${passwordType === "password" ? "fa-eye" : "fa-eye-slash"}`} onClick={() => setPasswordType(passwordType === 'password' ? 'text' : 'password')}></i>
 
-					<button className="edit-button">Save Changes</button>
-				</form>}
-			</div>
+				<button className="edit-button">Save Changes</button>
+			</form>
 		</div>
 	)
 }
