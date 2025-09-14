@@ -34,7 +34,6 @@ const Header = () => {
 
 			let count = 4;
 			if (data.account_type === "Boy") count += 1
-			if (data.account_type === "Admin") count += 1;
 			if ((data.account_type !== "Boy") || (data.account_type === "Boy" && data.appointment !== null)) count += 3
 			if (data.account_type !== "Boy") count += 1
 			setButtons(count);
@@ -59,7 +58,6 @@ const Header = () => {
 	const logOut = async () => {
 		try {
 			await signOut(auth);
-			localStorage.clear();
 			setLoggedIn(false);
 			setUser({});
 			setNavigationViewable(false);
