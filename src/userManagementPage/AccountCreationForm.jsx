@@ -7,6 +7,7 @@ import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import axios from 'axios';
 import BASE_URL from '../Constants';
+import styles from './accountCreationForm.module.scss'
 
 // To create new accounts
 const AccountCreationForm = ({ account_type, appointment }) => {
@@ -81,7 +82,7 @@ const AccountCreationForm = ({ account_type, appointment }) => {
 	}
 
 	return (
-		<form className='create-account-form' onSubmit={submitForm}>
+		<form className={styles.account_creation} onSubmit={submitForm}>
 			<h2>Account Creation</h2>
 
 			<div>
@@ -92,7 +93,7 @@ const AccountCreationForm = ({ account_type, appointment }) => {
 				<input name={"email"} placeholder='Enter Email' id='user-name-input' autoComplete='email' />
 
 				<label htmlFor='password-input'>Password:</label>
-				<input name={'password'} placeholder='Enter Password' autoComplete='new-password' id='password-input' />
+				<input type='text' name={'password'} placeholder='Enter Password' autoComplete='new-password' id='password-input' />
 
 				<label htmlFor='account-type-input'>Account Type: </label>
 				<select name="account_type" id="account-type-input" onChange={(e) => setType(e)} defaultValue="Boy">
@@ -103,7 +104,7 @@ const AccountCreationForm = ({ account_type, appointment }) => {
 
 				{accountType && <label htmlFor="rank-input">Rank: </label>}
 				{["Officer", "Primer", "Boy"].includes(accountType) && (
-					<select id="rank-input" name="rank" defaultValue={accountType === "Boy" ? "REC" : "NIL"}>
+					<select id="rank-input" name="rank" defaultValue={accountType === "Boy" ? "REC" : "NIL"} onChange={(e) => setAccountRank(e.target.value)}>
 						{accountType === "Officer" && (<>
 							<option value="NIL">Not Applicable</option>
 							<option value="OCT">OCT</option>

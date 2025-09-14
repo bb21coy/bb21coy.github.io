@@ -4,32 +4,27 @@ import { showMessage } from '../general/handleServerError'
 import AppointmentInformation from './AppointmentInformation';
 import { collection, getDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
+import styles from './appointmentHoldersList.module.scss'
 
 // To manage permissions for appointment holders
 const AppointmentHoldersList = ({ account_type, usersList }) => {
 	const [appointments, setAppointments] = useState([])
-	const [boyList, setBoyList] = useState([])
-	const [primerList, setPrimerList] = useState([])
-	const [officerList, setOfficerList] = useState([])
 	const [accountType, setAccountType] = useState()
 
 	useEffect(() => {
 		const unsubscribe = onSnapshot(collection(db, "appointments"), async (querySnapshot) => {
 			if (querySnapshot.empty) return;
-
-			const firstDoc = querySnapshot.docs[0]; // assuming you only need the first doc
+			const firstDoc = querySnapshot.docs[0];
 			const data = firstDoc.data();
-
 			const appts = {};
 
 			for (const [key, ref] of Object.entries(data)) {
-				const refSnap = await getDoc(ref); // fetch each referenced doc
+				const refSnap = await getDoc(ref);
 				if (refSnap.exists()) {
 					appts[key] = { id: refSnap.id, ...refSnap.data() };
 				}
 			}
 
-			console.log(appts);
 			setAppointments(appts);
 		});
 
@@ -59,17 +54,17 @@ const AppointmentHoldersList = ({ account_type, usersList }) => {
 	}
 
 	return (
-		<div className='appointment-holders-list'>
+		<div className={styles['appointment-holders-list']}>
 			<h2>Appointment Holders</h2>
 
-			<div className='appointment-holders-users'>
+			<div className={styles['appointment-holders-users']}>
 				{Object.entries(appointments).map(([key, appointment], index) =>
-					<AppointmentInformation accountType={account_type} key={index} appointment={appointment} appointment_name={key} boyList={boyList} primerList={primerList} officerList={officerList} />
+					<AppointmentInformation accountType={account_type} key={index} appointment={appointment} appointment_name={key} usersList={usersList} />
 				)}
 			</div>
 
 			{(["Admin", "Officer"].includes(account_type)) && <form onSubmit={createAppointment} noValidate>
-				<h3>Add Appointment</h3>
+				<h3>New Appointment</h3>
 
 				<label htmlFor='name'>Appointment Name:</label>
 				<input placeholder='Enter Appointment Name' type='text' id='name' autoComplete='off' required name='appointment_name' />
@@ -92,7 +87,7 @@ const AppointmentHoldersList = ({ account_type, usersList }) => {
 					</select>
 				</>}
 
-				<button>Add New Appointment</button>
+				<button>Add</button>
 			</form>}
 		</div>
 	)

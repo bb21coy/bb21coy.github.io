@@ -4,8 +4,9 @@ import AccountCreationForm from './AccountCreationForm'
 import AppointmentHoldersList from './AppointmentHoldersList'
 import UserInformation from './UserInformation'
 import UserAccountsList from './UserAccountsList'
-import "../styles/userManagementPage.scss"
+import styles from "./userManagementPage.module.scss"
 import { useUser } from '../general/UserContext'
+import usersListStyles from './usersList.module.scss'
 
 // To access current users and create new accounts
 const UserManagementPage = () => {
@@ -34,7 +35,8 @@ const UserManagementPage = () => {
 		if (pageSize) {
 			setPageState(id)
 		} else {
-			navigate("/user_management/" + encodeURIComponent(id))
+			const data = usersList.find(user => user.id === id)
+			navigate("/user_management/" + encodeURIComponent(id), { state: data })
 		}
 	}
 
@@ -48,35 +50,31 @@ const UserManagementPage = () => {
 	}
 
 	return (
-		<div className='user-management-page'>
-			<div className='toggle-buttons'>
+		<div className={styles['user-management-page']}>
+			<div className={styles['toggle-buttons']}>
 				<input type="radio" name="toggle-buttons" id="users" onChange={showForm1} checked={pageState !== "appointments"} />
 				<label htmlFor="users">Users</label>
 				<input type="radio" name="toggle-buttons" id="appt" onChange={showAppointments} checked={pageState === "appointments"} />
 				<label htmlFor="appt">Appointments</label>
 			</div>
 
-			<div className='users'>
+			<div className={styles.users}>
 				{pageState !== "appointments" && <>
-					<div className='users-list'>
+					<div className={usersListStyles.usersList} data-class='usersList'>
 						<div>
 							<i className='fa-solid fa-magnifying-glass'></i>
 							<input type="search" id="search" placeholder='Find someone' onInput={filter} />
 							<i onClick={showForm} className='fa-solid fa-user-plus'></i>
 						</div>
 
-						<div id='all-users'>
-							<UserAccountsList setUsersList={setUsersList} usersList={usersList} showUser={showUser} pageState={pageState} />
-						</div>
+						<UserAccountsList setUsersList={setUsersList} usersList={usersList} showUser={showUser} pageState={pageState} />
 					</div>
 					<hr />
 				</>}
 
-				<div className='main-block'>
-					{pageState === "form" && <AccountCreationForm account_type={accountType} appointment={appointment} />}
-					{pageState === "appointments" && <AppointmentHoldersList account_type={accountType} usersList={usersList} />}
-					{pageState !== "form" && pageState !== "appointments" && <UserInformation userInfo={usersList.find(user => user.id === pageState)} showForm={showForm} />}
-				</div>
+				{pageState === "form" && <AccountCreationForm account_type={accountType} appointment={appointment} />}
+				{pageState === "appointments" && <AppointmentHoldersList account_type={accountType} usersList={usersList} />}
+				{pageState !== "form" && pageState !== "appointments" && <UserInformation userInfo={usersList.find(user => user.id === pageState)} showForm={showForm} />}
 			</div>
 		</div>
 	)

@@ -5,7 +5,6 @@ const UserSchema = z.object({
     
     account_type: z.enum(["Admin", "Officer", "Primer", "Boy"]),
     graduated: z.boolean().nullable().default(false),
-    appointment: z.string().nullable().default(null),
     honorifics: z.enum(["Mr", "Ms", "Mrs"]).nullable().default(null),
     level: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5), z.null()]).default(null),
 

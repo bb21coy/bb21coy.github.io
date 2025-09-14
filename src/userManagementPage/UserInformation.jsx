@@ -6,9 +6,10 @@ import UserSchema from '../schema/Users'
 import { showMessage } from '../general/handleServerError'
 import { useUser } from '../general/UserContext'
 import { getAuth } from "firebase/auth";
-import { updateDoc, deleteDoc } from 'firebase/firestore'
+import { updateDoc, deleteDoc, getDoc } from 'firebase/firestore'
 import { doc } from 'firebase/firestore'
 import { db } from '../firebase'
+import styles from './userInformation.module.scss'
 import Loading from '../general/Loading'
 
 // To view users information and delete user accounts
@@ -21,6 +22,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 
 	const [email, setEmail] = useState();
 	const [password, setPassword] = useState();
+	const [appointment, setAppointment] = useState();
 	const [accountRank, setAccountRank] = useState();
 	const [accountLevel, setAccountLevel] = useState();
 	const [accountClass, setAccountClass] = useState();
@@ -54,10 +56,25 @@ const UserInformation = ({ userInfo, showForm }) => {
 				setEmail(resp.data.email)
 			} catch (err) {
 				console.error("Failed to fetch admin data:", err)
+				showMessage("Failed to fetch email")
+			}
+		}
+
+		const fetchAppointmentData = async () => {
+			try {
+				const apptRef = doc(db, "appointments", "HJbxljYligJkryXpA7sh");
+				const docSnap = await getDoc(apptRef);
+
+				const data = docSnap.data();
+				const apptName = Object.keys(data).find((key) => data[key].id === userInfo.id);
+				setAppointment(apptName);
+			} catch (err) {
+				console.error("Failed to fetch admin data:", err)
 			}
 		}
 
 		if (userInfo) fetchAdminData()
+		if (userInfo) fetchAppointmentData()
 	}, [userInfo])
 
 	function setRank(e) {
@@ -127,7 +144,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 			if (submit) {
 				await updateDoc(doc(db, "users", userInfo.id), result.data);
 
-				if (emailInput !== email || password) {
+				if ((emailInput && emailInput !== email) || password) {
 					await axios.put(`${BASE_URL}/admin`, { email: emailInput, password, uid: userInfo.id }, { headers: { Authorization: `Bearer ${adminId}` } })
 				}
 
@@ -154,10 +171,10 @@ const UserInformation = ({ userInfo, showForm }) => {
 	if (!userInfo) return <Loading />
 
 	return (
-		<div className='user-information'>
+		<div className={styles.userInformation}>
 			<h2>User - {userInfo.account_name}</h2>
 
-			<form className="edit-account-form" id='edit-account-form' onSubmit={editAccount} ref={form} key={userInfo.id}>
+			<form id='edit-account-form' onSubmit={editAccount} ref={form} key={userInfo.id}>
 				<label htmlFor='name-input'>Full Name:</label>
 				<input id='name-input' name="account_name" defaultValue={userInfo.account_name} placeholder='Enter Full Name' />
 
@@ -266,9 +283,9 @@ const UserInformation = ({ userInfo, showForm }) => {
 					</select>
 				</>}
 
-				{userInfo.appointment != null && <>
+				{appointment && <>
 					<label htmlFor='appointment-input'>Appointment:</label>
-					<input type="text" name='appointment' id='appointment-input' disabled defaultValue={userInfo.appointment} />
+					<input type="text" name='appointment' id='appointment-input' disabled defaultValue={appointment} />
 				</>}
 
 				{(userInfo.class_1?.toLowerCase() === "staff" || accountRank === null) && <>
@@ -298,19 +315,16 @@ const UserInformation = ({ userInfo, showForm }) => {
 			</form>
 
 			<div>
-				<button className="edit-button" type='submit' form='edit-account-form'>Save Changes</button>
-				<button className="delete-button" type='button' onClick={deleteAccount}>Delete Account</button>
+				<button type='submit' form='edit-account-form'>Save Changes</button>
+				<button type='button' onClick={deleteAccount}>Delete Account</button>
 			</div>
 		</div>
 	)
 }
 
 UserInformation.propTypes = {
-	accountType: PropTypes.string,
-	appointment: PropTypes.string,
-	userId: PropTypes.string.isRequired,
-	showForm: PropTypes.func,
-	reLoad: PropTypes.func
+	userInfo: PropTypes.shape(),
+	showForm: PropTypes.func
 }
 
 export default UserInformation

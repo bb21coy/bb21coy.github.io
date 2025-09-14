@@ -1,0 +1,41 @@
+.userInformation {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+    flex: 1;
+
+	form {
+		display: grid;
+        grid-template-columns: max-content 1fr;
+		gap: 10px 30px;
+        width: 100%;
+		align-items: center;
+
+		input, select {
+			padding: 5px;
+			border-bottom: 1px solid black;
+		}
+	}
+
+	>div {
+		display: flex;
+		gap: 10px;
+		justify-content: flex-end;
+		flex-wrap: wrap;
+
+		button {
+			background: black;
+			color: white;
+			border-radius: 10px;
+			cursor: pointer;
+			padding: 5px 10px;
+		}
+	}
+}
+
+@media screen and (max-width: 800px) {
+    .userInformation form {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+}

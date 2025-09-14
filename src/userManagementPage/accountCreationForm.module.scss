@@ -1,0 +1,39 @@
+.account_creation {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+
+    button {
+        margin-left: auto;
+        cursor: pointer;
+        background: black;
+        color: white;
+        border-radius: 10px;
+        padding: 5px 10px;
+    }
+
+    >div {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 10px 30px;
+        align-items: center;
+
+        input,
+        select {
+            padding: 5px;
+            border-bottom: 1px solid black;
+        }
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .account_creation {
+        width: 100%;
+
+        div {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+    }
+}

@@ -1,0 +1,83 @@
+.usersList {
+    max-width: 250px;
+    width: 20vw;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+
+    >div {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    input {
+        border: none;
+        border-bottom: 1px solid black;
+        outline: none;
+        background: transparent;
+        color: black;
+        border-radius: 0;
+        padding: 5px;
+        width: 100%;
+    }
+
+    i:last-of-type {
+        border-radius: 50%;
+        border: 1px solid black;
+        width: 25px;
+        display: flex;
+        font-size: 12px;
+        justify-content: center;
+        align-items: center;
+        height: 25px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    p {
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    input[type='radio'] {
+        display: none;
+    }
+
+    >div:last-of-type {
+        overflow: auto;
+        flex-direction: column;
+        align-items: flex-start;
+
+        label {
+            padding: 3px 5px;
+            cursor: pointer;
+            border-radius: 10px;
+            color: black;
+            width: 100%;
+        }
+
+        input[type='radio']:checked+label {
+            background: black;
+            color: white;
+        }
+
+        label:hover {
+            background: lightgrey;
+        }
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .usersList {
+        flex: 1;
+        max-width: unset;
+        width: unset;
+
+        >div:first-of-type {
+            background: white;
+            position: sticky;
+            top: 0;
+        }
+    }
+}
