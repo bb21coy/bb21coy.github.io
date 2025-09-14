@@ -28,17 +28,16 @@ module.exports = async (req, res) => {
         const method = req.method;
 
         if (!token) return res.status(401).json({ message: 'Missing authorization token' });
-        console.log(token)
         const decoded = await admin.auth().verifyIdToken(token, true);
         if (!decoded) return res.status(401).json({ message: 'Invalid token' });
 
+        const userDoc = await db.collection("users").doc(decoded.uid).get();
+        if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
+        const user = userDoc.data();
+        if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
+
         switch (method) {
             case 'GET': {
-                const userDoc = await db.collection("users").doc(decoded.uid).get();
-                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
-                const user = userDoc.data();
-                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
-            
                 const uid = req.query.id;
                 if (!uid) return res.status(400).json({ message: 'Missing user id' });
                 const userRecord = await admin.auth().getUser(uid);
@@ -46,11 +45,6 @@ module.exports = async (req, res) => {
             }
 
             case 'POST': {
-                const userDoc = await db.collection("users").doc(decoded.uid).get();
-                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
-                const user = userDoc.data();
-                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
-            
                 const { email, password } = req.body;
                 if (!email || !password) return res.status(400).json({ message: 'Missing email or password' });
                 const userCredential = await admin.auth().createUser({ email, password });
@@ -58,11 +52,6 @@ module.exports = async (req, res) => {
             }
 
             case 'PUT': {
-                const userDoc = await db.collection("users").doc(decoded.uid).get();
-                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
-                const user = userDoc.data();
-                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
-
                 const { uid, email, password } = req.body;
                 if (!uid || !email || !password) return res.status(400).json({ message: 'Missing uid, email or password' });
                 const updateData = {};
@@ -77,11 +66,6 @@ module.exports = async (req, res) => {
             }
 
             case 'DELETE': {
-                const userDoc = await db.collection("users").doc(decoded.uid).get();
-                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
-                const user = userDoc.data();
-                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
-            
                 const uid = req.query.id;
                 if (!uid) return res.status(400).json({ message: 'Missing user id' });
                 await admin.auth().deleteUser(uid);
