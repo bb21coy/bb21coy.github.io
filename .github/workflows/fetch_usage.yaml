@@ -2,13 +2,16 @@ name: Fetch Vercel Usage
 
 on:
   schedule:
-    - cron: "0 0 * * *"   # every 1 day
-  workflow_dispatch:          # allow manual trigger
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   fetch-usage:
     runs-on: ubuntu-latest
-    env:                      # make secret available as env var
+    env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - name: Checkout repo
