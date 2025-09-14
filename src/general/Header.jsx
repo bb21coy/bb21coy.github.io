@@ -181,7 +181,7 @@ const Header = () => {
 						</>}
 
 						{user.account_type !== "Boy" &&
-							<button onClick={() => navigate('/uniform_inspection_results')} className={currentPage === '/uniform_inspection_results' ? styles.active : ''}>
+							<button onClick={() => navigate('/uniform_inspection_results')} className={currentPage === '/uniform_inspection' ? styles.active : ''}>
 								<i className='fa-solid fa-shirt-long-sleeve'></i>
 								Uniform Inspection
 							</button>}
