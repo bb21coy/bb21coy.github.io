@@ -1,139 +1,95 @@
+const admin = require("firebase-admin");
 const dotenv = require('dotenv');
-const jwt = require('jsonwebtoken');
-const cookie = require('cookie');
-const axios = require('axios');
-const mongoose = require('mongoose');
-const User = require('../models/users.js');
-const Token = require('../models/token.js');
-const { connectToDatabase, getAllCollections } = require('../mongoose.js');
 dotenv.config({ quiet: true });
 
-const decodeJWT = async (token, res, sendResponse = true) => {
-    try {
-        if (!token) throw new Error('Missing authorization token');
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (!decoded) throw new Error('Invalid token');
-
-        if (decoded.exp < Date.now() / 1000) throw new Error('Token expired');
-        const used = await Token.findOne({ token });
-        if (used) throw new Error('Token already used');
-
-        return decoded;
-    } catch (error) {
-        if (sendResponse && res) return res.status(401).json({ message: error.message });
-        return null;
-    }
-};
-
-const checkAuthenication = async (authorization, res, allowed = ["Admin", "Officer", "Primer", "Boy"]) => {
-    if (!Array.isArray(allowed)) {
-        console.error("Expected 'allowed' to be an array but got:", typeof allowed);
-        return false;
-    }
-    
-    const decoded = await decodeJWT(authorization, res);
-    if (!decoded || decoded.error) return false;
-
-    const user = await User.findById(decoded.id);
-    if (!user) return false;
-
-    const tokenType = user.account_type;
-    if (!tokenType || !allowed.includes(tokenType)) return false;
-    
-    return true;
-};
-
 module.exports = async (req, res) => {
+    if (!admin.apps.length) {
+        admin.initializeApp({
+            credential: admin.credential.cert({
+                projectId: process.env.FIREBASE_PROJECT_ID,
+                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+                privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+            }),
+        });
+    }
+
+    const db = admin.firestore();
     const origin = req.headers.origin || '*';
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-route');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Max-Age', '86400');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
-        const route = req.headers['x-route'];
-        const cookies = cookie.parse(req.headers.cookie || '');
-        const authorization = cookies.token;
+        const token = req.headers.authorization?.split('Bearer ')[1];
         const method = req.method;
 
-        if (!route) return res.status(401).json({ message: 'Missing route in headers' });
+        if (!token) return res.status(401).json({ message: 'Missing authorization token' });
+        console.log(token)
+        const decoded = await admin.auth().verifyIdToken(token, true);
+        if (!decoded) return res.status(401).json({ message: 'Invalid token' });
 
-        const routeKey = `${method.toUpperCase()} ${route}`;
-        await connectToDatabase();
-
-        switch (routeKey) {
-            case 'GET /get_table_names': {
-                if (!checkAuthenication(authorization, res, ["Admin"])) return res.status(401).json({ message: 'Unauthorized' });
-
-                const tableNames = await getAllCollections();
-                return res.status(200).json(tableNames);
+        switch (method) {
+            case 'GET': {
+                const userDoc = await db.collection("users").doc(decoded.uid).get();
+                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
+                const user = userDoc.data();
+                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
+            
+                const uid = req.query.id;
+                if (!uid) return res.status(400).json({ message: 'Missing user id' });
+                const userRecord = await admin.auth().getUser(uid);
+                return res.status(200).json(userRecord);
             }
 
-            case 'GET /get_table': {
-                if (!checkAuthenication(authorization, res, ["Admin"])) return res.status(401).json({ message: 'Unauthorized' });
-
-                let { table_name } = req.query;
-                if (!table_name) return res.status(400).json({ message: 'Missing table name' });
-
-                switch (table_name.toLowerCase()) {
-                    case 'users': {
-                        table_name = 'User';
-                        break;
-                    }
-                    case 'token_blacklist': {
-                        table_name = 'Token';
-                        break;
-                    }
-                    case 'appointments': {
-                        table_name = 'Appointment';
-                        break;
-                    }
-                    case 'uniform_inspections': {
-                        table_name = 'UniformInspections';
-                        break;
-                    }
-                    case 'uniform_components': {
-                        table_name = 'ComponentField';
-                        break;
-                    }
-                    case 'uniform_categories': {
-                        table_name = 'UniformComponent';
-                        break;
-                    }
-                    case 'masteries': {
-                        table_name = 'Masteries';
-                        break;
-                    }
-                    case 'awards': {
-                        table_name = 'Awards';
-                        break;
-                    }
-                }
-
-                const Model = mongoose.model(table_name);
-                const collection = await Model.find();
-                return res.status(200).json(collection);
+            case 'POST': {
+                const userDoc = await db.collection("users").doc(decoded.uid).get();
+                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
+                const user = userDoc.data();
+                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
+            
+                const { email, password } = req.body;
+                if (!email || !password) return res.status(400).json({ message: 'Missing email or password' });
+                const userCredential = await admin.auth().createUser({ email, password });
+                return res.status(200).json(userCredential);
             }
 
-            case 'GET /vercel_usage': {
-                if (!checkAuthenication(authorization, res, ["Admin"])) return res.status(401).json({ message: 'Unauthorized' });
+            case 'PUT': {
+                const userDoc = await db.collection("users").doc(decoded.uid).get();
+                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
+                const user = userDoc.data();
+                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
 
-                const resp = await axios.get(`https://vercel.com/api/usage-summary?teamId=bb21coys-projects`, {
-                    headers: {
-                        Authorization: `Bearer ${process.env.VERCEL_TOKEN}`
-                    }
-                });
+                const { uid, email, password } = req.body;
+                if (!uid || !email || !password) return res.status(400).json({ message: 'Missing uid, email or password' });
+                const updateData = {};
+                if (email) updateData.email = email;
+                if (password) updateData.password = password;
 
-                return res.json(resp.data.data.usage);
+                if (Object.keys(updateData).length === 0) return res.status(400).json({ message: 'Nothing to update' });
+                
+                await admin.auth().updateUser(uid, updateData);
+                console.log('User updated successfully');
+                return res.status(200).end();
+            }
+
+            case 'DELETE': {
+                const userDoc = await db.collection("users").doc(decoded.uid).get();
+                if (!userDoc.exists) return res.status(401).json({ message: 'User not found' });
+                const user = userDoc.data();
+                if (user.account_type === "Boy" && !!user.appointment) return res.status(403).json({ message: 'Unauthorized' });
+            
+                const uid = req.query.id;
+                if (!uid) return res.status(400).json({ message: 'Missing user id' });
+                await admin.auth().deleteUser(uid);
+                return res.status(200).end();
             }
         }
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: 'Internal server error', error });
     }
 }
