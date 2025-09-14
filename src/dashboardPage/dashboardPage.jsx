@@ -27,7 +27,6 @@ const DashboardPage = () => {
     const logOut = async () => {
 		try {
 			await signOut(auth);
-            localStorage.clear();
             setLoggedIn(false);
             setNavigationViewable(false);
             navigate('/login')
