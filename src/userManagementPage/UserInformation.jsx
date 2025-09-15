@@ -34,6 +34,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 	useEffect(() => {
 		if (form.current) form.current.reset()
 		if (!userInfo) return
+		setEmail(undefined)
 		setAccountRank(userInfo.rank ?? null)
 		setAccountLevel(userInfo.level)
 		setAccountClass(userInfo.class1)

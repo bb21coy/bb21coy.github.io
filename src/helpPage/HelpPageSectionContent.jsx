@@ -299,7 +299,7 @@ function HelpPageSectionContent({ accountType, appointment, styles }) {
                 <p><strong>Note that the editing of a parade is only accessible by Officers, Primers, and Boys (with appointment) account types</strong></p>
                 <p><strong>The editing of a parade must be done before finalisation</strong></p>
                 
-                <h3>Delete existing parade</h3>
+                <h3 id="delete-existing-parade">Delete existing parade</h3>
                 <div>
                     <HelpPageSteps steps={delete_parade_steps} />
                 </div>

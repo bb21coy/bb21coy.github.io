@@ -13,7 +13,7 @@ const Header = () => {
 	const { user, setUser, loggedIn, setLoggedIn, navigationViewable, setNavigationViewable } = useUser();
 	const [buttons, setButtons] = useState(2);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-	const [currentPage, setCurrentPage] = useState(window.location.pathname);
+	const [currentPage, setCurrentPage] = useState(window.location.hash);
 
 	useEffect(() => {
 		const unsub = onAuthStateChanged(auth, (user) => {
@@ -39,13 +39,13 @@ const Header = () => {
 			setButtons(count);
 		}
 
-		setCurrentPage(window.location.pathname);
+		setCurrentPage(window.location.hash);
 		return () => unsub();
 	}, [navigate, location])
 
 	useEffect(() => {
 		console.log(acsiiArt);
-	}, [navigate])
+	}, [])
 
 	const toggleUserMenu = () => {
 		setNavigationViewable(prevState => !prevState);
@@ -136,67 +136,67 @@ const Header = () => {
 						<button onClick={() => navigate('/parade_notice')}>Parade Notice</button>
 						<button onClick={() => navigate('/login')}>Members Log In</button>
 					</> : <>
-						<button onClick={() => navigate('/home')} className={currentPage === '/home' ? styles.active : ''}>
+						<button onClick={() => navigate('/home')} className={currentPage === '#/home' ? styles.active : ''}>
 							<i className='fa-solid fa-house'></i>
 							Dashboard
 						</button>
 
 						{(user.account_type !== "Boy" || user.appointment !== null) &&
-							<button onClick={() => navigate('/user_management')} className={currentPage === '/user_management' ? styles.active : ''}>
+							<button onClick={() => navigate('/user_management')} className={currentPage === '#/user_management' ? styles.active : ''}>
 								<i className='fa-solid fa-users'></i>
 								Users Management
 							</button>}
 
 						{(user.account_type === "Officer" || user.appointment?.toLowerCase().includes("tech")) &&
-							<button onClick={() => navigate('/home_editor')} className={currentPage === '/home_editor' ? styles.active : ''}>
+							<button onClick={() => navigate('/home_editor')} className={currentPage === '#/home_editor' ? styles.active : ''}>
 								<i className='fa-solid fa-edit'></i>
 								Home Page Editor
 							</button>}
 
-						<button onClick={() => navigate('/attendance_management')} className={currentPage === '/attendance_management' ? styles.active : ''}>
+						<button onClick={() => navigate('/attendance_management')} className={currentPage === '#/attendance_management' ? styles.active : ''}>
 							<i className='fa-solid fa-file'></i>
 							Parades & Attendance
 						</button>
 
 						{(user.account_type === "Boy") && <>
-							<button onClick={() => navigate('/user_awards')} className={currentPage === '/user_awards' ? styles.active : ''}>
+							<button onClick={() => navigate('/user_awards')} className={currentPage === '#/user_awards' ? styles.active : ''}>
 								<i className='fa-solid fa-award'></i>
 								My Awards
 							</button>
-							<button onClick={() => navigate('/user_inspections')} className={currentPage === '/user_inspections' ? styles.active : ''}>
+							<button onClick={() => navigate('/user_inspections')} className={currentPage === '#/user_inspections' ? styles.active : ''}>
 								<i className='fa-solid fa-shirt-long-sleeve'></i>
 								My Inspection Results
 							</button>
 						</>}
 
 						{(user.account_type !== "Boy" || user.appointment !== null) && <>
-							<button onClick={() => navigate('/awards')} className={currentPage === '/awards' ? styles.active : ''}>
+							<button onClick={() => navigate('/awards')} className={currentPage === '#/awards' ? styles.active : ''}>
 								<img src="awards_tracker.webp" alt="Awards Management Icon" />
 								Awards Management
 							</button>
-							<button onClick={() => navigate('/generate_result')} className={currentPage === '/generate_result' ? styles.active : ''}>
+							<button onClick={() => navigate('/generate_result')} className={currentPage === '#/generate_result' ? styles.active : ''}>
 								<i className='fa-solid fa-file-invoice'></i>
 								Result Generation
 							</button>
 						</>}
 
 						{user.account_type !== "Boy" &&
-							<button onClick={() => navigate('/uniform_inspection_results')} className={currentPage === '/uniform_inspection' ? styles.active : ''}>
+							<button onClick={() => navigate('/uniform_inspection')} className={currentPage === '#/uniform_inspection' ? styles.active : ''}>
 								<i className='fa-solid fa-shirt-long-sleeve'></i>
 								Uniform Inspection
 							</button>}
 
 						{user.account_type === "Boy" &&
-							<button onClick={() => navigate('/resources')} className={currentPage === '/resources' ? styles.active : ''}>
+							<button onClick={() => navigate('/resources')} className={currentPage === '#/resources' ? styles.active : ''}>
 								<i className='fa-solid fa-book'></i>
 								Resources
 							</button>}
 
-						<button onClick={() => navigate('/reset_password')} className={currentPage === '/reset_password' ? styles.active : ''}>
+						<button onClick={() => navigate('/reset_password')} className={currentPage === '#/reset_password' ? styles.active : ''}>
 							<i className='fa-solid fa-rotate-right'></i>
 							Reset Log In Information
 						</button>
-						<button onClick={() => navigate('/help')} className={currentPage === '/help' ? styles.active : ''}>
+						<button onClick={() => navigate('/help')} className={currentPage === '#/help' ? styles.active : ''}>
 							<i className='fa-solid fa-question'></i>
 							Help
 						</button>
