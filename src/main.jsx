@@ -65,8 +65,6 @@ createRoot(document.body).render(
 
 if ('serviceWorker' in navigator) {
 	window.addEventListener('load', () => {
-		navigator.serviceWorker.register('/sw.js')
-			.then((reg) => console.log('SW registered', reg.scope))
-			.catch(console.error);
+		navigator.serviceWorker.register('/sw.js').catch(console.error);
 	});
 }
