@@ -1,16 +1,28 @@
-const express = require('express');
-const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
+const Fastify = require('fastify');
 const accountFunction = require('./api/admin.js');
 
-// Dynamically handle routes
-app.all('/api/admin', (req, res) => {
-	accountFunction(req, res);
+const app = Fastify();
+
+app.addHook('preHandler', async (req, reply) => {
+	req.body = req.body || {};
+	req.query = req.query || {};
+	req.headers = req.headers || {};
 });
 
-app.listen(3000, () => {
-	console.log('Express server running on http://localhost:3000');
+app.all('/api/admin', async (req, reply) => {
+	return accountFunction(req, {
+		status: (code) => {
+			reply.status(code);
+			return {
+				json: (data) => reply.send(data),
+				end: () => reply.send(),
+			};
+		},
+		setHeader: (name, value) => reply.header(name, value),
+		json: (data) => reply.send(data),
+	});
+});
+
+app.listen({ port: 3000 }, () => {
+	console.log('Fastify server running on http://localhost:3000');
 });
