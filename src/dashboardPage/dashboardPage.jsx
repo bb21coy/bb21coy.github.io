@@ -60,8 +60,7 @@ const DashboardPage = () => {
                 </>}
 
                 {user.account_type !== "Boy" && <DashboardOptions title="Uniform Inspection" icon="shirt-long-sleeve" url="/uniform_inspection" />}
-                {user.account_type === "Boy" && <DashboardOptions title="Resources" icon="book" url="/resources" />}
-
+                <DashboardOptions title="Resources" icon="book" url="/resources" />
                 <DashboardOptions title="Change Password" icon="rotate-right" url="/reset_password" />
                 <DashboardOptions title="Help" icon="question" url="/help" />
                 <DashboardOptions title="Log Out" icon="lock" func={logOut} />

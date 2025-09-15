@@ -109,9 +109,7 @@ const Header = () => {
 						{user.account_type !== "Boy" &&
 							<button onClick={() => navigate('/uniform_inspection_results')}>Uniform Inspection</button>}
 
-						{(user.account_type === "Boy") &&
-							<button onClick={() => navigate('/user_awards')}>Resources</button>}
-
+						<button onClick={() => navigate('/user_awards')}>Resources</button>
 						<button onClick={() => navigate('/reset_password')}>Reset Log In Information</button>
 						<button onClick={() => navigate('/help')}>Help</button>
 						<button onClick={logOut}>Log Out</button>
@@ -186,11 +184,10 @@ const Header = () => {
 								Uniform Inspection
 							</button>}
 
-						{user.account_type === "Boy" &&
-							<button onClick={() => navigate('/resources')} className={currentPage === '#/resources' ? styles.active : ''}>
-								<i className='fa-solid fa-book'></i>
-								Resources
-							</button>}
+						<button onClick={() => navigate('/resources')} className={currentPage === '#/resources' ? styles.active : ''}>
+							<i className='fa-solid fa-book'></i>
+							Resources
+						</button>
 
 						<button onClick={() => navigate('/reset_password')} className={currentPage === '#/reset_password' ? styles.active : ''}>
 							<i className='fa-solid fa-rotate-right'></i>

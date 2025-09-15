@@ -3,6 +3,7 @@
     display: flex;
     font-family: sans-serif;
     box-sizing: border-box;
+    flex: 1;
     scroll-behavior: smooth;
 
     li {
@@ -51,6 +52,7 @@
         flex-direction: column;
         gap: 10px;
         overflow-x: hidden;
+        flex: 1;
 
         h3 {
             margin-top: 10px;
@@ -364,6 +366,26 @@
             }
         }
     }
+}
+
+.resource-page-blocked {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    width: 100%;
+
+    img {
+        width: 200px !important;
+    }
+}
+
+.block-panel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 @media screen and (max-width: 800px) {
