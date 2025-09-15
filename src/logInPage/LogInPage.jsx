@@ -21,6 +21,14 @@ const LogInPage = () => {
 		return () => unsub();
 	}, [navigate])
 
+	useEffect(() => {
+		const link = document.createElement('link');
+		link.rel = 'preload';
+		link.as = 'image';
+		link.href = "/slide 2.webp";
+		document.head.appendChild(link);
+	}, []);
+
 	async function submitForm(e) {
 		e.preventDefault()
 		if (!email || !password) return showMessage("Please enter both email and password");

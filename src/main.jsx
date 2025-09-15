@@ -1,31 +1,30 @@
-import { StrictMode, Suspense } from 'react'
+import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-
 import { UserProvider } from "./general/UserContext";
 
 import Layout from './general/Layout';
-// import { HomePage } from './homePage/HomePage'
-import LogInPage from './logInPage/LogInPage';
-import AttendanceManagementPage from './attendanceManagementPage/AttendanceManagementPage';
-import AwardsManagementPage from './awardsManagementPage/AwardsManagementPage';
-import ResultPage from './resultPage/ResultPage';
-import ResultGenerationPage from './resultPage/ResultGenerationPage';
-import UniformInspectionPage from './uniformInspectionPage/UniformInspectionPage';
-import UniformInspectionResultPage from './uniformInspectionPage/UniformInspectionResultPage';
-import UniformInspectionForm from './uniformInspectionPage/UniformInspectionForm';
-import UserManagementPage from './userManagementPage/UserManagementPage';
-import UserManagementSmallPage from './userManagementPage/UserManagementSmallPage';
-import ResetPasswordPage from './userManagementPage/ResetPasswordPage';
-import NotFound from './general/NotFound';
-import DashboardPage from './dashboardPage/dashboardPage';
-import ParadeNoticePage from './attendanceManagementPage/ParadeNoticePage';
-import UserAwards from './awardsManagementPage/UserAwards';
-import HelpPage from './helpPage/HelpPage';
-import HomeEditorPage from './homePage/HomeEditorPage';
-import UniformInspectionUser from './uniformInspectionPage/UniformInspectionUser';
-import ResourcePage from './resourcePage/ResourcePage';
 import Loading from './general/Loading';
+
+const LogInPage = lazy(() => import('./logInPage/LogInPage'));
+const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
+const AwardsManagementPage = lazy(() => import('./awardsManagementPage/AwardsManagementPage'));
+const ResultPage = lazy(() => import('./resultPage/ResultPage'));
+const ResultGenerationPage = lazy(() => import('./resultPage/ResultGenerationPage'));
+const UniformInspectionPage = lazy(() => import('./uniformInspectionPage/UniformInspectionPage'));
+const UniformInspectionResultPage = lazy(() => import('./uniformInspectionPage/UniformInspectionResultPage'));
+const UniformInspectionForm = lazy(() => import('./uniformInspectionPage/UniformInspectionForm'));
+const UserManagementPage = lazy(() => import('./userManagementPage/UserManagementPage'));
+const UserManagementSmallPage = lazy(() => import('./userManagementPage/UserManagementSmallPage'));
+const ResetPasswordPage = lazy(() => import('./userManagementPage/ResetPasswordPage'));
+const NotFound = lazy(() => import('./general/NotFound'));
+const DashboardPage = lazy(() => import('./dashboardPage/dashboardPage'));
+const ParadeNoticePage = lazy(() => import('./attendanceManagementPage/ParadeNoticePage'));
+const UserAwards = lazy(() => import('./awardsManagementPage/UserAwards'));
+const HelpPage = lazy(() => import('./helpPage/HelpPage'));
+const HomeEditorPage = lazy(() => import('./homePage/HomeEditorPage'));
+const UniformInspectionUser = lazy(() => import('./uniformInspectionPage/UniformInspectionUser'));
+const ResourcePage = lazy(() => import('./resourcePage/ResourcePage'));
 
 createRoot(document.body).render(
 	<StrictMode>
@@ -63,3 +62,11 @@ createRoot(document.body).render(
 		</Router>
 	</StrictMode>
 );
+
+if ('serviceWorker' in navigator) {
+	window.addEventListener('load', () => {
+		navigator.serviceWorker.register('/sw.js')
+			.then((reg) => console.log('SW registered', reg.scope))
+			.catch(console.error);
+	});
+}
