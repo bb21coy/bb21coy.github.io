@@ -5,9 +5,9 @@ import BASE_URL from '../Constants'
 import UserSchema from '../schema/Users'
 import { showMessage } from '../general/handleServerError'
 import { useUser } from '../general/UserContext'
-import { getAuth } from "firebase/auth";
-import { updateDoc, deleteDoc, getDoc } from 'firebase/firestore'
-import { doc } from 'firebase/firestore'
+import { getAuth } from "@firebase/auth";
+import { updateDoc, deleteDoc, getDoc } from '@firebase/firestore'
+import { doc } from '@firebase/firestore'
 import { db } from '../firebase'
 import styles from './userInformation.module.scss'
 import Loading from '../general/Loading'

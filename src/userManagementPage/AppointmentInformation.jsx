@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { showMessage } from '../general/handleServerError'
-import { doc, updateDoc, deleteField } from 'firebase/firestore'
+import { doc, updateDoc, deleteField } from '@firebase/firestore'
 import { db } from '../firebase'
 
 // To manage permissions for appointment holders

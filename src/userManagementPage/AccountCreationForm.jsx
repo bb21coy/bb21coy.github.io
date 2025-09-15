@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { showMessage } from '../general/handleServerError'
 import UserSchema from '../schema/Users'
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import { doc, setDoc } from "@firebase/firestore";
 import { db } from "../firebase";
 import axios from 'axios';
 import BASE_URL from '../Constants';

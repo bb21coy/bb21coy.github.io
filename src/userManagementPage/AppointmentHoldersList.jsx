@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { showMessage } from '../general/handleServerError'
 import AppointmentInformation from './AppointmentInformation';
-import { collection, getDoc, updateDoc, doc, onSnapshot } from "firebase/firestore";
+import { collection, getDoc, updateDoc, doc, onSnapshot } from "@firebase/firestore";
 import { db } from "../firebase";
 import styles from './appointmentHoldersList.module.scss'
 

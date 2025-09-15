@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "@firebase/firestore";
 import { db } from "../firebase";
 import { useUser } from '../general/UserContext';
 

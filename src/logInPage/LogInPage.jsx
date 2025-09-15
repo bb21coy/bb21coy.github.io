@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { showMessage } from '../general/handleServerError';
 import styles from './logInPage.module.scss'
 import { auth } from "../firebase";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "@firebase/auth";
 
 // To log in, accounts can only be created by existing users
 const LogInPage = () => {
@@ -28,11 +28,11 @@ const LogInPage = () => {
 		if (!emailRegex.test(email)) return showMessage("Please enter a valid email address");
 
 		signInWithEmailAndPassword(auth, email, password)
-		.then(() => {
-			if (searchParams.get('next')) navigate(searchParams.get('next'));
-			else navigate('/home');
-		})
-		.catch(() => showMessage("Incorrect email or password"))
+			.then(() => {
+				if (searchParams.get('next')) navigate(searchParams.get('next'));
+				else navigate('/home');
+			})
+			.catch(() => showMessage("Incorrect email or password"))
 	}
 
 	return (

@@ -5,7 +5,7 @@ import DashboardOptions from './dashboardOptions'
 import { handleServerError } from '../general/handleServerError'
 import styles from './dashboardPage.module.scss'
 import { useUser } from '../general/UserContext'
-import { signOut } from "firebase/auth";
+import { signOut } from "@firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from 'react-router-dom'
 import AdminUsageAnalytics from './UsageAnalytics'
@@ -25,16 +25,16 @@ const DashboardPage = () => {
     }, [user])
 
     const logOut = async () => {
-		try {
-			await signOut(auth);
+        try {
+            await signOut(auth);
             setLoggedIn(false);
             setNavigationViewable(false);
             navigate('/login')
-		} catch (err) {
-			console.error("Error logging out:", err);
-			handleServerError(err.response.status)
-		}
-	}
+        } catch (err) {
+            console.error("Error logging out:", err);
+            handleServerError(err.response.status)
+        }
+    }
 
     if (loading) return <Loading />
 
@@ -68,7 +68,7 @@ const DashboardPage = () => {
             </div>
 
             <PendingTasks accountType={user.account_type} appointment={user.appointment} userId={userId} paradesAfterToday={paradesAfterToday} styles={styles} />
-        
+
             {user.account_type === "Admin" && <AdminUsageAnalytics></AdminUsageAnalytics>}
         </div>
     )

@@ -1,6 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp } from "@firebase/app";
+import { getAuth, setPersistence, browserLocalPersistence } from "@firebase/auth";
+import { getFirestore } from "@firebase/firestore";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyAISfmXUtURhQg78JjB6duTTluS_yCfV10",

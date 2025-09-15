@@ -3,7 +3,7 @@ import { showMessage } from '../general/handleServerError'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../general/UserContext'
 import styles from './resetPasswordPage.module.scss'
-import { getAuth, updatePassword, updateEmail, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, updatePassword, updateEmail, onAuthStateChanged, signOut } from "@firebase/auth";
 
 // To allow boys to reset their password
 const ResetPasswordPage = () => {

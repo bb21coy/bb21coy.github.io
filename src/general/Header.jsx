@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { handleServerError } from './handleServerError'
 import { useUser } from './UserContext'
-import { signOut, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { signOut, onAuthStateChanged } from "@firebase/auth";
+import { doc, getDoc } from "@firebase/firestore";
 import { auth, db } from "../firebase";
 import styles from './header.module.scss'
 
