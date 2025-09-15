@@ -1,10 +1,9 @@
-const CACHE_NAME = "site-cache-v1"; // bump this to invalidate old cache
+const CACHE_NAME = "bb21coy-cache-v1"; // bump this to invalidate old cache
 
 // These are the known root files and folders
 const STATIC_ASSETS = [
     "/",
-    "/index.html",
-    "/manifest.webmanifest",
+    "/index.html"
 ];
 
 // Regex patterns for runtime caching
@@ -13,7 +12,15 @@ const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico)$/; // direct c
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+        caches.open(CACHE_NAME).then(async (cache) => {
+            for (const file of STATIC_ASSETS) {
+                try {
+                    await cache.add(file);
+                } catch (err) {
+                    console.warn("Failed to cache", file, err);
+                }
+            }
+        })
     );
 });
 
