@@ -1,7 +1,7 @@
-#pdf-template {
+#template {
     position: relative;
-    width: 210mm;
-    min-height: 296mm;
+    width: 794px;
+    height: 1123px;
     padding: 5mm 10mm;
     box-sizing: border-box;
     margin: 0;
@@ -9,7 +9,7 @@
     font-family: Arial, Helvetica, sans-serif;
     flex-direction: column;
 
-    .header {
+    header {
         padding: 0;
         display: flex;
         justify-content: flex-start;
@@ -24,7 +24,7 @@
             font-size: 7px;
         }
 
-        .verse {
+        div:last-of-type {
             margin-left: auto;
             display: block;
             text-align: right;
@@ -98,6 +98,7 @@
     }
 
     footer {
+        display: flex;
         margin-top: auto;
         border-top: 1px solid #d3d3d3;
         flex-direction: row;
@@ -107,5 +108,36 @@
         padding: 0;
         font-size: 9px;
         padding-top: 3px;
+    }
+}
+
+@media screen {
+    #template {
+        display: none;
+    }
+}
+
+@media print {
+    @page {
+        size: A4;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    header {
+        display: none;
+    }
+
+    #template,
+    #template * {
+        visibility: visible;
+    }
+
+    #template {
+        position: absolute;
+        left: 0;
+        top: 0;
     }
 }

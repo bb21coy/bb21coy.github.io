@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import { useEffect, useState, useMemo, Fragment } from 'react'
 import Loading from '../general/Loading'
-import { handleServerError, showMessage } from '../general/handleServerError'
+import { showMessage } from '../general/handleServerError'
 import ResultPage from './ResultPage'
-import '../styles/resultGenerationPage.scss'
-import BASE_URL from '../Constants'
+import styles from './resultGenerationPage.module.scss'
+import { getDocs, collection } from '@firebase/firestore'
+import { db } from '../firebase'
 
 // To manually create 32A results
 const ResultGenerationPage = () => {
+	const [allUsers, setAllUsers] = useState([])
 	const [awards, setAwards] = useState([]) // awards list with masteries
 	const [award, setAward] = useState(); // selected award
 	const [mastery, setMastery] = useState(); // selected mastery
 	const [boys, setBoys] = useState([]); // selected boys id
 	const [instructor, setInstructor] = useState({}); // selected instructor
 
-	// get accounts
-	const [boyAccounts, setBoyAccounts] = useState([])
-	const [primerAccounts, setPrimerAccounts] = useState([])
-	const [officerAccounts, setOfficerAccounts] = useState([])
-
-	const [pdfLoading, setPdfLoading] = useState(false);
-	const [pdf, setPdf] = useState(false)
-	const [pdfurl, setPdfurl] = useState('')
 	const [descriptionHint, setDescriptionHint] = useState();
 	const [descriptionInput, setDescriptionInput] = useState();
 
@@ -30,144 +23,132 @@ const ResultGenerationPage = () => {
 	useEffect(() => {
 		const init = async () => {
 			try {
-				let resp = await axios.get(`${BASE_URL}/account?type=Boy`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
-				setBoyAccounts(resp.data);
+				const awardsSnap = await getDocs(collection(db, "awards"));
+				const awards = awardsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				setAwards(awards);
 
-				resp = await axios.get(`${BASE_URL}/account?type=Primer`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
-				setPrimerAccounts(resp.data);
+				const usersSnap = await getDocs(collection(db, "users"));
+				const users = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				setAllUsers(users);
 
-				resp = await axios.get(`${BASE_URL}/account?type=Officer`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
-				setOfficerAccounts(resp.data)
-
-				resp = await axios.get(`${BASE_URL}/awards`, { headers: { "x-route": "/get_awards" }, withCredentials: true })
-				setAwards(resp.data)
-				setLoading(false)
+				setLoading(false);
 			} catch (err) {
-				handleServerError(err.response.status)
+				console.error(err)
+				showMessage("Failed to get awards")
 			}
 		}
 
 		init();
 	}, [])
 
+	const groupedUsers = useMemo(() => {
+		const officers = [];
+		const primers = [];
+		const boys = [];
+
+		for (const u of allUsers) {
+			if (u.account_type === "Officer") officers.push(u);
+			else if (u.account_type === "Primer") primers.push(u);
+			else if (u.account_type === "Boy" && u.graduated === false) boys.push(u);
+		}
+
+		return { officers, primers, boys };
+	}, [allUsers]);
+
 	function selectAward(e) {
 		const parts = e.target.value.split('-badge-selector-');
 		const award = awards.find((award) => award.badge_name === parts[0]);
-		let mastery;
 
 		setAward(award)
-		setMastery(award?.badge_masteries.find((mastery) => mastery.mastery_name === parts[1]));
-		setDescriptionHint(award?.badge_description_hint)
-
-		if (award?.badge_masteries.length > 0) {
-			mastery = award.badge_masteries.find((mastery) => mastery.mastery_name === parts[1]);
+		if (parts[1] !== "") {
+			const mastery = award?.badge_masteries.find(mastery => mastery.mastery_name === parts[1]);
+			setMastery(mastery);
 			setDescriptionHint(mastery.mastery_description_hint)
+		} else {
+			setMastery(null);
+			setDescriptionHint(award?.badge_description)
 		}
 	}
 
-	function selectBoy() {
-		let boyAccountSelector = document.getElementsByClassName('boy-account-selector')
-		let accounts = []
-		for (let account of boyAccountSelector) {
-			if (account.checked) accounts.push(boyAccounts.find(boy => boy._id == account.id))
-		}
-
-		setBoys(accounts);
+	function selectBoy(e) {
+		const id = e.target.id;
+		setBoys(prev => {
+			if (e.target.checked) {
+				return [...prev, groupedUsers.boys.find(boy => boy.id === id)];
+			} else {
+				return prev.filter(boy => boy.id !== id);
+			}
+		});
 	}
 
-	function selectInstructor(instructorId) {
-		let account = primerAccounts.find(account => account._id == instructorId);
-		if (!account) account = officerAccounts.find(account => account._id == instructorId);
-		setInstructor(account)
-	}
-
-	function generateResult(e) {
-		e.preventDefault()
-		setPdf(false)
-
-		if (award == null) return showMessage("Results cannot be generated without an Award.")
-		if (instructor == null) return showMessage("Results cannot be generated without any Primers or Officers.")
-		if (boys.length == 0) return showMessage("Results cannot be generated without any Boys.")
-
-		boys.map(boy => {
-			boyAccounts.find(account => account._id == boy)
-		})
-
-		if (pdfLoading) return;
-		setPdf(true);
+	function selectInstructor(id) {
+		const user = groupedUsers.officers.find(officer => officer.id === id) || groupedUsers.primers.find(primer => primer.id === id)
+		if (!user) return;
+		if (user.credentials === "" || !user.credentials) return showMessage("Instructor must have credentials.");
+		setInstructor(user);
 	}
 
 	if (loading) return <Loading />
 
 	return (
-		<div className='result-generation-page'>
-			<div className='page-container'>
-				<div className='main-block'>
-					<form className='fields generate-results-form' onSubmit={generateResult} id='generate-results-form'>
-						<h1>Generate Results</h1>
+		<div className={styles['result-generation-page']}>
+			<h2>Generate Results</h2>
 
-						<label htmlFor='results-badge'>Select a badge to view results:</label>
-						<select onChange={selectAward} id='results-badge' defaultValue={""}>
-							<option value="" hidden>Select an Award</option>
-							{awards.map(award => {
-								const options = award.badge_masteries.length > 0
-									? award.badge_masteries.map(mastery => (
-										<option key={mastery._id} value={`${award.badge_name}-badge-selector-${mastery.mastery_name}`}>{award.badge_name} {mastery.mastery_name}</option>
-									))
-									: [<option key={award._id} value={`${award.badge_name}-badge-selector-`}>{award.badge_name}</option>];
+			<form className={styles['generate-results-form']} id='generate-results-form'>
+				<label htmlFor='results-badge'>Select a badge to view results:</label>
+				<select onChange={selectAward} id='results-badge' defaultValue={""}>
+					<option value="" hidden>Select an Award</option>
+					{awards.map(award => {
+						if (["swimming", "first aid"].includes(award.badge_name)) return [];
 
-								if (!["swimming", "first aid"].includes(award.badge_name)) return options;
-							})}
-						</select>
+						return award.badge_masteries.length > 0
+							? award.badge_masteries.map((mastery, index) => (
+								<option key={`${award.id}-${index}`} value={`${award.badge_name}-badge-selector-${mastery.mastery_name}`}>{award.badge_name} {mastery.mastery_name}</option>
+							))
+							: [<option key={award.id} value={`${award.badge_name}-badge-selector-`}>{award.badge_name}</option>];
+					})}
+				</select>
 
-						<label htmlFor="results-instructor">Select the instructor for the badgework:</label>
-						<select onChange={(e) => selectInstructor(e.target.value)} defaultValue={""} id='results-instructor'>
-							<option value="" hidden>Select an Instructor</option>
-							{primerAccounts.map((primerAccount) => {
-								return (<option key={primerAccount._id + "-primer-instructor"} value={primerAccount._id}>{primerAccount.rank} {primerAccount.account_name}</option>)
-							})}
-							{officerAccounts.map((officerAccount) => {
-								return (<option key={officerAccount._id + "-officer-instructor"} value={officerAccount._id}>{officerAccount.rank} {officerAccount.account_name}</option>)
-							})}
-						</select>
+				<label htmlFor="results-instructor">Select the instructor for the badgework:</label>
+				<select onChange={(e) => selectInstructor(e.target.value)} defaultValue={""} id='results-instructor'>
+					<option value="" hidden>Select an Instructor</option>
+					{groupedUsers.primers.map((primerAccount) => {
+						return (<option key={primerAccount.id + "-primer-instructor"} value={primerAccount.id}>{primerAccount.rank} {primerAccount.account_name}</option>)
+					})}
+					{groupedUsers.officers.map((officerAccount) => {
+						return (<option key={officerAccount.id + "-officer-instructor"} value={officerAccount.id}>{officerAccount.rank} {officerAccount.account_name}</option>)
+					})}
+				</select>
 
-						<p>Select the Boys to include in the results:</p>
-						<div className='boy-accounts'>
-							{boyAccounts.map(boyAccount => (
-								<div key={boyAccount._id + "-display"}>
-									<input type='checkbox' id={boyAccount._id} onChange={selectBoy} className='boy-account-selector'></input>
-									<label htmlFor={boyAccount._id}><span>Sec {boyAccount.level} {boyAccount.rank} {boyAccount.account_name}</span></label>
-								</div>
-							))}
+				<p>Select the Boys to include in the results:</p>
+				<div className={styles['boy-accounts']}>
+					{groupedUsers.boys.map(boyAccount => (
+						<div key={boyAccount.id + "-display"}>
+							<input type='checkbox' id={boyAccount.id} onChange={selectBoy}></input>
+							<label htmlFor={boyAccount.id}><span>Sec {boyAccount.level} {boyAccount.rank} {boyAccount.account_name}</span></label>
 						</div>
-
-						{(award != null && mastery != null && descriptionHint) && <React.Fragment>
-							<label htmlFor='results-description'>Description of badgework:</label>
-							<p>{descriptionHint}</p>
-							<textarea className='result-description' id='results-description' onChange={(e) => setDescriptionInput(e.target.value)} defaultValue={descriptionInput || award.results_description} placeholder='Description of badgework'></textarea>
-						</React.Fragment>}
-					</form>
-
-					{pdf && pdfurl ? <iframe src={pdfurl} width="100%" height="500" style={{ border: 'none' }} />
-					: (
-						<div style={{ display: 'none' }}>
-							<ResultPage
-								award={award}
-								mastery={mastery}
-								instructor={instructor}
-								boys={boys}
-								description={descriptionInput}
-								setPdfUrl={setPdfurl}
-								setIsLoading={setPdfLoading}
-							/>
-						</div>
-					)}
-
-					<button type='submit' form='generate-results-form' disabled={pdfLoading}>Generate Results</button>
+					))}
 				</div>
-			</div>
+
+				{(award != null && mastery != null && descriptionHint) && <Fragment>
+					<label htmlFor='results-description'>Description of badgework:</label>
+					<p>{descriptionHint}</p>
+					<textarea id='results-description' onChange={(e) => setDescriptionInput(e.target.value)} defaultValue={descriptionInput || award.results_description} placeholder='Description of badgework'></textarea>
+				</Fragment>}
+			</form>
+
+			{award != null && ((award.badge_masteries.length > 0 && mastery != null) || (award.badge_masteries.length === 0 && mastery == null)) && instructor != null && boys.length > 0 && <>
+				<button onClick={() => window.print()}>Generate Results</button>
+				<ResultPage
+					award={award}
+					mastery={mastery}
+					instructor={instructor}
+					boys={boys}
+					description={descriptionInput}
+				/>
+			</>}
 		</div>
-	)
+	);
 }
 
 export default ResultGenerationPage

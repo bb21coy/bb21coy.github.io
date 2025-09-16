@@ -1,0 +1,107 @@
+.result-generation-page {
+    margin: 20px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+
+    .generate-results-form {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(2, max-content);
+        align-items: center;
+
+        select {
+            border: 1px solid black;
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        label {
+            display: flex;
+            width: max-content;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input[type="checkbox"]+label::before {
+            font: var(--fa-font-solid);
+            content: "\f00d";
+            color: red;
+            width: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        input[type="checkbox"]:checked+label::before {
+            content: "\f00c";
+            color: darkgreen;
+        }
+
+        p {
+            grid-column: span 2;
+        }
+
+        .account-display label {
+            cursor: pointer;
+            width: 300px;
+        }
+
+        .account-display span {
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .boy-accounts {
+            grid-column: span 2;
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    }
+
+    button {
+        margin-left: auto;
+        background: black;
+        padding: 5px 8px;
+        border-radius: 10px;
+        color: white;
+    }
+
+    label[for='results-description'] {
+        margin-top: 20px;
+    }
+
+    textarea {
+        height: 200px;
+        width: 550px;
+        resize: none;
+        outline: none;
+        padding: 10px;
+        border-radius: 10px;
+        grid-column: span 2;
+        border: 1px solid black;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .generate-results-form {
+        grid-template-columns: 1fr !important;
+
+        h1,
+        p,
+        .boy-accounts,
+        button {
+            grid-column: span 1;
+        }
+    }
+}

@@ -14,8 +14,6 @@ const ResourcePage = () => {
     const [selectedResource, setSelectedResource] = useState('target');
     const { user } = useUser();
 
-    console.log(styles);
-
     useEffect(() => {
 		const unsubscribe = onSnapshot(collection(db, "appointments"), async (querySnapshot) => {
 			if (querySnapshot.empty) return;
