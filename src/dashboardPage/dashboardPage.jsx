@@ -61,9 +61,9 @@ const DashboardPage = () => {
 
                 {user.account_type !== "Boy" && <DashboardOptions title="Uniform Inspection" icon="shirt-long-sleeve" url="/uniform_inspection" />}
                 <DashboardOptions title="Resources" icon="book" url="/resources" />
-                <DashboardOptions title="Change Password" icon="rotate-right" url="/reset_password" />
+                <DashboardOptions title="Manage Login" icon="lock" url="/manage_login" />
                 <DashboardOptions title="Help" icon="question" url="/help" />
-                <DashboardOptions title="Log Out" icon="lock" func={logOut} />
+                <DashboardOptions title="Logout" icon="right-from-bracket" func={logOut} />
             </div>
 
             <PendingTasks accountType={user.account_type} appointment={user.appointment} userId={userId} paradesAfterToday={paradesAfterToday} styles={styles} />

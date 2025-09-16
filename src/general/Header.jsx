@@ -110,9 +110,9 @@ const Header = () => {
 							<button onClick={() => navigate('/uniform_inspection_results')}>Uniform Inspection</button>}
 
 						<button onClick={() => navigate('/user_awards')}>Resources</button>
-						<button onClick={() => navigate('/reset_password')}>Reset Log In Information</button>
+						<button onClick={() => navigate('/manage_login')}>Manage Login</button>
 						<button onClick={() => navigate('/help')}>Help</button>
-						<button onClick={logOut}>Log Out</button>
+						<button onClick={logOut}>Logout</button>
 
 						<button aria-label='Open Sidebar' onClick={toggleSidebar}>
 							<i className='fa-solid fa-bars'></i>
@@ -189,17 +189,17 @@ const Header = () => {
 							Resources
 						</button>
 
-						<button onClick={() => navigate('/reset_password')} className={currentPage === '#/reset_password' ? styles.active : ''}>
-							<i className='fa-solid fa-rotate-right'></i>
-							Reset Log In Information
+						<button onClick={() => navigate('/manage_login')} className={currentPage === '#/manage_login' ? styles.active : ''}>
+							<i className='fa-solid fa-lock'></i>
+							Manage Login
 						</button>
 						<button onClick={() => navigate('/help')} className={currentPage === '#/help' ? styles.active : ''}>
 							<i className='fa-solid fa-question'></i>
 							Help
 						</button>
 						<button onClick={logOut} className='log-out--button'>
-							<i className='fa-solid fa-lock'></i>
-							Log Out
+							<i className='fa-solid fa-right-from-bracket'></i>
+							Logout
 						</button>
 					</>}
 				</div>

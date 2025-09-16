@@ -3,7 +3,7 @@ import { showMessage } from '../general/handleServerError'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../general/UserContext'
 import styles from './resetPasswordPage.module.scss'
-import { getAuth, updatePassword, updateEmail, onAuthStateChanged, signOut } from "@firebase/auth";
+import { getAuth, updatePassword, updateEmail, onAuthStateChanged, signOut, linkWithPopup, OAuthProvider, unlink, GoogleAuthProvider } from "@firebase/auth";
 
 // To allow boys to reset their password
 const ResetPasswordPage = () => {
@@ -11,13 +11,24 @@ const ResetPasswordPage = () => {
 	const [passwordType, setPasswordType] = useState("password");
 	const [password, setPassword] = useState("");
 	const [email, setEmail] = useState();
+	const [linkedWithMicrosoft, setLinkedWithMicrosoft] = useState(false);
 	const navigate = useNavigate();
 	const { setLoggedIn, setNavigationViewable, setUser } = useUser();
 
 	useEffect(() => {
-		const unsub = onAuthStateChanged(auth, (user) => {
+		const unsub = onAuthStateChanged(auth, async (user) => {
 			if (user) {
 				setEmail(user.email)
+
+				try {
+					await user.reload();
+					const refreshedUser = auth.currentUser;
+
+					const providers = refreshedUser.providerData.map(p => p.providerId);
+					setLinkedWithMicrosoft(providers.includes("microsoft.com"));
+				} catch (err) {
+					console.error("Failed to reload user", err);
+				}
 			};
 		})
 
@@ -45,10 +56,33 @@ const ResetPasswordPage = () => {
 				setLoggedIn(false);
 				setUser({});
 				setNavigationViewable(false);
-				navigate('/login?next=/reset_password')
+				navigate('/login?next=/manage_login')
 			}
 			else showMessage(err.code)
 		}
+	}
+
+	async function linkMicrosoft() {
+		const user = auth.currentUser;
+		const microsoftProvider = new OAuthProvider('microsoft.com');
+		const result = await linkWithPopup(user, microsoftProvider);
+		const microsoftEmail = result?._tokenResponse?.email || null;
+
+		if (microsoftEmail?.toLowerCase() !== user.email?.toLowerCase()) {
+			await unlink(user, 'microsoft.com');
+			return showMessage("The Microsoft account email must match your current email.");
+		}
+
+		showMessage("Microsoft account has been linked", "success");
+		setLinkedWithMicrosoft(true);
+	}
+
+	async function unlinkMicrosoft() {
+		const user = auth.currentUser;
+		await unlink(user, "microsoft.com");
+		setLinkedWithMicrosoft(false);
+		showMessage("Microsoft account has been unlinked", "success");
+		setLinkedWithMicrosoft(false);
 	}
 
 	return (
@@ -65,6 +99,19 @@ const ResetPasswordPage = () => {
 
 				<button>Save Changes</button>
 			</form>
+
+			<div>
+				<h2>Link Microsoft Account</h2>
+				<p>Linking your Microsoft account will allow you to sign in using your password and Microsoft account.</p>
+				<p>You can only link to the Microsoft account that have the same email as your current email.</p>
+				{!linkedWithMicrosoft ? <button onClick={linkMicrosoft}>Link Microsoft Account</button> : <button data-state="unlink" onClick={unlinkMicrosoft}>Unlink Microsoft Account</button>}
+			</div>
+
+			<div>
+				<h2>Link Google Account</h2>
+				<p>Linking your Google account will allow you to sign in using your password and Google account.</p>
+				<p>By default, this is enabled and cannot be disabled.</p>
+			</div>
 		</div>
 	)
 }

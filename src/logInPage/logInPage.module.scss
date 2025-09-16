@@ -23,6 +23,11 @@
 			display: flex;
 			flex-direction: column;
 			gap: 5px;
+
+			&:last-of-type {
+				flex-direction: row;
+				justify-content: center;
+			}
 		}
 
 		label {
@@ -72,11 +77,18 @@
 		}
 
 		button {
-			padding: 5px;
+			padding: 5px 8px;
 			background: black;
 			color: white;
 			cursor: pointer;
 			border-radius: 10px;
+
+			&[type="button"] {
+				width: max-content;
+				display: flex;
+				gap: 10px;
+				align-items: center;
+			}
 		}
 	}
 }

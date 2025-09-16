@@ -50,7 +50,7 @@ createRoot(document.body).render(
 							<Route path='/user_inspections' element={<UniformInspectionUser />} />
 							<Route path='/user_management' element={<UserManagementPage />} />
 							<Route path='/user_management/:userId' element={<UserManagementSmallPage />} />
-							<Route path='/reset_password' element={<ResetPasswordPage />} />
+							<Route path='/manage_login' element={<ResetPasswordPage />} />
 							<Route path='/help' element={<HelpPage />} />
 							<Route path='/home_editor' element={<HomeEditorPage />} />
 							<Route path='/resources' element={<ResourcePage />} />
