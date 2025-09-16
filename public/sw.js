@@ -1,4 +1,5 @@
-const CACHE_NAME = "bb21coy-cache-v1"; // bump this to invalidate old cache
+const version = "1.0.0";
+const CACHE_NAME = `bb21coy-cache-v${version}`;
 
 // These are the known root files and folders
 const STATIC_ASSETS = [
@@ -11,6 +12,7 @@ const ASSETS_PATTERN = /^\/assets\//;      // built CSS/JS
 const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico)$/; // direct children of /public
 
 self.addEventListener("install", (event) => {
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then(async (cache) => {
             for (const file of STATIC_ASSETS) {
@@ -26,11 +28,11 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(keys.map((key) => {
-                if (key !== CACHE_NAME) return caches.delete(key);
-            }))
-        )
+        (async () => {
+            const keys = await caches.keys();
+            await Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key)));
+            await self.clients.claim();  // 👈 immediately control open tabs
+        })()
     );
 });
 
