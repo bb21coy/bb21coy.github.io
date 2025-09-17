@@ -31,7 +31,6 @@ const UniformInspectionForm = () => {
 			try {
 				const componentsSnap = await getDocs(query(collection(db, "uniform_categories"), orderBy("order")));
 				const components = componentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-				console.log(components);
 				setComponents(components);
 
 				const usersSnap = await getDocs(query(collection(db, "users"), where("account_type", "==", "Boy")));
