@@ -7,11 +7,16 @@ import { useUser } from '../general/UserContext'
 function HelpPage() {
     const [loading, setLoading] = useState(true);
     const { user } = useUser();
-    const accountType = user?.account_type ?? null;
-    const appointment = user?.appointment ?? null;
+    const [accountType, setAccountType] = useState();
+    const [appointment, setAppointment] = useState();
 
     useEffect(() => {
         if (user && user.account_name !== null) setLoading(false)
+
+        if (user) {
+            setAccountType(user.account_type);
+            setAppointment(user.appointment);
+        }
     }, [user])
 
     const scrollToSection = (e, id) => {
