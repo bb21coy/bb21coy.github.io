@@ -1,43 +1,60 @@
-const cookie = require('cookie');
-const { checkAuthentication } = require('../functions.js');
-const { connectToDatabase } = require('../mongoose.js');
-const { Awards } = require('../models/awards.js');
+const dotenv = require('dotenv');
+const XLSX = require('xlsx');
+dotenv.config({ quiet: true });
 
 module.exports = async (req, res) => {
     const origin = req.headers.origin || '*';
     res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-route');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Disposition, Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Max-Age', '86400');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
-        const route = req.headers['x-route'];
-        const cookies = cookie.parse(req.headers.cookie || '');
-        const authorization = cookies.token;
         const method = req.method;
 
-        if (!route) return res.status(401).json({ message: 'Missing route in headers' });
-        if (!authorization) return res.status(401).json({ message: 'Missing authorization token' });
+        switch (method) {
+            case 'POST': {
+                let body = Buffer.alloc(0);
 
-        const routeKey = `${method.toUpperCase()} ${route}`;
-        await connectToDatabase();
+                await new Promise((resolve, reject) => {
+                    req.on('data', chunk => {
+                        body = Buffer.concat([body, chunk]);
+                    });
+                    req.on('end', resolve);
+                    req.on('error', reject);
+                });
 
-        switch (routeKey) {
-            case 'GET /get_awards': {
-                const auth = await checkAuthentication(authorization, res, ["Admin", "Officer", "Primer", "Boy"], includeAppt = true);
-                if (!auth) return res.status(401).json({ message: 'Unauthorized' })
-                
-                const awards = await Awards.find({});
-                return res.status(200).json(awards);
+                if (!body.length) return res.status(400).json({ message: 'No file uploaded' });
+
+                const contentDisposition = req.headers['content-disposition'] || '';
+                const match = contentDisposition.match(/filename="?([^"]+)"?/);
+                const filename = match ? match[1] : 'uploaded.xls';
+
+                if (!filename.toLowerCase().endsWith('.xls')) return res.status(400).json({ message: 'Only .xls files are supported' });
+
+                try {
+                    const wb = XLSX.read(body, { type: 'buffer' });
+                    const out = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+
+                    res.setHeader(
+                        'Content-Disposition',
+                        'attachment; filename="converted.xlsx"'
+                    );
+                    res.setHeader(
+                        'Content-Type',
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    );
+                    return res.send(out);
+                } catch (err) {
+                    console.error(err);
+                }
             }
 
             default:
-                return res.status(404).json({ message: 'Route not found' });
+                return res.status(405).json({ message: 'Method Not Allowed' });
         }
     } catch (error) {
         return res.status(500).json({ message: error.message });

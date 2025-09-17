@@ -71,6 +71,10 @@ module.exports = async (req, res) => {
                 await admin.auth().deleteUser(uid);
                 return res.status(200).end();
             }
+
+            default: {
+                return res.status(405).json({ message: 'Method not allowed' });
+            }
         }
     } catch (error) {
         console.error(error);
