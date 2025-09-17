@@ -6,8 +6,6 @@ const generatePDF = ({ award, mastery, boys, instructor, description }) => {
 	let date = new Date();
 	const formattedDate = date.toLocaleDateString('en-GB');
 
-	console.log(instructor)
-
 	return (
 		<div id={styles.template}>
 			<header>
