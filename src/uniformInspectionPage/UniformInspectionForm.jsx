@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import { Fragment, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { handleServerError, showMessage } from '../general/handleServerError'
-import BASE_URL from '../Constants'
+import { showMessage } from '../general/handleServerError'
+import { where, collection, getDocs, query, orderBy, doc, Timestamp, writeBatch } from '@firebase/firestore'
+import { db } from '../firebase'
+import Loading from '../general/Loading'
+import styles from './uniformInspectionForm.module.scss'
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
 
 // To facilitate uniform inspection by Officers / Primers
 const UniformInspectionForm = () => {
-	const navigate = useNavigate()
+	const navigate = useNavigate();
+	const auth = getAuth();
 	const [boyAccounts, setBoyAccounts] = useState([]); 			// All Boys
 	const [boys, setBoys] = useState([]); 							// Selected Boys
 	const [components, setComponents] = useState([]);				// Sections
@@ -15,36 +19,61 @@ const UniformInspectionForm = () => {
 	const [sectionCollapse, setSectionCollapse] = useState(false)   // Name List Section Collapse State
 	const [remarks, setRemarks] = useState({})						// Remarks Per Section Per Boy
 
+	const [loading, setLoading] = useState(true);
+	const [uid, setUid] = useState(null);
+
 	useEffect(() => {
-		axios.get(`${BASE_URL}/uniform_inspection`, { headers: { "x-route": "/get_inspection_components" }, withCredentials: true })
-			.then(resp => setComponents(resp.data))
-			.catch(error => handleServerError(error.response.status))
-
-		axios.get(`${BASE_URL}/account?type=Boy`, { headers: { "x-route": "/get_accounts_by_type" }, withCredentials: true })
-			.then(resp => setBoyAccounts(resp.data))
-			.catch(resp => handleServerError(resp.response.status))
-	}, [])
-
-	function selectBoy() {
-		let boyAccountSelector = document.querySelectorAll('.boy-account-selector:checked')
-		let accounts = Array.from(boyAccountSelector, account => account.id)
-
-		setSelectedContents(prevContents => {
-			const updatedContents = { ...prevContents };
-			accounts.map(account => {
-				if (!updatedContents[account]) updatedContents[account] = [];
-			});
-			return updatedContents;
+		onAuthStateChanged(auth, (user) => {
+			if (user) setUid(user.uid)
 		});
 
-		let boys = []
-		boyAccountSelector.forEach(account => {
-			const acc = boyAccounts.find(boy => boy._id == account.id)
-			boys.push(acc)
-		})
+		const init = async () => {
+			try {
+				const componentsSnap = await getDocs(query(collection(db, "uniform_categories"), orderBy("order")));
+				const components = componentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				console.log(components);
+				setComponents(components);
 
-		setBoys(boys)
+				const usersSnap = await getDocs(query(collection(db, "users"), where("account_type", "==", "Boy")));
+				const users = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				setBoyAccounts(users);
+
+				setLoading(false);
+			} catch (err) {
+				console.error(err)
+				showMessage("Failed to get awards")
+			}
+		}
+
+		init();
+	}, [])
+
+	function selectBoy(e) {
+		const id = e.target.id;
+		const isChecked = e.target.checked;
+
+		setBoys(prev => {
+			let updated;
+			if (isChecked) {
+				updated = [...prev, boyAccounts.find(boy => boy.id === id)];
+			} else {
+				updated = prev.filter(boy => boy.id !== id);
+			}
+
+			const accounts = updated.map(account => account.id);
+
+			setSelectedContents(prevContents => {
+				const updatedContents = { ...prevContents };
+				accounts.forEach(accountId => {
+					if (!updatedContents[accountId]) updatedContents[accountId] = [];
+				});
+				return updatedContents;
+			});
+
+			return updated;
+		});
 	}
+
 
 	function selectField(e) {
 		setSelectedContents(prev => {
@@ -56,71 +85,90 @@ const UniformInspectionForm = () => {
 		})
 	}
 
-	function submitInspection(e) {
-		e.preventDefault()
+	async function submitInspection(e) {
+		try {
+			e.preventDefault()
 
-		const confirmed = window.confirm("Are you sure you have finished inspecting? Ensure that all boys selected have been inspected before submission.")
-		if (!confirmed) return
+			const confirmed = window.confirm("Are you sure you have finished inspecting? Ensure that all boys selected have been inspected before submission.")
+			if (!confirmed) return;
 
-		const result = {};
-		const allKeys = new Set([...Object.keys(selectedContents), ...Object.keys(remarks)]);
-		allKeys.forEach(key => {
-			result[key] = {
-				fields: selectedContents[key] || [],
-				remarks: remarks[key] || {}
-			};
-		});
+			const batch = writeBatch(db);
+			boys.map(boy => {
+				const total = selectedContents[boy.id].reduce((sum, fieldId) => {
+					const [componentId, fieldPart] = fieldId.split("-field");
+					const fieldIndex = parseInt(fieldPart, 10);
 
-		// const formattedDate = date.toLocaleDateString('en-GB');
-		axios.post(`${BASE_URL}/uniform_inspection`, result, { headers: { "x-route": "/create_uniform_inspection" }, withCredentials: true })
-		.then(() => {
-			showMessage("Uniform Inspection submitted successfully", 'success')
-			navigate('/uniform_inspection_results')
-		})
-		.catch(resp => handleServerError(resp.response?.status))
+					const component = components.find(c => c.id === componentId);
+					const fieldScore = component?.components_fields?.[fieldIndex]?.field_score || 0;
+
+					return sum + fieldScore;
+				}, 0);
+
+				const data = {
+					boy: doc(db, "users", boy.id),
+					fields: selectedContents[boy.id],
+					remarks: remarks[boy.id] || [],
+					score: total,
+					assessed_date: Timestamp.fromDate(new Date()),
+					assessor: doc(db, "users", uid)
+				}
+
+				const newInspectionRef = doc(collection(db, "uniform_inspections"));
+				batch.set(newInspectionRef, data);
+			})
+
+			await batch.commit();
+			showMessage("Inspection has been submitted", "success")
+			navigate("/uniform_inspection")
+		} catch (err) {
+			console.error(err);
+			showMessage("Failed to submit inspection")
+		}
 	}
 
+	if (loading) return <Loading></Loading>
+
 	return (
-		<div className='uniform-inspection-form'>
-			<div className='form-selection'>
+		<div className={styles['uniform-inspection-form']}>
+			<div className={styles['form-selection']}>
 				<label htmlFor='boy-selector'>Inspecting:</label>
 				<select id='boy-selector' onChange={e => setCurrentForm(e.target.value)} value={currentForm ? currentForm : ''}>
-					<option value='' disabled={true}>Select a boy</option>
-					{boys.map(boy => <option key={boy._id} value={boy._id}>{boy.rank} {boy.account_name}</option>)}
+					<option value='' disabled hidden>Select a boy</option>
+					{boys.map(boy => <option key={boy.id} value={boy.id}>{boy.rank} {boy.account_name}</option>)}
 				</select>
 			</div>
 
-			<div className='page-container'>
+			<div className={styles['page-container']}>
 				<h2>Uniform Inspection</h2>
 				<div>
 					<p>Pick the boys to inspect:</p>
 					<i className='fa-solid fa-chevron-right' onClick={() => setSectionCollapse(!sectionCollapse)} style={{ transform: !sectionCollapse ? 'rotate(90deg)' : 'rotate(0deg)' }}></i>
 				</div>
 
-				<div className='boy-selector' style={{ height: sectionCollapse ? 0 : 'max-content' }}>
-					{boyAccounts.map((boyAccount) => (
-						<React.Fragment key={boyAccount._id}>
-							<input type='checkbox' className='boy-account-selector' id={boyAccount._id} onChange={selectBoy}></input>
-							<label htmlFor={boyAccount._id}>
+				<div className={styles['boy-selector']} style={{ height: sectionCollapse ? 0 : 'max-content' }}>
+					{boyAccounts.map(boyAccount => (
+						<Fragment key={boyAccount.id}>
+							<input type='checkbox' className={styles['boy-account-selector']} id={boyAccount.id} onChange={e => selectBoy(e)}></input>
+							<label htmlFor={boyAccount.id}>
 								<p>Sec {boyAccount.level} {boyAccount.rank} {boyAccount.account_name}</p>
 							</label>
-						</React.Fragment>
+						</Fragment>
 					))}
 				</div>
 
 				<form onSubmit={submitInspection}>
 					{currentForm != null && components.map(component => (
-						<div key={component._id}>
+						<div key={component.id}>
 							<h3>{component.component_name}</h3>
 							<ul>
-								{component.components_fields.map(field => (
-									<li key={`${field._id}-${currentForm}`}>
-										<input type='checkbox' className={`${component._id}-field-selector ${field.field_description.toLowerCase().includes("missing") ? "field-missing" : ""}`} id={`${field._id}`} name={component._id} onChange={(e) => selectField(e)} defaultChecked={selectedContents[currentForm].includes(field._id)}></input>
-										<label htmlFor={`${field._id}`}>{field.field_description}</label>
+								{component.components_fields.map((field, index) => (
+									<li key={`${component.id}-field${index}-${currentForm}`}>
+										<input type='checkbox' className={`${component.id}-field-selector ${field.field_description.toLowerCase().includes("missing") ? styles["field-missing"] : ""}`} id={`${component.id}-field${index}`} onChange={(e) => selectField(e)} defaultChecked={selectedContents[currentForm].includes(`${component.id}-field${index}`)}></input>
+										<label htmlFor={`${component.id}-field${index}`}>{field.field_description}</label>
 									</li>
 								))}
 							</ul>
-							<textarea key={`${currentForm}-${component._id}`} name={`${component.component_name}-remarks`} placeholder='Remarks (Optional)' defaultValue={remarks[currentForm]?.[component._id]} onChange={(e) => setRemarks(prev => ({ ...prev, [currentForm]: { ...prev[currentForm], [component._id]: e.target.value } }))}></textarea>
+							<textarea key={`${currentForm}-${component.id}`} name={`${component.component_name}-remarks`} placeholder='Remarks (Optional)' defaultValue={remarks[currentForm]?.[component.id]} onChange={(e) => setRemarks(prev => ({ ...prev, [currentForm]: { ...prev[currentForm], [component.id]: e.target.value } }))}></textarea>
 						</div>
 					))}
 					<button>Finish Inspection</button>
