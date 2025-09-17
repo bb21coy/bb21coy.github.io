@@ -11,7 +11,7 @@ const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/A
 const AwardsManagementPage = lazy(() => import('./awardsManagementPage/AwardsManagementPage'));
 const ResultPage = lazy(() => import('./resultPage/ResultPage'));
 const ResultGenerationPage = lazy(() => import('./resultPage/ResultGenerationPage'));
-const UniformInspectionPage = lazy(() => import('./uniformInspectionPage/UniformInspectionPage'));
+const UniformInspectionPage = lazy(() => import('./uniformInspectionPage/UniformInspectionSummary'));
 const UniformInspectionResultPage = lazy(() => import('./uniformInspectionPage/UniformInspectionResultPage'));
 const UniformInspectionForm = lazy(() => import('./uniformInspectionPage/UniformInspectionForm'));
 const UserManagementPage = lazy(() => import('./userManagementPage/UserManagementPage'));
