@@ -101,7 +101,7 @@
         p,
         .boy-accounts,
         button {
-            grid-column: span 1;
+            grid-column: span 1 !important;
         }
     }
 }

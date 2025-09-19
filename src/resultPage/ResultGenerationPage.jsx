@@ -19,6 +19,7 @@ const ResultGenerationPage = () => {
 	const [descriptionInput, setDescriptionInput] = useState();
 
 	const [loading, setLoading] = useState(true);
+	const [isWebkit, setIsWebkit] = useState(false);
 
 	useEffect(() => {
 		const init = async () => {
@@ -37,6 +38,9 @@ const ResultGenerationPage = () => {
 				showMessage("Failed to get awards")
 			}
 		}
+
+		const ua = navigator.userAgent.toLowerCase();
+    	setIsWebkit(ua.includes("applewebkit"));
 
 		init();
 	}, [])
@@ -139,6 +143,7 @@ const ResultGenerationPage = () => {
 
 			{award != null && ((award.badge_masteries.length > 0 && mastery != null) || (award.badge_masteries.length === 0 && mastery == null)) && instructor != null && boys.length > 0 && <>
 				<button onClick={() => window.print()}>Generate Results</button>
+				{isWebkit && <p>It looks like you are using an Apple Device. Please press Share &gt; Print to generate results</p>}
 				<ResultPage
 					award={award}
 					mastery={mastery}
