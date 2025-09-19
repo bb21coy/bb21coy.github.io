@@ -94,7 +94,7 @@ const ResetPasswordPage = () => {
 				<span></span>
 
 				<label htmlFor='password'>New Password:</label>
-				<input type={passwordType} className='edit-field' required id='password' placeholder='Enter New Password' autoComplete='new-password' onChange={(e) => setPassword(e.target.value)}></input>
+				<input type={passwordType} required id='password' placeholder='Enter New Password' autoComplete='new-password' onChange={(e) => setPassword(e.target.value)}></input>
 				<i className={`fa-solid ${passwordType === "password" ? "fa-eye" : "fa-eye-slash"}`} onClick={() => setPasswordType(passwordType === 'password' ? 'text' : 'password')}></i>
 
 				<button>Save Changes</button>
