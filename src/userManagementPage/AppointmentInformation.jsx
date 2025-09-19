@@ -6,7 +6,7 @@ import { db } from '../firebase'
 
 // To manage permissions for appointment holders
 const AppointmentInformation = ({ accountType, appointment, appointment_name, usersList }) => {
-	const coreAppointments = ['Captain', 'CSM', 'DY CSM', 'Sec 4/5 PS', 'Sec 3 PS', 'Sec 2 PS', 'Sec 1 PS']
+	const coreAppointments = ['Captain', 'CSM', 'DY CSM', 'Sec 4&5 PS', 'Sec 3 PS', 'Sec 2 PS', 'Sec 1 PS']
 	const [accountId, setAccountId] = useState()
 	const appointmentRef = doc(db, "appointments", "HJbxljYligJkryXpA7sh");
 
@@ -37,7 +37,7 @@ const AppointmentInformation = ({ accountType, appointment, appointment_name, us
 			<select id={`${appointment.id}_${appointment_name}`} defaultValue={appointment.id} onChange={(e) => setAccountId(e.target.value)}>
 				<option value={appointment.id}>{appointment.account_name}</option>
 				{["Officer", "Admin"].includes(accountType) && usersList.filter(user => user.account_type === appointment.account_type && user.id !== appointment.id).map(user => (
-					<option key={user._id} value={user._id}>{user.account_name}</option>
+					<option key={user.id} value={user.id}>{user.account_name}</option>
 				))}
 			</select>
 

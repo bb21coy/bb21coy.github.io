@@ -49,7 +49,6 @@ const AccountCreationForm = ({ account_type, appointment }) => {
 			e.preventDefault()
 			let submit = true
 
-			if (accountType !== "Boy" && e.target.elements['credentials'].value === '') submit = false
 			if (e.target.elements['password'].value === '' || e.target.elements['password'].value.length < 6) submit = false
 
 			const formData = new FormData(e.target);
@@ -62,7 +61,7 @@ const AccountCreationForm = ({ account_type, appointment }) => {
 
 			const dataForValidation = {
 				...values,
-				roll_call: values.roll_call === "true",
+				roll_call: values.roll_call === "Yes",
 				rank: values.rank === "NIL" ? null : values.rank,
 				credentials: values.credentials === "" ? null : values.credentials,
 				level: parseInt(values.level) || null
@@ -168,7 +167,7 @@ const AccountCreationForm = ({ account_type, appointment }) => {
 
 				{(["Officer", "Primer"].includes(accountType)) && <>
 					<label htmlFor='credentials-input'>Credentials (For 32A results): </label>
-					<input className='account-credentials' name='credentials' placeholder='Enter Credentials' id='credentials-input' />
+					<input className='account-credentials' name='credentials' placeholder='Enter Credentials (Optional)' id='credentials-input' />
 				</>}
 			</div>
 

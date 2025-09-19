@@ -121,10 +121,6 @@ const UserInformation = ({ userInfo, showForm }) => {
 			e.preventDefault()
 			let submit = true
 			let emailInput = e.target.elements['email'].value
-			if (userInfo.account_type !== "Boy" && userInfo.account_type !== "Admin") {
-				const credentials = e.target.elements['credentials'].value
-				if (credentials === '') submit = false
-			}
 
 			const formData = new FormData(e.target);
 			const values = Object.fromEntries(formData.entries());
@@ -193,8 +189,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 				</select>
 
 				<label htmlFor='rank-input'>Rank:</label>
-				<select id="rank-input" name='rank' defaultValue={userInfo.rank || ""} onChange={setRank}>
-					<option value="" disabled hidden>Select Rank</option>
+				<select id="rank-input" name='rank' defaultValue={userInfo.rank || "NIL"} onChange={setRank}>
 					{userInfo.account_type === "Officer" && <>
 						<option value="NIL">Not Applicable</option>
 						<option value="OCT">OCT</option>
@@ -311,7 +306,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 
 				{userInfo.account_type !== "Boy" && <>
 					<label htmlFor='credentials-input'>Credentials (For 32A results):</label>
-					<input name="credentials" defaultValue={userInfo.credentials} id='credentials-input' />
+					<input name="credentials" defaultValue={userInfo.credentials} id='credentials-input' placeholder='Enter Credentials (Optional)' />
 				</>}
 			</form>
 

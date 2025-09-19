@@ -74,7 +74,7 @@ const UserManagementPage = () => {
 
 				{pageState === "form" && <AccountCreationForm account_type={accountType} appointment={appointment} />}
 				{pageState === "appointments" && <AppointmentHoldersList account_type={accountType} usersList={usersList} />}
-				{pageState !== "form" && pageState !== "appointments" && <UserInformation userInfo={usersList.find(user => user.id === pageState)} showForm={showForm} />}
+				{pageState !== "form" && pageState !== "appointments" && <UserInformation key={pageState} userInfo={usersList.find(user => user.id === pageState)} showForm={showForm} />}
 			</div>
 		</div>
 	)

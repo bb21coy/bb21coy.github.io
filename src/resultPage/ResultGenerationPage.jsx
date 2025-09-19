@@ -3,7 +3,7 @@ import Loading from '../general/Loading'
 import { showMessage } from '../general/handleServerError'
 import ResultPage from './ResultPage'
 import styles from './resultGenerationPage.module.scss'
-import { getDocs, collection } from '@firebase/firestore'
+import { getDocs, collection, orderBy, query } from '@firebase/firestore'
 import { db } from '../firebase'
 
 // To manually create 32A results
@@ -19,13 +19,18 @@ const ResultGenerationPage = () => {
 	const [descriptionInput, setDescriptionInput] = useState();
 
 	const [loading, setLoading] = useState(true);
-	const [isWebkit, setIsWebkit] = useState(false);
+	const [isApple, setIsApple] = useState(false);
 
 	useEffect(() => {
 		const init = async () => {
 			try {
-				const awardsSnap = await getDocs(collection(db, "awards"));
+				const awardsSnap = await getDocs(query(collection(db, "awards"), orderBy("badge_name")));
 				const awards = awardsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+				awards.sort((a, b) => {
+					if (a.badge_name.toLowerCase() === "target") return -1;
+					if (b.badge_name.toLowerCase() === "target") return 1;
+					return 0;
+				});
 				setAwards(awards);
 
 				const usersSnap = await getDocs(collection(db, "users"));
@@ -39,8 +44,7 @@ const ResultGenerationPage = () => {
 			}
 		}
 
-		const ua = navigator.userAgent.toLowerCase();
-    	setIsWebkit(ua.includes("applewebkit"));
+		setIsApple(/Mac|iPhone|iPad|iPod/i.test(navigator.userAgent));
 
 		init();
 	}, [])
@@ -86,10 +90,11 @@ const ResultGenerationPage = () => {
 	}
 
 	function selectInstructor(id) {
+		setInstructor(null);
 		const user = groupedUsers.officers.find(officer => officer.id === id) || groupedUsers.primers.find(primer => primer.id === id)
 		if (!user) return;
 		if (user.credentials === "" || !user.credentials) return showMessage("Instructor must have credentials.");
-		setInstructor(user);
+		else setInstructor(user);
 	}
 
 	if (loading) return <Loading />
@@ -103,7 +108,7 @@ const ResultGenerationPage = () => {
 				<select onChange={selectAward} id='results-badge' defaultValue={""}>
 					<option value="" hidden>Select an Award</option>
 					{awards.map(award => {
-						if (["swimming", "first aid"].includes(award.badge_name)) return [];
+						if (["swimming", "first aid", "kayaking"].includes(award.badge_name.toLowerCase())) return [];
 
 						return award.badge_masteries.length > 0
 							? award.badge_masteries.map((mastery, index) => (
@@ -135,15 +140,14 @@ const ResultGenerationPage = () => {
 				</div>
 
 				{(award != null && mastery != null && descriptionHint) && <Fragment>
-					<label htmlFor='results-description'>Description of badgework:</label>
-					<p>{descriptionHint}</p>
-					<textarea id='results-description' onChange={(e) => setDescriptionInput(e.target.value)} defaultValue={descriptionInput || award.results_description} placeholder='Description of badgework'></textarea>
+					<label htmlFor='results-description'>Description of Badgework:</label>
+					<textarea id='results-description' onChange={(e) => setDescriptionInput(e.target.value)} defaultValue={descriptionInput || award.results_description} placeholder={descriptionHint}></textarea>
 				</Fragment>}
 			</form>
 
-			{award != null && ((award.badge_masteries.length > 0 && mastery != null) || (award.badge_masteries.length === 0 && mastery == null)) && instructor != null && boys.length > 0 && <>
+			{award != null && ((award.badge_masteries.length > 0 && mastery != null) || (award.badge_masteries.length === 0 && mastery == null)) && instructor?.account_name != null && boys.length > 0 && <>
 				<button onClick={() => window.print()}>Generate Results</button>
-				{isWebkit && <p>It looks like you are using an Apple Device. Please press Share &gt; Print to generate results</p>}
+				{isApple && <p className={styles['apple-warning']}>It looks like you are using an Apple Device. Please press Share &gt; Print to generate results. Note that format might differ from other browsers.</p>}
 				<ResultPage
 					award={award}
 					mastery={mastery}

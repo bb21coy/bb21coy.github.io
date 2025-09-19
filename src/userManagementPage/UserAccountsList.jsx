@@ -31,6 +31,11 @@ const UserAccountsList = ({ usersList, setUsersList, showUser, pageState }) => {
 			else if (u.account_type === "Boy") boys.push(u);
 		}
 
+		boys.sort((a, b) => {
+			if (a.level !== b.level) return a.level - b.level;
+			return a.account_name.localeCompare(b.account_name);
+		});
+
 		return { officers, primers, boys, graduated };
 	}, [usersList]);
 
