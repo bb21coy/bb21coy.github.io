@@ -1,7 +1,9 @@
-import * as XLSX from "xlsx";
+import readXlsxFile, { readSheetNames } from 'read-excel-file';
 import { useState } from "react";
 import { showMessage } from "../general/handleServerError";
-import styles from "../styles/awardsUploadFile.module.scss"
+import styles from "./uploadFile.module.scss"
+import axios from "axios";
+import BASE_URL from "../Constants";
 
 function UploadFile() {
     const MAX_BYTES = 200 * 1024;
@@ -11,46 +13,27 @@ function UploadFile() {
 
     const [data, setData] = useState();
 
-    function handleFile(e) {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    async function handleFile(data) {
+        try {
+            const totalData = {};
+            const sheetNames = await readSheetNames(data);
 
-        const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
-        if (!ALLOWED_EXT.includes(ext)) return showMessage("Invalid file type.");
-        if (file.size > MAX_BYTES) return showMessage("File too large.");
+            for (const sheetName of sheetNames) {
+                if (['Sheet7', 'Sheet8', 'Sheet9'].includes(sheetName)) continue
+                const rows = (await readXlsxFile(data, { sheet: sheetName })).slice(1);
 
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-            try {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: "array" });
-                const totalData = {};
-
-                workbook.SheetNames.forEach(sheetName => {
-                    if (['Sheet7', 'Sheet8', 'Sheet9'].includes(sheetName)) return
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
-                        header: 1,           // raw 2D array, or remove to get objects with headers
-                        defval: null,        // replace empty cells with null
-                        blankrows: false,
-                        range: 1
-                    });
-
-                    const result = transformData(json);
-                    for (const [name, badges] of Object.entries(result)) {
-                        totalData[name] = totalData[name] || {};
-                        Object.assign(totalData[name], badges);
-                    }
-                })
-
-                console.log(totalData);
-                setData(totalData);
-            } catch (err) {
-                console.error(err);
-                showMessage("Failed to parse .xls file.");
+                const result = transformData(rows);
+                for (const [name, badges] of Object.entries(result)) {
+                    totalData[name] = totalData[name] || {};
+                    Object.assign(totalData[name], badges);
+                }
             }
-        };
 
-        reader.readAsArrayBuffer(file);
+            setData(totalData);
+        } catch (err) {
+            console.error(err);
+            showMessage("Failed to parse .xls file.");
+        }
     }
 
     function transformData(json) {
@@ -62,6 +45,19 @@ function UploadFile() {
             if (!badgeRow[col] && col > 0) {
                 badgeRow[col] = badgeRow[col - 1];
             }
+        }
+
+        const badgeStageCount = {};
+        for (let col = 2; col < badgeRow.length; col++) {
+            const badge = badgeRow[col];
+            let stage = headerRow[col];
+            if (!badge || !stage) continue;
+
+            if (badge === "Total Defence") stage = ttd[stage];
+            stage = mastery[stage];
+
+            badgeStageCount[badge] = badgeStageCount[badge] || new Set();
+            badgeStageCount[badge].add(stage);
         }
 
         for (let i = 2; i < json.length; i++) {
@@ -79,7 +75,7 @@ function UploadFile() {
                 if (badge === "Total Defence") stage = ttd[stage];
                 stage = mastery[stage];
 
-                const key = `${badge} ${stage}`;
+                const key = badgeStageCount[badge].size === 1 ? badge : `${badge} ${stage}`;
                 const val = row[col];
                 result[name][key] = val === "Attained";
             }
@@ -88,9 +84,36 @@ function UploadFile() {
         return result;
     }
 
+
     const toggleSize = (e) => {
         const size = e.currentTarget.getAttribute('data-open');
         e.currentTarget.setAttribute('data-open', size === "false" ? "true" : "false");
+    }
+
+    const convertToXlsx = async (e) => {
+        const file = e.target.files[0];
+
+        const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+        if (!ALLOWED_EXT.includes(ext)) return showMessage("Invalid file type.");
+        if (file.size > MAX_BYTES) return showMessage("File too large.");
+
+        const fileBuffer = await file.arrayBuffer();
+
+        try {
+            const resp = await axios.post(`${BASE_URL}/awards`, fileBuffer, {
+                headers: {
+                    "Content-Type": "application/octet-stream",
+                    "Content-Disposition": `attachment; filename="${file.name}"`,
+                },
+                responseType: "arraybuffer"
+            })
+
+            const data = new Uint8Array(resp.data);
+            handleFile(data);
+        } catch (e) {
+            console.error(e)
+            showMessage("Failed to convert to XLSX")
+        }
     }
 
     return (
@@ -99,7 +122,7 @@ function UploadFile() {
                 <label htmlFor="upload">
                     <i className="fa-solid fa-upload"></i>
                     Upload Excel from Member's Portal (.xls):</label>
-                <input type="file" accept=".xls,application/vnd.ms-excel" onChange={handleFile} id="upload" />
+                <input type="file" accept=".xls,application/vnd.ms-excel" onChange={e => convertToXlsx(e)} id="upload" />
             </>}
 
             {data && <>
@@ -118,7 +141,7 @@ function UploadFile() {
                             {Object.entries(badge).map(([badge, attained]) => (
                                 <div>
                                     <span>{badge}</span>
-                                    <span className={attained ? "attained" : "not-attained"}>{attained ? "Attained" : "Not Attained"}</span>
+                                    <span className={attained ? styles.attained : styles["not-attained"]}>{attained ? "Attained" : "Not Attained"}</span>
                                 </div>
                             ))}
                         </div>

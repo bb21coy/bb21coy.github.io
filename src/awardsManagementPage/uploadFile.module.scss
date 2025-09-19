@@ -1,11 +1,6 @@
 .upload-file {
-    * {
-        box-sizing: border-box;
-    }
-
-    *:not(i) {
-        font-family: sans-serif;
-    }
+    display: flex;
+    flex-direction: column;
 
     label {
         display: flex;
