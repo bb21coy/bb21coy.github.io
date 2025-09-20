@@ -32,7 +32,7 @@ const Header = () => {
 			if (snap.exists()) setUser(data);
 			else return
 
-			let count = 4;
+			let count = 5;
 			if (data.account_type === "Boy") count += 1
 			if ((data.account_type !== "Boy") || (data.account_type === "Boy" && data.appointment !== null)) count += 3
 			if (data.account_type !== "Boy") count += 1
