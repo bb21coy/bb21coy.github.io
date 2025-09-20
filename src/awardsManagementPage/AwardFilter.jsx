@@ -7,35 +7,54 @@ const AwardsFilter = () => {
     const [rankSelected, setRankSelected] = useState([]);
     const [levelSelected, setLevelSelected] = useState([]);
     const [openDropdown, setOpenDropdown] = useState(null);
-    const [search, setSearch] = useState([]);
+    const [search, setSearch] = useState("");
 
     function toggle(value, type) {
-        if (type === "level") return setLevelSelected(levelSelected.includes(value) ? levelSelected.filter(v => v !== value) : [...levelSelected, value]);
-        else return setRankSelected(rankSelected.includes(value) ? rankSelected.filter(v => v !== value) : [...rankSelected, value]);
+        if (type === "level") {
+            setLevelSelected(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
+        } else {
+            setRankSelected(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
+        }
     }
 
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            const value = e.target.value.trim().toLowerCase();
-            if (!value || value === "") return;
-            setSearch((prev) => (prev.includes(value) ? prev : [...prev, value]));
-            e.target.value = "";
-        }
-    };
+    useEffect(() => {
+        const rows = document.querySelectorAll("tr[data-row]");
+        const normalisedRank = rankSelected.map(r => r.split("(")[1].replace(")", ""));
+        
+        rows.forEach(row => {
+            const sec = row.dataset.sec;   // e.g. "Sec 1"
+            const rank = row.dataset.rank; // e.g. "PTE"
+            const rowName = row.querySelector("td:first-of-type").textContent.trim().toLowerCase();
+
+            const searchOk = search === "" || rowName.includes(search.trim().toLowerCase());
+            const levelOk = !levelSelected.includes(sec);
+            const rankOk = !normalisedRank.includes(rank);
+     
+            if (searchOk && levelOk && rankOk) {
+                row.style.display = "table-row";
+            } else {
+                row.style.display = "none";
+            }
+        })
+    }, [levelSelected, rankSelected, search])
+
+    const clearFilters = () => {
+        setRankSelected([]);
+        setLevelSelected([]);
+        setSearch("");
+    }
 
     return (
         <div className={styles['awards-filter']}>
             <div>
                 <label htmlFor="search"><i className="fa-solid fa-magnifying-glass"></i></label>
-                <input type="search" id="search" placeholder="Search..." onKeyDown={handleKeyDown} />
-            </div>
-
-            <div>
-                {[...search].reverse().map(s => <span key={s} onClick={() => setSearch(prev => prev.filter(p => p !== s))}>{s}</span>)}
+                <input type="search" id="search" placeholder="Search..." onChange={e => setSearch(e.target.value)} value={search} />
             </div>
 
             <MultiSelectDropDown label="Rank" options={rankOptions} selected={rankSelected} setSelected={(value) => toggle(value, "rank")} openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />
             <MultiSelectDropDown label="Level" options={levelOptions} selected={levelSelected} setSelected={(value) => toggle(value, "level")} openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />
+        
+            <button onClick={clearFilters}>Clear</button>
         </div>
     )
 }

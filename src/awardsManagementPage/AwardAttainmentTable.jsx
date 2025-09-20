@@ -168,7 +168,7 @@ const AwardAttainmentTable = memo(({ award_name, boys, toggleAttainment, attaine
 
 						const allChecked = rowIds.length > 0 && allNormalChecked && allPointsChecked;
 
-						return <tr key={boy.id}>
+						return <tr key={boy.id} data-row data-sec={`Sec ${boy.level}`} data-rank={boy.rank}>
 							<td style={{ backgroundColor: allChecked && award_name !== "service" && award_name !== "personal" ? "lightgreen" : "white" }}>{boy.account_name}</td>
 
 							{fixedRequirements[award_name].map(requirement => (
