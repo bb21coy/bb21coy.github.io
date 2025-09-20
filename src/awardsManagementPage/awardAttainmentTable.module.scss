@@ -1,0 +1,41 @@
+.award-attainment-table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: auto;
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: auto;
+
+        th, td {
+            border: 1px solid black;
+            padding: 5px 10px;
+            min-width: 120px;
+        }
+
+        td + td, th + th {
+            border-left: none;
+        }
+
+        tr + tr td, tr + tr th {
+            border-top: none;
+        }
+
+        td:has(input) {
+            text-align: center;
+        }
+
+        td:first-of-type, tr:first-of-type th:first-of-type {
+            position: sticky;
+            left: 0;
+            background: white;
+            border: 1px solid black;
+        }
+
+        input {
+            accent-color: black;
+        }
+    }
+}

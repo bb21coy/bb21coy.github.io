@@ -1,0 +1,41 @@
+.award-tracker {
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(20vw, 200px) 1fr;
+    width: 100%;
+    min-height: 300px;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 10px;
+    border-right: 1px solid black;
+    margin-right: 10px;
+
+    input {
+        display: none;
+
+        &+label {
+            cursor: pointer;
+            outline: none;
+            border-radius: 10px;
+            padding: 5px 10px;
+            color: black;
+            font-size: 14px;
+        }
+
+        &:checked+label {
+            background: black;
+            color: white;
+        }
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: auto;
+}

@@ -1,0 +1,112 @@
+.awards-filter {
+    display: flex;
+    gap: 10px;
+    height: max-content;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: visible;
+
+    >div:first-of-type {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    >div:nth-of-type(2) {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        overflow: auto;
+        user-select: none;
+
+        &::-webkit-scrollbar {
+            height: 5px
+        }
+
+        span {
+            background: black;
+            color: white;
+            border-radius: 10px;
+            padding: 3px 8px;
+            font-size: 13px;
+            position: relative;
+
+            &::after {
+                cursor: pointer;
+                font-size: 12px !important;
+                font: var(--fa-font-solid);
+                content: "\f00d";
+                margin-left: 15px;
+            }
+        }
+    }
+
+    input[type="search"] {
+        padding: 5px;
+        border-bottom: 1px solid black;
+    }
+
+    details {
+        flex-shrink: 0;
+        position: relative;
+        overflow: visible;
+
+        &[open] > summary::after {
+            transform: rotate(0deg);
+        }
+
+        summary {
+            list-style: none;
+            border: 1px solid black;
+            padding: 5px;
+            border-radius: 10px;
+            font-size: 13px;
+
+            &::after {
+                font: var(--fa-font-solid);
+                content: "\f078";
+                margin-left: 10px;
+                display: inline-block;
+                transform: rotate(-90deg);
+                transition: transform 0.2s ease;
+            }
+        }
+
+        div {
+            position: absolute;
+            top: 100%;
+            right: 0;
+        }
+    }
+
+    .dropdown-panel {
+        position: absolute;
+        background: white;
+        box-shadow: 0 0 10px rgba($color: #000000, $alpha: 0.4);
+        padding: 8px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        input {
+            display: none;
+        }
+
+        input+label::before {
+            font: var(--fa-font-solid);
+            content: "\f00c";
+            margin-right: 10px;
+            color: green;
+            font-size: 13px;
+            width: 20px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        input:checked+label::before {
+            content: "\f00d";
+            color: red;
+        }
+    }
+}

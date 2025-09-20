@@ -1,80 +1,202 @@
-import React from 'react'
+import { useState, useEffect, useMemo, useRef, memo } from 'react'
 import PropTypes from 'prop-types'
+import { collection, getDocs, query, orderBy } from "@firebase/firestore";
+import { db } from "../firebase";
+import styles from './awardAttainmentTable.module.scss'
 
 // To show attainment status for each special award
-const AwardAttainmentTable = ({ award_name, boys, checked, toggleAttainment, electivePoints }) => {
-	const electiveAwards = ["Adventure", "Drill", "Arts & Crafts", "Athletics", "First Aid", "Hobbies", "Kayaking", "Musketry", "Sailing", "Sportsman", "Swimming"]
-	const electiveMasteries = { "Adventure": ["Advanced"], "Drill": ["Advanced"], "Arts & Crafts": ["Basic", "Advanced"], "Athletics": ["Basic", "Advanced"], "First Aid": ["Basic", "Advanced"], "Hobbies": ["Basic", "Advanced"], "Kayaking": ["Basic", "Advanced"], "Musketry": ["Basic", "Advanced"], "Sailing": ["Basic", "Advanced"], "Sportsman": ["Basic", "Advanced"], "Swimming": ["Basic", "Advanced"] }
-	const ipaAwards = ["Target", "Adventure", "Drill", "Community Spiritedness", "Global Awareness", "Leadership"]
-	const ipaMasteries = { "Adventure": ["Basic"], "Drill": ["Basic"], "Community Spiritedness": ["Advanced"], "Global Awareness": ["Basic"], "Leadership": ["Basic"] }
-	const ipaFixedRequirements = [{ 'name': "1 Elective Points", 'requirements': (boy) => { return (electivePoints[boy.id] >= 1) } }]
-	const spaAwards = ["Intermediary Proficiency Award", "Total Defence", "Global Awareness", "Leadership"]
-	const spaMasteries = { "Total Defence": ["Silver"], "Global Awareness": ["Advanced"], "Leadership": ["Advanced"] }
-	const spaFixedRequirements = [{ 'name': "4 Elective Points", 'requirements': (boy) => { return (electivePoints[boy.id] >= 4) } }]
-	const foundersAwards = ["Senior Proficiency Award", "Christian Education", "Community Spiritedness", "Global Awareness", "Leadership"]
-	const foundersMasteries = { "Community Spiritedness": ["Master"], "Global Awareness": ["Master"], "Leadership": ["Master"] }
-	const foundersFixedRequirements = [{ 'name': "6 Elective Points", 'requirements': (boy) => { return (electivePoints[boy.id] >= 6) } }]
-	const serviceAwards = ["Link Badge", "1 Year Service (First Year)", "1 Year Service (Second Year)", "1 Year Service (Third Year)", "3 Year Service", "National Event"]
-	const awards = { "Electives": electiveAwards, "IPA": ipaAwards, "SPA": spaAwards, "Founders": foundersAwards, "Service": serviceAwards }
-	const masteries = { "Electives": electiveMasteries, "IPA": ipaMasteries, "SPA": spaMasteries, "Founders": foundersMasteries, "Service": {} }
-	const fixedRequirements = { "IPA": ipaFixedRequirements, "SPA": spaFixedRequirements, "Founders": foundersFixedRequirements }
-	const numberColumns = { "Electives": 20, "IPA": 7, "SPA": 5, "Founders": 6, "Service": 6 }
+const AwardAttainmentTable = memo(({ award_name, boys, toggleAttainment, attained }) => {
+	const [awardsList, setAwardsList] = useState([])
+	const scrollRef = useRef(null);
+	const fixedRequirements = {
+		"personal": [],
+		"ipa": ["1 Elective Point"],
+		"spa": ["4 Elective Points"],
+		"founders": ["6 Elective Points"],
+		"service": []
+	};
+
+	useEffect(() => {
+		const init = async () => {
+			const awards = await getDocs(query(collection(db, "awards"), orderBy("badge_name")));
+			setAwardsList(awards.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+		}
+
+		const handleKeyDown = (e) => {
+			if (!scrollRef.current) return;
+
+			const step = 50;
+			if (e.key === "ArrowRight") {
+				scrollRef.current.scrollLeft += step;
+			} else if (e.key === "ArrowLeft") {
+				scrollRef.current.scrollLeft -= step;
+			}
+		};
+
+		init();
+		window.addEventListener("keydown", handleKeyDown);
+
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [award_name])
+
+	const categorisedAwards = useMemo(() => {
+		const categories = {}
+
+		awardsList.map(award => {
+			const masteries = award.badge_masteries || [];
+			if (!categories[award.badge_category]) categories[award.badge_category] = {};
+
+			const masteriesList = masteries.map(m => m.mastery_name);
+			categories[award.badge_category][award.badge_name] = masteriesList;
+		})
+
+		// override for electives
+		if (!categories.personal) categories.personal = {};
+		delete categories.personal.Adventure;
+		delete categories.personal.Drill;
+		categories.personal = {
+			Adventure: ["Advanced"],
+			Drill: ["Advanced"],
+			...categories.personal
+		};
+
+		// override for IPA
+		if (!categories.ipa) categories.ipa = {};
+		categories.ipa = {
+			Target: [],
+			Adventure: ["Basic"],
+			Drill: ["Basic"],
+			...categories.ipa,
+			"Community Spiritedness": ["Advanced"],
+			"Global Awareness": ["Basic"],
+			"Leadership": ["Basic"]
+		};
+
+		// override for SPA
+		if (!categories.spa) categories.spa = {};
+		categories.spa = {
+			...categories.spa,
+			"Total Defence": ["Silver"],
+			"Global Awareness": ["Advanced"],
+			"Leadership": ["Advanced"],
+		};
+
+		// override for founders
+		if (!categories.founders) categories.founders = {};
+		categories.founders = {
+			...categories.founders,
+			"Community Spiritedness": ["Master"],
+			"Global Awareness": ["Master"],
+			"Leadership": ["Master"],
+		};
+
+		// override for service
+		if (!categories.service) categories.service = {};
+		delete categories.service["1 Year Service"];
+		categories.service = {
+			"1 Year Service (First Year)": [],
+			"1 Year Service (Second Year)": [],
+			"1 Year Service (Third Year)": [],
+			...categories.service,
+		};
+
+		return categories
+	}, [awardsList])
+
+	const calculatePoints = (awards, boyId) => {
+		let points = 0;
+
+		Object.entries(categorisedAwards.personal).forEach(([badge, masteries]) => {
+			masteries.forEach(mastery => {
+				const id = `${boyId}-${badge}-${mastery}`
+				if (attained.includes(id)) {
+					points += (mastery === "Advanced") ? 2 : 1;
+				};
+			});
+		});
+
+		return points;
+	}
 
 	return (
-		<div className="award-attainment-table">
-			<h1>{award_name}</h1>
-			<div className="award-table" style={{ "--columns": numberColumns[award_name] }}>
-				<p className='boy-header award-header'>Boy</p>
-				{award_name in fixedRequirements && fixedRequirements[award_name].map((requirement) => {
-					return (
-						<p key={requirement["name"]} style={{ "--rowspan": "2" }} className='award-header'>{requirement["name"]}</p>
-					)
-				})}
+		<div className={styles["award-attainment-table"]} ref={scrollRef}>
+			<table>
+				<thead>
+					<tr>
+						<th rowSpan={2}>Boy</th>
 
-				{awards[award_name].map((award) => {
-					if (award in masteries[award_name]) {
-						return (
-							<p key={award + "-label"} style={{ "--colspan": masteries[award_name][award].length }} className='award-header'>{award}</p>
-						)
-					} else return (<p key={award + "-label"} style={{ "--rowspan": "2" }} className='award-header'>{award}</p>)
-				})}
-				{awards[award_name].map((award) => {
-					if (award in masteries[award_name])
-						return masteries[award_name][award].map((mastery) => (<p key={award + " " + mastery} className='award-header'>{mastery}</p>))
-				})}
+						{fixedRequirements[award_name].map(requirement => (
+							<th key={requirement} rowSpan={2}>{requirement}</th>
+						))}
 
-				{boys.map((boy) => {
-					return (
-						<React.Fragment key={boy.id}>
-							<p className={`${boy.id}-${award_name} award-boy`}>{boy.account_name}</p>
-							{award_name in fixedRequirements && fixedRequirements[award_name].map((requirement) => {
-								return (
-									<p key={requirement["name"]}>
-										<input type='checkbox' disabled={true} checked={!!requirement['requirements'](boy)} />
-									</p>
+						{categorisedAwards[award_name] &&
+							Object.entries(categorisedAwards[award_name]).map(([badge, masteries]) => (
+								<th key={badge} colSpan={masteries.length} rowSpan={masteries.length > 0 ? 1 : 2}>{badge}</th>
+							))}
+					</tr>
+					<tr>
+						{categorisedAwards[award_name] &&
+							Object.entries(categorisedAwards[award_name]).flatMap(([badge, masteries]) =>
+								masteries.map((mastery) => <th key={`${badge}-${mastery}`}>{mastery}</th>)
+							)}
+					</tr>
+				</thead>
+				<tbody>
+					{boys.map((boy) => {
+						const points = calculatePoints(categorisedAwards.personal, boy.id);
+						const rowIds = [
+							...fixedRequirements[award_name].map(req => `${boy.id}-${req}`),
+							...(categorisedAwards[award_name]
+								? Object.entries(categorisedAwards[award_name]).flatMap(([badge, masteries]) =>
+									masteries.length > 0
+										? masteries.map(m => `${boy.id}-${badge}-${m}`)
+										: [`${boy.id}-${badge}`]
 								)
-							})}
-							{awards[award_name].map(award => {
-								if (award in masteries[award_name])
-									return masteries[award_name][award].map((mastery) => (
-										<p key={award + "-" + mastery + "-checkbox"}>
-											<input className={boy.id + "-" + award + '-' + mastery} type='checkbox' checked={!!checked[boy.id + "-" + award + '-' + mastery]} onChange={toggleAttainment} name='award-tracker-checkbox' />
-										</p>
-									))
-								else
-									return (
-										<p key={award + "-checkbox"}>
-											<input className={boy.id + "-" + award} type='checkbox' checked={!!checked[boy.id + "-" + award]} onChange={toggleAttainment} name='award-tracker-checkbox' />
-										</p>
-									)
-							})}
-						</React.Fragment>
-					)
-				})}
-			</div>
+								: [])
+						];
+
+						const normalIds = rowIds.filter(id => !id.includes("Point"));
+						const allNormalChecked = normalIds.every(id => attained.includes(id));
+
+						const requirements = rowIds.filter(id => id.includes("Point"));
+						const allPointsChecked = requirements.every(reqId => {
+							const parts = reqId.split("-");
+							const requirement = parts[parts.length - 1]; // "1 Elective Point"
+							const requiredNumber = parseInt(requirement); // 1 or 6
+							return points >= requiredNumber;
+						});
+
+						const allChecked = rowIds.length > 0 && allNormalChecked && allPointsChecked;
+
+						return <tr key={boy.id}>
+							<td style={{ backgroundColor: allChecked && award_name !== "service" && award_name !== "personal" ? "lightgreen" : "white" }}>{boy.account_name}</td>
+
+							{fixedRequirements[award_name].map(requirement => (
+								<td key={requirement}>
+									<input type='checkbox' id={boy.id + "-" + requirement} onChange={e => !requirement.includes("Point") ? toggleAttainment(e) : null} disabled={requirement.includes("Point")} checked={!requirement.includes("Point") ? attained.includes(boy.id + "-" + requirement) : points >= parseInt(requirement.split(" ")[0])} />
+								</td>
+							))}
+
+							{categorisedAwards[award_name] &&
+								Object.entries(categorisedAwards[award_name]).flatMap(([badge, masteries]) =>
+									masteries.length > 0
+										? masteries.map((mastery) => (
+											<td key={`${badge}-${mastery}`}>
+												<input type='checkbox' id={boy.id + "-" + badge + '-' + mastery} onChange={e => toggleAttainment(e)} checked={attained.includes(boy.id + "-" + badge + '-' + mastery)} />
+											</td>
+										)) : (
+											<td key={`${badge}`}>
+												<input type='checkbox' id={boy.id + "-" + badge} onChange={e => toggleAttainment(e)} checked={attained.includes(boy.id + "-" + badge)} />
+											</td>
+										)
+								)}
+						</tr>
+					})}
+				</tbody>
+			</table>
 		</div>
 	)
-}
+})
 
 AwardAttainmentTable.propTypes = {
 	award_name: PropTypes.string,
@@ -83,21 +205,8 @@ AwardAttainmentTable.propTypes = {
 		account_name: PropTypes.string,
 		level: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 	})),
-	checked: PropTypes.shape({
-		id: PropTypes.number,
-		account_name: PropTypes.string,
-		level: PropTypes.number
-	}),
 	toggleAttainment: PropTypes.func.isRequired,
-	electivePoints: PropTypes.shape({
-		id: PropTypes.number,
-	}),
-	ipaAttained: PropTypes.shape({
-		id: PropTypes.bool,
-	}),
-	spaAttained: PropTypes.shape({
-		id: PropTypes.bool,
-	})
+	attained: PropTypes.arrayOf(PropTypes.string)
 }
 
 export { AwardAttainmentTable }
