@@ -11,12 +11,16 @@ import { db } from '../firebase'
 const AwardTracker = () => {
 	const [boys, setBoys] = useState([])
 	const [attained, setAttained] = useState([])
+	const [awards, setAwards] = useState([])
 	const [category, setCategory] = useState("upload");
 
 	useEffect(() => {
 		const init = async () => {
 			const boys = await getDocs(query(collection(db, "users"), where("account_type", "==", "Boy"), where("graduated", "==", false), orderBy("level"), orderBy("account_name")));
 			setBoys(boys.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+			const awards = await getDocs(collection(db, "awards"));
+			setAwards(awards.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 		}
 
 		const unsubscribe = onSnapshot(collection(db, "attainments"), (snapshot) => {
@@ -58,7 +62,7 @@ const AwardTracker = () => {
 				<label htmlFor="service">Service</label>
 			</div>
 
-			{category == 'upload' ? <UploadFile /> : (
+			{category == 'upload' ? <UploadFile attained={attained} boys={boys} /> : (
 				<div className={styles.content}>
 					<AwardFilter />
 					<AwardAttainmentTable award_name={category} boys={boys} toggleAttainment={toggleAttainment} attained={attained} />
