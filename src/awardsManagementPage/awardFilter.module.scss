@@ -6,41 +6,6 @@
     overflow-x: auto;
     overflow-y: visible;
 
-    >div:first-of-type {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-    }
-
-    >div:nth-of-type(2) {
-        display: flex;
-        gap: 5px;
-        align-items: center;
-        overflow: auto;
-        user-select: none;
-
-        &::-webkit-scrollbar {
-            height: 5px
-        }
-
-        span {
-            background: black;
-            color: white;
-            border-radius: 10px;
-            padding: 3px 8px;
-            font-size: 13px;
-            position: relative;
-
-            &::after {
-                cursor: pointer;
-                font-size: 12px !important;
-                font: var(--fa-font-solid);
-                content: "\f00d";
-                margin-left: 15px;
-            }
-        }
-    }
-
     input[type="search"] {
         padding: 5px;
         border-bottom: 1px solid black;
@@ -108,5 +73,11 @@
             content: "\f00d";
             color: red;
         }
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .awards-filter {
+        flex-wrap: wrap;
     }
 }

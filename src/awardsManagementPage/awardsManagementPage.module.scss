@@ -16,17 +16,13 @@
 
 		label {
 			text-align: center;
-			width: 150px;
+			max-width: 150px;
 			padding: 5px 20px;
-			background: white;
 			border-radius: 10px;
 			cursor: pointer;
-			color: black;
-			border: 1px solid black;
-			outline: none;
-			display: flex;
-			justify-content: center;
-			align-items: center;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 
 		input:checked+label {

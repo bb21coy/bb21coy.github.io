@@ -39,3 +39,21 @@
     gap: 10px;
     overflow: auto;
 }
+
+@media screen and (max-width: 800px) {
+    .award-tracker {
+        grid-template-columns: 1fr;
+        grid-template-rows: max-content 1fr;
+        gap: 20px;
+
+        .sidebar {
+            flex-direction: row;
+            overflow: auto;
+            border: none;
+            white-space: nowrap;
+            padding-right: 0;
+            margin-right: 0;
+            height: max-content;
+        }
+    }
+}
