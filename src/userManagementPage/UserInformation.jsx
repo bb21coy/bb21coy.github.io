@@ -130,6 +130,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 			values.graduated = accountGraduated
 			values.level = parseInt(values.level) || accountLevel
 			values.roll_call = accountRollCall
+			values.rank = accountRank
 			for (let i = 1; i <= 5; i++) {
 				if (values[`class${i}`] === '') values[`class${i}`] = null
 				if (values[`rank${i}`] === '') values[`rank${i}`] = null
