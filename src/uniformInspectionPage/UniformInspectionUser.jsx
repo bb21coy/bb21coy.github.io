@@ -13,7 +13,7 @@ function UniformInspectionUser() {
     const auth = getAuth();
 
     useEffect(() => {
-        onAuthStateChanged(auth, async (user) => {
+        const unsub = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const componentsSnap = await getDocs(query(collection(db, "uniform_categories"), orderBy("order")));
 				const components = componentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -38,6 +38,8 @@ function UniformInspectionUser() {
                 setLoading(false);
             }
         });
+
+        return () => unsub();
     }, []);
 
     const getInspection = (id) => {

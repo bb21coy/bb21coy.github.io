@@ -1,53 +1,65 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import { handleServerError } from '../general/handleServerError'
-import BASE_URL from '../Constants'
+import { useState, useEffect, useMemo, Fragment } from 'react'
 import '../styles/userAwardsPage.scss'
 import Loading from '../general/Loading'
+import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import { db } from '../firebase'
+import { collection, getDocs, query, orderBy } from '@firebase/firestore'
 
 const UserAwards = () => {
+    const auth = getAuth()
     const [awards, setAwards] = useState([])
     const [attained, setAttained] = useState([])
     const [loading, setLoading] = useState(true)
+    const [search, setSearch] = useState('')
 
-    const images = {
-        'target': 'target-badge.webp',
-        'total defence': 'total-defence-bronze-badge.webp',
-        'arts & crafts': 'arts-&-crafts-badge.webp',
-        'community spiritedness': 'community-spiritedness-badge.webp',
-        'global awareness': 'global-awareness-badge.webp',
-        'leadership': 'leadership-badge.webp',
-        'adventure': 'adventure-badge.webp',
-        'drill': 'drill-badge.webp',
-        'athletics': 'athletics-badge.webp',
-        'first aid': 'first-aid-badge.webp',
-        'hobbies': 'hobbies-badge.webp',
-        'kayaking': 'kayaking-badge.webp',
-        'musketry': 'musketry-badge.webp',
-        'sailing': 'sailing-badge.webp',
-        'sportsman': 'sportsman-badge.webp',
-        'swimming': 'swimming-badge.webp',
-        'christian education': 'christian-education-badge.webp',
-        'senior proficiency award': 'senior-proficiency-award-badge.webp',
-        'intermediary proficiency award': 'intermediary-proficiency-award-badge.webp',
-        'link badge': 'link-badge.webp',
-        '3 year service': '3-year-service-badge.webp',
-        'national event': 'national-event-badge.webp',
-        'founders': 'founders-badge.webp',
-        '1 year service': '1-year-service-badge.webp',
-    }
-    
     useEffect(() => {
-        axios.get('/api/award_tracker/0/user_awards')
-        .then(response => setAttained(response.data.map(award => `${award.award_id}-${award.mastery_id}`)))
-        .catch(error => handleServerError(error.response?.status))
+        const unsub = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const awards = await getDocs(query(collection(db, "awards"), orderBy("badge_name")));
+                const awardList = awards.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setAwards(awardList);
 
-        axios.get(`${BASE_URL}/awards`, { headers: { "x-route": "/get_awards" }, withCredentials: true })
-        .then(response => setAwards(response.data))
-        .catch(error => handleServerError(error.response?.status))
+                const attained = await getDocs(collection(db, "attainments"));
+                const docIds = attained.docs.map((doc) => doc.id);
+                const userAwards = docIds.filter(id => id.includes(user.uid));
+                const normalisedUserAwards = userAwards.map(id => id.slice(id.indexOf("-") + 1));
+                setAttained(normalisedUserAwards);
 
-        setLoading(false)
+                setLoading(false)
+            }
+        })
+
+        return () => unsub();
     }, [])
+
+    useEffect(() => {
+        const documents = document.querySelectorAll(".award");
+        documents.forEach(doc => {
+            if (doc.innerText.toLowerCase().includes(search.toLowerCase())) {
+                doc.style.display = "flex";
+            } else {
+                doc.style.display = "none";
+            }   
+        })   
+    }, [search])
+
+    const order = useMemo(() => {
+        const specialAwards = ["Intermediary Proficiency Award", "Senior Proficiency Award", "Founder's Award"]
+        const sortedList = [
+            "1 year service (first year)",
+            "1 year service (second year)",
+            "1 year service (third year)",
+            "target",
+            "3 year service",
+            "leadership",
+            "national event",
+        ]
+        const awardNames = awards.map(award => award.badge_name).filter(name => !specialAwards.includes(name) && name !== "1 Year Service" && name !== "3 Year Service")
+        const targetIndex = sortedList.indexOf("target");
+        sortedList.splice(targetIndex + 1, 0, ...awardNames);
+        const finalList = [...sortedList, ...specialAwards.reverse()];
+        return finalList
+    }, [awards])
 
     if (loading) return <Loading />
 
@@ -55,28 +67,32 @@ const UserAwards = () => {
         <div className='user-awards'>
             <h2>My Awards</h2>
 
+            <div>
+                <label htmlFor="search"><i className="fa-solid fa-magnifying-glass"></i></label>
+                <input type="search" name="search" id="search" placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
+
             <div className='awards-list'>
-                {awards.map(award => {
-                    return <div key={award._id} className='award'>
-                        <img src={images[award.badge_name.toLowerCase()]} alt={award.badge_name} />
+                {order.map(o => {
+                    const award = awards.find(award => award.badge_name.toLowerCase().trim() === o.toLowerCase().split("(")[0].trim())
+                    const awardName = o.replace(/(^|[^a-zA-Z'])[a-z]/g, char => char.toUpperCase())
+
+                    return <div key={o} className='award'>
+                        <img src={`${award.badge_name.toLowerCase().replaceAll(" ", "-").replace("-badge", "")}-badge.webp`} onError={(e) => { e.currentTarget.src = "1-year-service-badge.webp"; }} alt={award.badge_name} />
 
                         <div>
-                            <h3>{award.badge_name}</h3>
-                            {award.badge_masteries.length > 0 ? award.badge_masteries.map(mastery => (
-                                <div key={mastery._id}>
+                            <h3>{awardName}</h3>
+                            {(award.badge_masteries.length > 0 ? award.badge_masteries : [{ mastery_name: "-" }]).map(mastery => (
+                                <Fragment key={`${award.badge_name}-${mastery.mastery_name}`}>
                                     <p>{mastery.mastery_name}</p>
-                                    <i className={attained.includes(`${award._id}-${mastery._id}`) ? 'fa-solid fa-check' : 'fa-solid fa-xmark'}></i>
-                                </div>
-                            )) : 
-                            <div>
-                                <p>&ndash;</p>
-                                <i className={attained.includes(`${award._id}-null`) ? 'fa-solid fa-check' : 'fa-solid fa-xmark'}></i>   
-                            </div>}
+                                    <i className={attained.includes(`${awardName}${mastery.mastery_name === "-" ? "" : `-${mastery.mastery_name}`}`) ? 'fa-solid fa-check' : 'fa-solid fa-xmark'}></i>
+                                </Fragment>
+                            ))}
                         </div>
                     </div>
                 })}
             </div>
-        </div> 
+        </div>
     )
 }
 
