@@ -3,32 +3,33 @@ import { showMessage } from '../general/handleServerError'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../general/UserContext'
 import styles from './resetPasswordPage.module.scss'
-import { getAuth, updatePassword, updateEmail, onAuthStateChanged, signOut, linkWithPopup, OAuthProvider, unlink, GoogleAuthProvider } from "@firebase/auth";
+import { updatePassword, updateEmail, onAuthStateChanged, signOut, linkWithPopup, OAuthProvider, unlink, GoogleAuthProvider } from "@firebase/auth";
+import { auth } from "../firebase";
 
 // To allow boys to reset their password
 const ResetPasswordPage = () => {
-	const auth = getAuth();
 	const [passwordType, setPasswordType] = useState("password");
 	const [password, setPassword] = useState("");
 	const [email, setEmail] = useState();
 	const [linkedWithMicrosoft, setLinkedWithMicrosoft] = useState(false);
+	const [linkedWithGoogle, setLinkedWithGoogle] = useState(false);
 	const navigate = useNavigate();
 	const { setLoggedIn, setNavigationViewable, setUser } = useUser();
+	const [linkedEmails, setLinkedEmails] = useState({});
 
 	useEffect(() => {
 		const unsub = onAuthStateChanged(auth, async (user) => {
 			if (user) {
+				console.log(user)
 				setEmail(user.email)
 
-				try {
-					await user.reload();
-					const refreshedUser = auth.currentUser;
-
-					const providers = refreshedUser.providerData.map(p => p.providerId);
-					setLinkedWithMicrosoft(providers.includes("microsoft.com"));
-				} catch (err) {
-					console.error("Failed to reload user", err);
-				}
+				const providers = user.providerData.map(provider => provider.providerId);
+				setLinkedWithMicrosoft(providers.includes("microsoft.com"));
+				setLinkedWithGoogle(providers.includes("google.com"));
+				setLinkedEmails(user.providerData.reduce((acc, provider) => {
+					acc[provider.providerId] = provider.email;
+					return acc
+				}, {}));
 			};
 		})
 
@@ -63,18 +64,16 @@ const ResetPasswordPage = () => {
 	}
 
 	async function linkMicrosoft() {
-		const user = auth.currentUser;
-		const microsoftProvider = new OAuthProvider('microsoft.com');
-		const result = await linkWithPopup(user, microsoftProvider);
-		const microsoftEmail = result?._tokenResponse?.email || null;
-
-		if (microsoftEmail?.toLowerCase() !== user.email?.toLowerCase()) {
-			await unlink(user, 'microsoft.com');
-			return showMessage("The Microsoft account email must match your current email.");
+		try {
+			const user = auth.currentUser;
+			const microsoftProvider = new OAuthProvider('microsoft.com');
+			await linkWithPopup(user, microsoftProvider);
+			showMessage("Microsoft account has been linked", "success");
+			setLinkedWithMicrosoft(true);
+		} catch (err) {
+			console.error("Failed to link Microsoft:", err);
+			showMessage("Error linking Microsoft: " + err.message);
 		}
-
-		showMessage("Microsoft account has been linked", "success");
-		setLinkedWithMicrosoft(true);
 	}
 
 	async function unlinkMicrosoft() {
@@ -83,6 +82,31 @@ const ResetPasswordPage = () => {
 		setLinkedWithMicrosoft(false);
 		showMessage("Microsoft account has been unlinked", "success");
 		setLinkedWithMicrosoft(false);
+	}
+
+	const linkGoogle = async () => {
+		try {
+			const user = auth.currentUser;
+			const googleProvider = new GoogleAuthProvider();
+			await linkWithPopup(user, googleProvider);
+			showMessage("Google account has been linked", "success");
+			setLinkedWithGoogle(true);
+		} catch (err) {
+			console.error("Failed to link Google:", err);
+			showMessage("Error linking Google: " + err.message);
+		}
+	}
+
+	const unlinkGoogle = async () => {
+		try {
+			const user = auth.currentUser;
+			await unlink(user, "google.com");
+			setLinkedWithGoogle(false);
+			showMessage("Google account has been unlinked", "success");
+		} catch (err) {
+			console.error("Failed to unlink Google:", err);
+			showMessage("Error unlinking Google: " + err.message);
+		}
 	}
 
 	return (
@@ -101,16 +125,24 @@ const ResetPasswordPage = () => {
 			</form>
 
 			<div>
-				<h2>Link Microsoft Account</h2>
-				<p>Linking your Microsoft account will allow you to sign in using your password and Microsoft account.</p>
-				<p>You can only link to the Microsoft account that have the same email as your current email.</p>
-				{!linkedWithMicrosoft ? <button onClick={linkMicrosoft}>Link Microsoft Account</button> : <button data-state="unlink" onClick={unlinkMicrosoft}>Unlink Microsoft Account</button>}
+				<h2>Linked Accounts</h2>
+				<p>Linking adds another login option for your account. Once linked, you can sign in with either your password or this account. You can only link one account of each provider at a time, but you can unlink any account at any time.</p>
 			</div>
 
 			<div>
-				<h2>Link Google Account</h2>
-				<p>Linking your Google account will allow you to sign in using your password and Google account.</p>
-				<p>By default, this is enabled and cannot be disabled.</p>
+				<h3>Link Microsoft Account</h3>
+				<div>
+					{!linkedWithMicrosoft ? <button onClick={linkMicrosoft}>Link Microsoft Account</button> : <button data-state="unlink" onClick={unlinkMicrosoft}>Unlink Microsoft Account</button>}
+					{linkedWithMicrosoft && <p>Currently linked to: {linkedEmails["microsoft.com"]}</p>}
+				</div>
+			</div>
+
+			<div>
+				<h3>Link Google Account</h3>
+				<div>
+					{!linkedWithGoogle ? <button onClick={linkGoogle}>Link Google Account</button> : <button data-state="unlink" onClick={unlinkGoogle}>Unlink Google Account</button>}
+					{linkedWithGoogle && <p>Currently linked to: {linkedEmails["google.com"]}</p>}
+				</div>
 			</div>
 		</div>
 	)
