@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, Fragment } from 'react'
-import '../styles/userAwardsPage.scss'
+import styles from './userAwardsPage.module.scss'
 import Loading from '../general/Loading'
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { db } from '../firebase'
@@ -64,7 +64,7 @@ const UserAwards = () => {
     if (loading) return <Loading />
 
     return (
-        <div className='user-awards'>
+        <div className={styles['user-awards']}>
             <h2>My Awards</h2>
 
             <div>
@@ -72,20 +72,20 @@ const UserAwards = () => {
                 <input type="search" name="search" id="search" placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} />
             </div>
 
-            <div className='awards-list'>
+            <div className={styles['awards-list']}>
                 {order.map(o => {
                     const award = awards.find(award => award.badge_name.toLowerCase().trim() === o.toLowerCase().split("(")[0].trim())
                     const awardName = o.replace(/(^|[^a-zA-Z'])[a-z]/g, char => char.toUpperCase())
 
-                    return <div key={o} className='award'>
-                        <img src={`${award.badge_name.toLowerCase().replaceAll(" ", "-").replace("-badge", "")}-badge.webp`} onError={(e) => { e.currentTarget.src = "1-year-service-badge.webp"; }} alt={award.badge_name} />
+                    return <div key={o} className={styles.award}>
+                        <img src={`${award.badge_name.toLowerCase().replaceAll(" ", "-").replace("-badge", "")}-badge.webp`} onError={(e) => { e.currentTarget.src = "1-year-service-badge.webp"; }} alt={o} />
 
                         <div>
                             <h3>{awardName}</h3>
                             {(award.badge_masteries.length > 0 ? award.badge_masteries : [{ mastery_name: "-" }]).map(mastery => (
                                 <Fragment key={`${award.badge_name}-${mastery.mastery_name}`}>
                                     <p>{mastery.mastery_name}</p>
-                                    <i className={attained.includes(`${awardName}${mastery.mastery_name === "-" ? "" : `-${mastery.mastery_name}`}`) ? 'fa-solid fa-check' : 'fa-solid fa-xmark'}></i>
+                                    <i className={attained.includes(`${awardName}${mastery.mastery_name === "-" ? "" : `-${mastery.mastery_name}`}`) ? `fa-solid fa-check ${styles["fa-check"]}` : `fa-solid fa-xmark ${styles["fa-xmark"]}`}></i>
                                 </Fragment>
                             ))}
                         </div>
