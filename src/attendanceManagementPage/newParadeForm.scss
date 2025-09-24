@@ -1,0 +1,161 @@
+.new-parade-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 20px;
+
+    >div:not(:nth-of-type(-n + 2)) {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .parade-selection {
+        gap: 10px;
+        align-items: center;
+        display: flex;
+
+        select {
+            width: 200px;
+            padding: 5px;
+            border-bottom: 1px solid black;
+        }
+    }
+
+    .flex-block {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+
+        div {
+            flex: 1;
+            display: grid;
+            align-items: center;
+            gap: 5px 10px;
+            grid-template-columns: max-content 1fr;
+
+            input, select {
+                width: 100% !important;
+                padding: 5px;
+                border-bottom: 1px solid black;
+            }
+        }
+    }
+
+    textarea {
+        border-radius: 10px;
+        padding: 10px;
+        border: 1px solid black;
+        height: 100px;
+
+        &:disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    input[type="datetime-local"], input[type="date"] {
+        cursor: pointer;
+        width: 150px;
+
+        &::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
+    }
+
+    .announcement-container {
+        list-style-type: none;
+        list-style-position: inside;
+        counter-reset: section;
+
+        li {
+            display: flex;
+            align-items: center;
+            padding-left: 0;
+            gap: 10px;
+            margin-bottom: 10px;
+
+            &::before {
+                counter-increment: section;
+                content: counters(section, ".") ")";
+            }
+
+            input {
+                flex: 1;
+                border-bottom: 1px solid black;
+                padding: 5px;
+            }
+        }
+    }
+
+    >div:nth-of-type(5) {
+        counter-reset: div-counter;
+        gap: 20px;
+        margin-bottom: 10px;
+
+        >div {
+            counter-increment: div-counter;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            &::before {
+                content: "Secondary " counters(div-counter, ".");
+                margin-bottom: 5px;
+                font-size: 24px;
+                padding-bottom: 5px;
+                border-bottom: 1px solid black;
+                font-weight: bold;
+            }
+
+            >div {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            >div>div:not(:first-of-type) {
+                margin-top: 10px;
+            }
+        }
+
+        >div:last-of-type::before {
+            content: "Secondary 4/5";
+        }
+    }
+
+    .platoon-program-container {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+        align-items: center;
+
+        input[type='datetime-local'] {
+            padding: 5px;
+            border: 1px solid black;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        input[type='text'] {
+            padding: 5px;
+            background: transparent;
+            border-bottom: 1px solid black;
+            flex: 1;
+        }
+
+        i {
+            cursor: pointer;
+            font-size: 16px;
+        }
+    }
+
+    >button {
+        background: black;
+        color: white;
+        border-radius: 10px;
+        padding: 5px 10px;
+        margin-left: auto;
+        margin-top: 10px;
+    }
+}

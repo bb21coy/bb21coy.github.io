@@ -1,248 +1,205 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, Fragment } from 'react'
 import axios from 'axios'
-import PropTypes from 'prop-types'
-import { handleServerError } from '../general/handleServerError'
+import { handleServerError, showMessage } from '../general/handleServerError'
+import { db } from '../firebase'
+import './newParadeForm.scss'
+import { getDocs, collection, query, orderBy, doc, getDoc, where, Timestamp, addDoc } from '@firebase/firestore'
+import ParadeSchema from '../schema/Parade'
+import { ZodError } from 'zod'
 
 // To access attendance records and take new attendance
-const NewParadeForm = ({ setReload }) => {
+const NewParadeForm = () => {
 	const levels = ['1', '2', '3', '4/5']
-	const [boyList, setBoyList] = useState([])
-	const [primerList, setPrimerList] = useState([])
-	const [officerList, setOfficerList] = useState([])
-	const [companyAnnouncements, setCompanyAnnouncements] = useState([])
-	const [platoonAnnouncements, setPlatoonAnnouncements] = useState({ '1': [], '2': [], '3': [], '4/5': [] })
-	const [platoonPrograms, setPlatoonPrograms] = useState({ '1': [], '2': [], '3': [], '4/5': [] })
+	const [allUsers, setAllUsers] = useState([])
 	const [paradeType, setParadeType] = useState("Parade")
-	const [appointmentHolders, setAppointmentHolders] = useState({ 'dt': null, 'do': null, 'cos': null, 'flag_bearer': null, 'csm': null, 'ce': null })
+	const [appointmentHolders, setAppointmentHolders] = useState({ DT: null, DO: null, COS: null, 'Flag Bearer': null, CSM: null, 'CE Sergeant': null })
+
+	const makeEmptyAnnouncement = () => ({ id: crypto.randomUUID(), announcement: "" })
+	const [companyAnnouncements, setCompanyAnnouncements] = useState([makeEmptyAnnouncement()])
+	const [platoonAnnouncements, setPlatoonAnnouncements] = useState({
+		'1': [makeEmptyAnnouncement()],
+		'2': [makeEmptyAnnouncement()],
+		'3': [makeEmptyAnnouncement()],
+		'4/5': [makeEmptyAnnouncement()]
+	})
+
+	const makeEmptyProgram = () => ({ id: crypto.randomUUID(), start_time: "", end_time: "", program: "" })
+	const [platoonPrograms, setPlatoonPrograms] = useState({
+		'1': [makeEmptyProgram()],
+		'2': [makeEmptyProgram()],
+		'3': [makeEmptyProgram()],
+		'4/5': [makeEmptyProgram()]
+	})
 
 	useEffect(() => {
-		loadList()
+		const init = async () => {
+			const userDocs = await getDocs(query(collection(db, 'users'), orderBy('account_name')))
+			const users = userDocs.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+			setAllUsers(users)
+
+			const appointmentDoc = await getDoc(doc(db, "appointments", "HJbxljYligJkryXpA7sh"));
+			Object.entries(appointmentDoc.data()).map(([appt, id]) => {
+				if (["CE Sergeant", "CSM"].includes(appt)) setAppointmentHolders(prev => ({ ...prev, [appt]: id.id }))
+			})
+		}
+
+		init()
 	}, [])
 
-	function loadList() {
-		axios.post('/api/account/0/get_accounts_by_type', {
-			account_type: "Boy"
-		}, {
-			withCredentials: true
-		})
-		.then(resp => {
-			setBoyList(resp.data)
+	const setDefaultData = (type) => {
+		setParadeType(type)
+		const date = document.getElementById('date-input').value;
+		const month = new Date(date).getMonth();
+		document.getElementById('reporting-time-input').value = `${date}T08:30`
+		document.getElementById('dismissal-time-input').value = `${date}T12:30`
 
-			let updatedAppointments = { ...appointmentHolders };
-
-			resp.data.map((boy) => {
-				if (boy.appointment === 'CSM') {
-					updatedAppointments['csm'] = boy.id;
-				}
-
-				if (boy.appointment === 'CE Sergeant') {
-					updatedAppointments['ce'] = boy.id;
-				}
-			})
-
-			setAppointmentHolders(updatedAppointments)
-		})
-		.catch(resp => handleServerError(resp.response.status))
-
-		axios.post('/api/account/0/get_accounts_by_type', {
-			account_type: "Primer"
-		}, {
-			withCredentials: true
-		})
-			.then(resp => {
-				setPrimerList(resp.data)
-			})
-			.catch(resp => handleServerError(resp.response.status))
-		axios.post('/api/account/0/get_accounts_by_type', {
-			account_type: "Officer"
-		}, {
-			withCredentials: true
-		})
-			.then(resp => {
-				setOfficerList(resp.data)
-			})
-			.catch(resp => handleServerError(resp.response.status))
-	}
-
-	function setDefaultDate(e) {
-		let reportingTimeInput = document.getElementsByClassName('reporting-time-input')[0]
-		reportingTimeInput.value = e.target.value + 'T08:30'
-		let dismissalTimeInput = document.getElementsByClassName('dismissal-time-input')[0]
-		dismissalTimeInput.value = e.target.value + 'T12:30'
-		levels.map((level) => {
-			document.getElementsByName('sec-' + level + '-start-time')[0].value = e.target.value + 'T08:30'
-			document.getElementsByName('sec-' + level + '-end-time')[0].value = e.target.value + 'T12:30'
-		})
 		if (paradeType == 'Parade') {
-			setCompanyAnnouncements([{ announcement: 'All to bring PT Kit' }])
+			setCompanyAnnouncements([{ announcement: 'All to bring PT Kit', id: crypto.randomUUID() }, makeEmptyAnnouncement()])
+			const makeDefaultPlatoonSchedule = (date) => [
+				{ id: crypto.randomUUID(), start_time: `${date}T08:30`, end_time: `${date}T08:45`, program: "Opening Parade" },
+				{ id: crypto.randomUUID(), start_time: `${date}T08:45`, end_time: `${date}T09:45`, program: "CE and Worship" },
+				{ id: crypto.randomUUID(), start_time: `${date}T09:45`, end_time: `${date}T11:00`, program: "" },
+				{ id: crypto.randomUUID(), start_time: `${date}T11:00`, end_time: `${date}T12:00`, program: "" },
+				{ id: crypto.randomUUID(), start_time: `${date}T12:00`, end_time: `${date}T12:15`, program: "Closing Parade" },
+				makeEmptyProgram()
+			];
+
 			setPlatoonPrograms({
-				'1': [{ start_time: e.target.value + 'T08:30', end_time: e.target.value + 'T08:45', program: 'Opening Parade' },
-				{ start_time: e.target.value + 'T08:45', end_time: e.target.value + 'T09:45', program: 'CE and Worship' },
-				{ start_time: e.target.value + 'T09:45', end_time: e.target.value + 'T11:00', program: 'Program 1' },
-				{ start_time: e.target.value + 'T11:00', end_time: e.target.value + 'T12:00', program: 'Program 2' },
-				{ start_time: e.target.value + 'T12:00', end_time: e.target.value + 'T12:15', program: 'Closing Parade' }
-				],
-				'2': [{ start_time: e.target.value + 'T08:30', end_time: e.target.value + 'T08:45', program: 'Opening Parade' },
-				{ start_time: e.target.value + 'T08:45', end_time: e.target.value + 'T09:45', program: 'CE and Worship' },
-				{ start_time: e.target.value + 'T09:45', end_time: e.target.value + 'T11:00', program: 'Program 1' },
-				{ start_time: e.target.value + 'T11:00', end_time: e.target.value + 'T12:00', program: 'Program 2' },
-				{ start_time: e.target.value + 'T12:00', end_time: e.target.value + 'T12:15', program: 'Closing Parade' }],
-				'3': [{ start_time: e.target.value + 'T08:30', end_time: e.target.value + 'T08:45', program: 'Opening Parade' },
-				{ start_time: e.target.value + 'T08:45', end_time: e.target.value + 'T09:45', program: 'CE and Worship' },
-				{ start_time: e.target.value + 'T09:45', end_time: e.target.value + 'T11:00', program: 'Program 1' },
-				{ start_time: e.target.value + 'T11:00', end_time: e.target.value + 'T12:00', program: 'Program 2' },
-				{ start_time: e.target.value + 'T12:00', end_time: e.target.value + 'T12:15', program: 'Closing Parade' }],
-				'4/5': []
-			})
-		}
-	}
-
-	function setParade(e) {
-		setParadeType(e.target.value)
-		if (paradeType != 'Parade') {
-			setCompanyAnnouncements([])
-			setPlatoonPrograms({ '1': [], '2': [], '3': [], '4/5': [] })
-			setPlatoonAnnouncements({ '1': [], '2': [], '3': [], '4/5': [] })
-		}
-	}
-
-	function setAccount1(appointment, value) {
-		setAppointmentHolders((prev) => {
-			prev[appointment] = value.target.value
-			return { ...prev }
-		})
-	}
-
-	function addCompanyAnnouncement() {
-		let newAnnouncement = document.getElementsByName('new-company-announcement')[0].value
-		if (newAnnouncement != '') {
-			setCompanyAnnouncements((prev) => {
-				return [...prev, { announcement: newAnnouncement }]
+				'1': makeDefaultPlatoonSchedule(date),
+				'2': makeDefaultPlatoonSchedule(date),
+				'3': makeDefaultPlatoonSchedule(date),
+				'4/5': month <= 3 ? makeDefaultPlatoonSchedule(date) : [makeEmptyProgram()]
 			})
 		} else {
-			alert("The company announcement cannot be empty!")
-		}
-	}
-
-	function updateCompanyAnnouncement(e, index) {
-		setCompanyAnnouncements((prev) => {
-			prev[index].announcement = e.target.value
-			return [...prev]
-		})
-	}
-
-	function deleteCompanyAnnouncement(index) {
-		setCompanyAnnouncements((prev) => {
-			prev.splice(index, 1)
-			return [...prev]
-		})
-	}
-
-	function addPlatoonProgram(level) {
-		let newProgram = document.getElementsByName('sec-' + level + '-program-new')[0].value
-		let newStartTime = document.getElementsByName('sec-' + level + '-start-time-new')[0].value
-		let newEndTime = document.getElementsByName('sec-' + level + '-end-time-new')[0].value
-		if (newProgram != '') {
-			setPlatoonPrograms((prev) => {
-				prev[level] = [...prev[level], { start_time: newStartTime, end_time: newEndTime, program: newProgram }]
-				return { ...prev }
+			setCompanyAnnouncements([makeEmptyAnnouncement()])
+			setPlatoonPrograms({
+				'1': [makeEmptyAnnouncement()],
+				'2': [makeEmptyAnnouncement()],
+				'3': [makeEmptyAnnouncement()],
+				'4/5': [makeEmptyAnnouncement()]
 			})
-		} else {
-			alert("Please fill in all the fields!")
+			setPlatoonAnnouncements({
+				'1': [makeEmptyProgram()],
+				'2': [makeEmptyProgram()],
+				'3': [makeEmptyProgram()],
+				'4/5': [makeEmptyProgram()]
+			})
 		}
 	}
 
-	function updatePlatoonProgram(e, level, index, column) {
+	const users = useMemo(() =>
+		allUsers.reduce((acc, user) => {
+			if (user.account_type === "Boy") acc.boys.push(user);
+			else if (user.account_type === "Primer") acc.primers.push(user);
+			else if (user.account_type === "Officer") acc.officers.push(user);
+			return acc;
+		}, { boys: [], primers: [], officers: [] })
+		, [allUsers])
+
+	const nextSaturday = d => new Date(d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7 || 7)));
+	const setAppt = (appointment, value) => setAppointmentHolders(prev => ({ ...prev, [appointment]: value.target.value }))
+
+	const updateCompanyAnnouncement = (e, id) => {
+		const value = e.target.value;
+		setCompanyAnnouncements(prev => {
+			const updated = prev.map((item) => item.id === id ? { ...item, announcement: value } : item);
+			const last = updated[updated.length - 1]
+			if (last.announcement) updated.push(makeEmptyAnnouncement())
+			return updated;
+		});
+	}
+
+	const deleteCompanyAnnouncement = (index) => {
+		setCompanyAnnouncements(prev => {
+			const updated = prev.filter((_, i) => i !== index)
+			if (updated.length === 0) updated.push(makeEmptyAnnouncement())
+			return updated
+		})
+	};
+
+	const updatePlatoonProgram = (e, level, id, field) => {
+		const value = e.target.value
 		setPlatoonPrograms((prev) => {
-			prev[level][index][column] = e.target.value
-			return { ...prev }
+			const updated = prev[level].map((program) => program.id === id ? { ...program, [field]: value } : program)
+			const last = updated[updated.length - 1]
+			if (last.start_time && last.end_time && last.program) updated.push(makeEmptyProgram())
+			return { ...prev, [level]: updated }
 		})
 	}
 
-	function deletePlatoonProgram(level, index) {
+	const deletePlatoonProgram = (level, index) => {
 		setPlatoonPrograms((prev) => {
-			prev[level].splice(index, 1)
-			return { ...prev }
+			const updated = prev[level].filter((_, i) => i !== index)
+			if (updated.length === 0) updated.push(makeEmptyProgram())
+			return { ...prev, [level]: updated }
 		})
 	}
 
-	function addPlatoonAnnouncement(level) {
-		let newAnnouncement = document.getElementById('sec-' + level + '-announcement').value
-		if (newAnnouncement != '') {
-			setPlatoonAnnouncements((prev) => {
-				prev[level] = [...prev[level], { announcement: newAnnouncement }]
-				return { ...prev }
-			})
-		} else {
-			alert("The platoon announcement cannot be empty")
-		}
-	}
-
-	function updatePlatoonAnnouncement(e, level) {
-		const index = e.target.getAttribute("data-index")
-		if (index === null || index === undefined) {
-			return alert("Platoon Announcement index not found. This is most likely a development error. If you see error, please contact the admin.")
-		}
-
-		setPlatoonAnnouncements((prev) => {
-			const newAnnouncements = [...prev[level]];
-			newAnnouncements[index] = { ...newAnnouncements[index], announcement: e.target.value };
-			return { ...prev, [level]: newAnnouncements };
-		})
+	const updatePlatoonAnnouncement = (e, level, id) => {
+		const value = e.target.value;
+		setPlatoonAnnouncements(prev => {
+			const updated = prev[level].map((item) => item.id === id ? { ...item, announcement: value } : item);
+			const last = updated[updated.length - 1]
+			if (last.announcement) updated.push(makeEmptyAnnouncement())
+			return { ...prev, [level]: updated };
+		});
 	}
 
 	function deletePlatoonAnnouncement(level, index) {
 		setPlatoonAnnouncements((prev) => {
-			prev[level].splice(index, 1)
-			return { ...prev }
+			const updated = prev[level].filter((_, i) => i !== index)
+			if (updated.length === 0) updated.push(makeEmptyAnnouncement())
+			return { ...prev, [level]: updated }
 		})
 	}
 
-	function submitForm(e) {
-		e.preventDefault()
-		let submit = true
-		if (e.target.elements['date'].value == "") {
-			submit = false
-		}
-		if (submit) {
-			axios.post('/api/parade/0/create_parade', {
-				parade_type: paradeType,
-				date: e.target.elements['date'].value,
-				venue: e.target.elements['venue'].value,
-				sec_1_attire: e.target.elements['sec_1_attire'].value,
-				sec_2_attire: e.target.elements['sec_2_attire'].value,
-				sec_3_attire: e.target.elements['sec_3_attire'].value,
-				sec_4_5_attire: e.target.elements['sec_4_5_attire'].value,
-				reporting_time: e.target.elements['reporting_time'].value,
-				dismissal_time: e.target.elements['dismissal_time'].value,
-				dt_id: appointmentHolders['dt'],
-				do_id: appointmentHolders['do'],
-				cos_id: appointmentHolders['cos'],
-				flag_bearer_id: appointmentHolders['flag_bearer'],
-				csm_id: appointmentHolders['csm'],
-				ce_id: appointmentHolders['ce'],
-				description: e.target.elements['description'].value,
-				company_announcements: companyAnnouncements,
-				platoon_programs: platoonPrograms,
-				platoon_announcements: platoonAnnouncements
-			}, {
-				withCredentials: true
-			})
-			.then(() => {
-				alert("Parade has been added!")
-				setReload((prev) => !prev)
-			})
-			.catch(resp => handleServerError(resp.response.status))
+	async function submitForm(e) {
+		try {
+			e.preventDefault()
+
+			const form = new FormData(e.target);
+			const data = Object.fromEntries(form.entries());
+			data.company_announcements = companyAnnouncements;
+			data.platoon_programs = platoonPrograms;
+			data.platoon_announcements = platoonAnnouncements;
+			data.appointments = appointmentHolders;
+			
+			if (data.reporting_time == "") return showMessage("Please select a date and reporting time.");
+			const findDoc = await getDocs(query(collection(db, "parades"), where("date", "==", Timestamp.fromDate(new Date(data.reporting_time)))));
+			if (findDoc.docs.length) return showMessage("A parade has already been scheduled for that day.");
+
+			const result = await ParadeSchema(db).parseAsync(data);
+			await addDoc(collection(db, "parades"), result);
+			showMessage("Parade created successfully", "success");
+		} catch (e) {
+			if (e instanceof ZodError) {
+				console.error(e)
+				const issue = e.issues[0];
+				const path = issue.path;
+				if (path[0] === "platoon_programs") {
+					const platoon = path[1];
+					const index = (path[2] ?? 0) + 1;
+					const field = path[3];
+
+					showMessage(`Sec ${platoon} Platoon Programs → Program #${index} → ${field}: ${issue.message}`);
+				} else {
+					showMessage(`Error at ${path.join(" → ")}: ${issue.message}`);
+				}
+			} else {
+				console.error(e)
+				showMessage("Failed to create parade");
+			}
 		}
 	}
 
 	return (
 		<form onSubmit={submitForm} className='new-parade-form'>
-			<h2>Create New Parade Notice</h2>
+			<h2>New Parade Notice</h2>
 
-			<div>
+			<div className='parade-selection'>
 				<label htmlFor='parade-type-select'>Parade Type:</label>
-				<select name="parade_type" id="parade-type-select" onChange={e => setParade(e)}>
+				<select name="parade_type" id="parade-type-select" onChange={e => setDefaultData(e.target.value)} defaultValue="">
+					<option value="" hidden disabled>Select Parade Type</option>
 					<option value="Parade">Parade</option>
 					<option value="Camp">Camp</option>
 					<option value="Others">Others</option>
@@ -250,205 +207,103 @@ const NewParadeForm = ({ setReload }) => {
 			</div>
 
 			<div className='flex-block'>
-				<div className="half-block">
+				<div>
 					<label htmlFor='date-input'>Date: </label>
-					<input type='date' name='date' onChange={setDefaultDate} id='date-input'></input>
+					<input type='date' name='date' defaultValue={nextSaturday(new Date()).toISOString().split('T')[0]} onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} id='date-input'></input>
 
 					<label htmlFor='venue-input'>Venue: </label>
 					<input name='venue' defaultValue='School, GMSS' id='venue-input' placeholder='Enter Parade Venue'></input>
 
-					<label htmlFor='sec-1-attire'>Sec 1 Attire:</label>
-					<input name='sec_1_attire' id='sec-1-attire' placeholder='Enter Sec 1 Attire'></input>
-
-					<label htmlFor='sec-2-attire'>Sec 2 Attire: </label>
-					<input name='sec_2_attire' id='sec-2-attire' placeholder='Enter Sec 2 Attire'></input>
-
-					<label htmlFor='sec-3-attire'>Sec 3 Attire: </label>
-					<input name='sec_3_attire' id='sec-3-attire' placeholder='Enter Sec 3 Attire'></input>
-
-					<label htmlFor='sec-4-5-attire'>Sec 4 / 5 Attire: </label>
-					<input name='sec_4_5_attire' id='sec-4-5-attire' placeholder='Enter Sec 4 / 5 Attire'></input>
+					{["1", "2", "3", "4/5"].map(level => (
+						<Fragment key={level}>
+							<label htmlFor={`sec-${level}-attire`}>Sec {level} Attire:</label>
+							<input name={`sec-${level}-attire`} id={`sec-${level}-attire`} placeholder={`Enter Sec ${level} Attire`} />
+						</Fragment>
+					))}
 
 					<label htmlFor='reporting-time-input'>Reporting Time: </label>
-					<input name='reporting_time' className='reporting-time-input' type='datetime-local' id='reporting-time-input'></input>
+					<input name='reporting_time' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} className='reporting-time-input' type='datetime-local' id='reporting-time-input'></input>
 
 					<label htmlFor='dismissal-time-input'>Dismissal Time: </label>
-					<input name='dismissal_time' className='dismissal-time-input' type='datetime-local' id='dismissal-time-input'></input>
+					<input name='dismissal_time' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} className='dismissal-time-input' type='datetime-local' id='dismissal-time-input'></input>
 				</div>
 
-				<div className="half-block">
+				<div>
 					<label htmlFor='dt-select'>Duty Teacher:</label>
-					<select name="dt" id="dt-select" onChange={(e) => setAccount1('dt', e)} defaultValue={""}>
-						<option value='' disabled={true}>Select Duty Teacher</option>
-						{officerList.map((officer) => {
-							return (<option key={officer.id} id={officer.id} value={officer.id}>{officer.account_name}</option>)
-						})}
+					<select id="dt-select" value={appointmentHolders.DT || ""} onChange={(e) => setAppt('DT', e)}>
+						<option value='' disabled hidden>Select Duty Teacher</option>
+						{users.officers.map(officer => <option key={officer.id} value={officer.id}>{officer.account_name}</option>)}
 					</select>
 
 					<label htmlFor='do-select'>Duty Officer:</label>
-					<select name="do" id="do-select" onChange={(e) => setAccount1('do', e)} defaultValue={""}>
-						<option value='' disabled>Select Duty Officer</option>
-						{officerList.map((officer) => {
-							return (<option key={officer.id} id={officer.id} value={officer.id}>{officer.account_name}</option>)
-						})}
-						{primerList.map((primer) => {
-							return (<option key={primer.id} id={primer.id} value={primer.id}>{primer.account_name}</option>)
-						})}
+					<select id="do-select" value={appointmentHolders.DO || ""} onChange={(e) => setAppt('DO', e)}>
+						<option value='' disabled hidden>Select Duty Officer</option>
+						{users.officers.map(officer => <option key={officer.id} value={officer.id}>{officer.account_name}</option>)}
+						{users.primers.map(primer => <option key={primer.id} value={primer.id}>{primer.account_name}</option>)}
 					</select>
 
-					<label htmlFor='cos-select'>COS:</label>
-					<select name="cos" id="cos-select" onChange={(e) => setAccount1('cos', e)} defaultValue={""}>
-						<option value='' disabled={true}>Select COS</option>
-						{boyList.map((boy) => {
-							return (<option key={boy.id} id={boy.id} value={boy.id}>{boy.account_name}</option>)
-						})}
-					</select>
-
-					<label htmlFor='flag-bearer-select'>Flag Bearer:</label>
-					<select name="flag_bearer" id="flag-bearer-select" onChange={(e) => setAccount1('flag_bearer', e)} defaultValue={""}>
-						<option value='' disabled={true}>Select Flag Bearer</option>
-						{boyList.map((boy) => {
-							return (<option key={boy.id} id={boy.id} value={boy.id}>{boy.account_name}</option>)
-						})}
-					</select>
-
-					<label htmlFor='csm-select'>CSM:</label>
-					<select name="csm" id="csm-select" value={appointmentHolders.csm ?? ''} onChange={(e) => setAccount1('csm', e)}>
-						{boyList.map((boy) => {
-							return (<option key={boy.id} value={boy.id}>{boy.account_name}</option>)
-						})}
-					</select>
-
-					<label htmlFor='ce-select'>CE:</label>
-					<select name="ce" id="ce-select" value={appointmentHolders.ce ?? ''} onChange={(e) => setAccount1('ce', e)}>
-						{boyList.map((boy) => {
-							return (<option key={boy.id} value={boy.id}>{boy.account_name}</option>)
-						})}
-					</select>
+					{["COS", "Flag Bearer", "CSM", "CE Sergeant"].map(holder => (
+						<Fragment key={holder}>
+							<label htmlFor={`${holder.toLowerCase()}-select`}>{holder}:</label>
+							<select id={`${holder.toLowerCase()}-select`} value={appointmentHolders[holder] || ""} onChange={(e) => setAppt(holder, e)}>
+								<option value='' disabled>Select {holder}</option>
+								{users.boys.map(boy => <option key={boy.id} value={boy.id}>{boy.account_name}</option>)}
+							</select>
+						</Fragment>
+					))}
 				</div>
 			</div>
 
 			<div>
 				<label htmlFor='description'>Description: </label>
-				<textarea name='description' placeholder='Remarks (if any)' id='description'></textarea>
+				<textarea name='description' placeholder='Enter Remarks (Optional)' id='description'></textarea>
 			</div>
 
 			<div>
 				<h3>Company Announcements:</h3>
-				<div>
-					{companyAnnouncements.length > 0 ? (
-						<ol>
-							{companyAnnouncements.map((announcement, index) => {
-								return (
-									<li key={'company' + announcement.announcement}>
-										<input defaultValue={announcement.announcement} onBlur={(e) => { updateCompanyAnnouncement(e, index) }} id={`company-announcement-${index + 1}`} placeholder='Enter Announcement' />
-										<button type='button' onClick={() => deleteCompanyAnnouncement(index)} aria-label='Remove Company Announcment'>
-											<i className='fa-solid fa-xmark'></i>
-										</button>
-									</li>
-								)
-							})}
-						</ol>
-					) : (
-						<p>No Announcements</p>
-					)}
-				</div>
-
-				<div className='new-announcement-container'>
-					<label htmlFor='new-company-announcement'>New Announcement:</label>
-					<input name='new-company-announcement' id='new-company-announcement' placeholder='Enter Announcement' />
-					<button type='button' onClick={addCompanyAnnouncement} aria-label='Add Company Announcment'>
-						<i className='fa-solid fa-plus'></i>
-					</button>
-				</div>
+				<ol className='announcement-container'>
+					{companyAnnouncements.map((announcement, index) => (
+						<li key={`company-${index}`}>
+							<input value={announcement.announcement} onChange={e => updateCompanyAnnouncement(e, announcement.id)} id={`company-announcement-${index}`} placeholder='Enter Announcement' />
+							{index !== companyAnnouncements.length - 1 && <i className='fa-solid fa-xmark' onClick={() => deleteCompanyAnnouncement(index)} aria-label='Remove Company Announcment'></i>}
+						</li>
+					))}
+				</ol>
 			</div>
-			
+
 			<div>
-				{levels.map((level) => {
-					return (
-						<div key={level}>
-							<h3>Programs:</h3>
-							<div>
-								{platoonPrograms[level].length > 0 ? (
-									platoonPrograms[level].map((program, index) => {
-										return (
-											<div key={level + program.program} className='platoon-program-container'>
-												<div>
-													<div>
-														<input type='datetime-local' defaultValue={program.start_time.slice(0, 16)} onBlur={(e) => { updatePlatoonProgram(e, level, index, 'start_time') }} name={'sec-' + level + '-start-time'} />
-														<p>-</p>
-														<input type='datetime-local' defaultValue={program.end_time.slice(0, 16)} onBlur={(e) => { updatePlatoonProgram(e, level, index, 'end_time') }} name={'sec-' + level + '-end-time'} />
-													</div>
-													
-													<input type='text' defaultValue={program.program} onBlur={(e) => { updatePlatoonProgram(e, level, index, 'program') }} name={'sec-' + level + '-program'} placeholder='Enter Program' />
-												</div>
-												
-												<button type='button' onClick={() => deletePlatoonProgram(level, index)} aria-label='Remove Platoon Program'>
-													<i className='fa-solid fa-xmark'></i>
-												</button>
-											</div>
-										)
-									})
-								) : (
-									<p>No Programs</p>
-								)}
+				{levels.map((level) => (
+					<div key={level}>
+						<h3>Programs:</h3>
+						<div>
+							{platoonPrograms[level].map((program, index) => (
+								<div key={`sec-${level}-program-${program.id}`} className='platoon-program-container'>
+									<input type='datetime-local' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'start_time')} />
+									<p>-</p>
+									<input type='datetime-local' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'end_time')} />
 
-								<div className='platoon-program-container'>
-									<div>
-										<div>
-											<input type='datetime-local' name={'sec-' + level + '-start-time-new'} />
-											<p>-</p>
-											<input type='datetime-local' name={'sec-' + level + '-end-time-new'} />
-										</div>
-										
-										<input type='text' name={'sec-' + level + '-program-new'}  placeholder='Enter Program' />
-									</div>
-									
-									<button type='button' onClick={() => addPlatoonProgram(level)} aria-label='Add Platoon Program'>
-										<i className='fa-solid fa-plus'></i>
-									</button>
+									<input type='text' defaultValue={program.program} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'program')} placeholder='Enter Program' />
+									{index !== platoonPrograms[level].length - 1 && <i className='fa-solid fa-xmark' aria-label='Remove Platoon Program' onClick={() => deletePlatoonProgram(level, index)}></i>}
 								</div>
-							</div>
-
-							<h3>Platoon Announcements:</h3>
-							<div>
-								{platoonAnnouncements[level].length > 0 ? (
-									<ol id={'sec-' + level + '-announcement-list'}>
-										{platoonAnnouncements[level].map((announcement, index) => {
-											return (
-												<li key={level + announcement.announcement}>
-													<input defaultValue={announcement.announcement} data-index={index} onBlur={(e) => { updatePlatoonAnnouncement(e, level) }} placeholder='Enter Announcement' name={'sec-' + level + '-announcement'} />
-													<button type='button' onClick={() => deletePlatoonAnnouncement(level, index)} aria-label='Remove Platoon Announcement'>
-														<i className='fa-solid fa-xmark'></i>
-													</button>
-												</li>
-											)
-										})}
-									</ol>
-								) : (
-									<p>No Announcements</p>
-								)}
-
-								<div className='new-announcement-container'>
-									<label htmlFor={'sec-' + level + '-announcement'}>New Announcement:</label>
-									<input name={'sec-' + level + '-announcement'} id={'sec-' + level + '-announcement'}  placeholder='Enter Announcement' />
-									<button type='button' onClick={() => addPlatoonAnnouncement(level)} aria-label='Add Platoon Announcment'>
-										<i className='fa-solid fa-plus'></i>
-									</button>
-								</div>
-							</div>
+							))}
 						</div>
-					)
-				})}
+
+						<h3>Platoon Announcements:</h3>
+						<ol className='announcement-container'>
+							{platoonAnnouncements[level].map((announcement, index) => (
+								<li key={level + announcement.id}>
+									<input value={announcement.announcement} onChange={e => updatePlatoonAnnouncement(e, level, announcement.id)} placeholder='Enter Announcement' />
+									{index !== platoonAnnouncements[level].length - 1 && <i className='fa-solid fa-xmark' onClick={() => deletePlatoonAnnouncement(level, index)} aria-label='Remove Platoon Announcement'></i>}
+								</li>
+							))}
+						</ol>
+					</div>
+				))}
 			</div>
 
 			<button>Add Parade</button>
 		</form>
 	)
-}
-
-NewParadeForm.propTypes = {
-	setReload: PropTypes.func.isRequired
 }
 
 export { NewParadeForm }

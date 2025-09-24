@@ -1,26 +1,36 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { handleServerError } from '../general/handleServerError'
 import { HandleDownloadWithExcelJS } from './AnnualAttendanceExcel'
+import { db } from '../firebase'
+import { onSnapshot, orderBy, collection, query } from '@firebase/firestore'
+import { useUser } from '../general/UserContext'
 
-const ParadeList = ({accountType, appointment, setPageState, reload}) => {
+const ParadeList = ({ setPageState }) => {
+    const { user } = useUser()
+    const [accountType, setAccountType] = useState();
+    const [appointment, setAppointment] = useState();
     const [parades, setParades] = useState([])
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 
     useEffect(() => {
-        axios.post("/api/parade/0/get_parades_by_year", {
-            year: currentYear
-        }, {withCredentials: true})
-        .then((resp) => setParades([...resp.data.parades]))
-        .catch(resp => handleServerError(resp.response.status))
-    }, [currentYear, reload])
+        const unsub = onSnapshot(query(collection(db, "parades"), orderBy("date", "desc")), (snapshot) => {
+            setParades(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
+        })
+
+        return () => unsub()
+    }, [])
 
     useEffect(() => {
-        if (accountType == "Boy" && !appointment) {
+        if (user) {
+            setAccountType(user.account_type);
+            setAppointment(user.appointment);
+        }
+
+        if (["Admin", "Officer", "Primer", "CSM", "DY CSM", "Admin Sergeant"].includes(user.account_type)) setPageState("form")
+        else {
             if (parades.length > 0) setPageState(String(parades[parades.length - 1]?.id))
         }
-    }, [parades])
+    }, [user]);
 
     function showNewParadeForm() {
         setPageState('form')
@@ -40,28 +50,25 @@ const ParadeList = ({accountType, appointment, setPageState, reload}) => {
             <div>
                 <div>
                     <div>
-                        <button onClick={() => {changeYear("-1")}} aria-label='Previous Year'>
+                        <button onClick={() => { changeYear("-1") }} aria-label='Previous Year'>
                             <i className='fa-solid fa-chevron-left'></i>
                         </button>
                         <h1>{currentYear}</h1>
-                        <button onClick={() => {changeYear("1")}} aria-label='Next Year'>
+                        <button onClick={() => { changeYear("1") }} aria-label='Next Year'>
                             <i className='fa-solid fa-chevron-right'></i>
                         </button>
                     </div>
                     <div>
-                        {(accountType == 'Admin' || accountType == 'Officer' || accountType == 'Primer' ||
-                        appointment == 'CSM' || appointment == 'DY CSM' || appointment == 'Admin Sergeant') &&
-                        <button onClick={showNewParadeForm}><i className='fa-solid fa-plus'></i>New</button>
+                        {["Admin", "Officer", "Primer", "CSM", "DY CSM", "Admin Sergeant"].includes(accountType) &&
+                            <button onClick={showNewParadeForm}><i className='fa-solid fa-plus'></i>New</button>
                         }
-                        <HandleDownloadWithExcelJS key={currentYear} year={currentYear}/>
+                        <HandleDownloadWithExcelJS key={currentYear} year={currentYear} />
                     </div>
                 </div>
                 <div id='parade-list-container'>
-                    {parades.slice().reverse().map((parade) => {
-                    return(
-                        <button tabIndex={0} key={parade.id} className={parade.id} onClick={showParadeInformation}>{parade.date.split('T')[0]}</button>
-                    )
-                    })}
+                    {parades.filter((parade) => parade.date.toDate().getFullYear() == currentYear).map((parade) => (
+                        <button tabIndex={0} key={parade.id} className={parade.id} onClick={showParadeInformation}>{parade.date.toDate().toLocaleDateString('en-GB')}</button>
+                    ))}
                 </div>
             </div>
         </div>
