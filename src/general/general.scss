@@ -33,6 +33,15 @@ input, select {
     }
 }
 
+textarea {
+    border: none;
+    outline: none;
+    background: transparent;
+    color: black;
+    border-radius: 0;
+    resize: none;
+}
+
 .layout {
     display: flex;
     flex-direction: column;
