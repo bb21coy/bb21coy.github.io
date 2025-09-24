@@ -135,6 +135,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 				if (values[`class${i}`] === '') values[`class${i}`] = null
 				if (values[`rank${i}`] === '') values[`rank${i}`] = null
 			}
+			if (values.account_type === "Officer") values.class1 = accountClass
 
 			const result = UserSchema.safeParse(values);
 			if (!result.success || !submit) return showMessage(`${result.error.issues[0].path[0].replace("_", " ")}: ${result.error.issues[0].message}`)
@@ -285,9 +286,9 @@ const UserInformation = ({ userInfo, showForm }) => {
 					<input type="text" name='appointment' id='appointment-input' disabled defaultValue={appointment} />
 				</>}
 
-				{(userInfo.class_1?.toLowerCase() === "staff" || accountRank === null) && <>
+				{(userInfo.class1?.toLowerCase() === "staff" || accountRank === null) && <>
 					<label htmlFor='honorific-input'>Honorifics:</label>
-					<select id="honorific-input" name='honorifics' onChange={(e) => setAccountHonorific(e.target.value)} defaultValue={accountHonorific}>
+					<select id="honorific-input" name='honorifics' onChange={(e) => setAccountHonorific(e.target.value)} value={accountHonorific}>
 						<option value="">-</option>
 						<option value="Mr">Mr</option>
 						<option value="Ms">Ms</option>
@@ -297,7 +298,8 @@ const UserInformation = ({ userInfo, showForm }) => {
 
 				{((userInfo.account_type === "Primer" && userInfo.rank === null) || userInfo.account_type === "Officer") && <>
 					<label htmlFor='class-input'>Class:</label>
-					<select id="class-input" name='class_1' onChange={(e) => setAccountClass(e.target.value)} defaultValue={accountClass} placeholder='Enter Class'>
+					<select id="class-input" name='class_1' onChange={(e) => setAccountClass(e.target.value)} value={accountClass || ""} placeholder='Enter Class'>
+						<option value="" hidden disabled>Select Class</option>
 						<option value="VAL">VAL</option>
 						<option value="STAFF">STAFF</option>
 						<option value="UNI">UNI</option>
