@@ -1,0 +1,70 @@
+.parade-list {
+    width: 20vw;
+    max-width: 200px;
+    flex-shrink: 0;
+
+    >div {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    button {
+        border: 1px solid black;
+        padding: 5px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+}
+
+.header {
+    display: flex;
+    gap: 5px;
+    justify-content: space-between;
+    align-items: center;
+
+    div {
+        align-items: center;
+        display: flex;
+        gap: 5px;
+        justify-content: space-between;
+
+        &:first-of-type {
+            flex: 1;
+        }
+    }
+
+    i {
+        cursor: pointer;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .parade-list {
+        width: 100%;
+        max-width: none;
+        position: sticky;
+        top: 0px;
+        background: white;
+        padding-bottom: 10px;
+
+        >div {
+            flex-direction: row;
+        }
+    }
+
+    .header {
+        width: 35%;
+        min-width: 150px;
+    }
+
+    .parade-list-container {
+        overflow: auto;
+    }
+}
+
+@media screen and (max-width: 300px) {
+    .parade-list > div {
+        flex-direction: column;
+    }
+}

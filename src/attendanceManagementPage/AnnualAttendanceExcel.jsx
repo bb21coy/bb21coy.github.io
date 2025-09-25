@@ -963,7 +963,7 @@ const HandleDownloadWithExcelJS = ({year}) => {
 		});
 	}
 	return (
-		<button onClick={handleParadesData}><i className="fa-solid fa-file-excel"></i> Attendance</button>
+		<i className="fa-solid fa-file-excel" onClick={handleParadesData} title="Export Attendance to Excel"></i>
 	);
 };
 

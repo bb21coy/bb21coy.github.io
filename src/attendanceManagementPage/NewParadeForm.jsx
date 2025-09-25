@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo, Fragment } from 'react'
-import axios from 'axios'
-import { handleServerError, showMessage } from '../general/handleServerError'
+import { showMessage } from '../general/handleServerError'
 import { db } from '../firebase'
-import './newParadeForm.scss'
+import styles from './newParadeForm.module.scss'
 import { getDocs, collection, query, orderBy, doc, getDoc, where, Timestamp, addDoc } from '@firebase/firestore'
 import ParadeSchema from '../schema/Parade'
 import { ZodError } from 'zod'
@@ -22,6 +21,8 @@ const NewParadeForm = () => {
 		'3': [makeEmptyAnnouncement()],
 		'4/5': [makeEmptyAnnouncement()]
 	})
+
+	console.log(styles)
 
 	const makeEmptyProgram = () => ({ id: crypto.randomUUID(), start_time: "", end_time: "", program: "" })
 	const [platoonPrograms, setPlatoonPrograms] = useState({
@@ -193,10 +194,10 @@ const NewParadeForm = () => {
 	}
 
 	return (
-		<form onSubmit={submitForm} className='new-parade-form'>
+		<form onSubmit={submitForm} className={styles['new-parade-form']}>
 			<h2>New Parade Notice</h2>
 
-			<div className='parade-selection'>
+			<div className={styles['parade-selection']}>
 				<label htmlFor='parade-type-select'>Parade Type:</label>
 				<select name="parade_type" id="parade-type-select" onChange={e => setDefaultData(e.target.value)} defaultValue="">
 					<option value="" hidden disabled>Select Parade Type</option>
@@ -206,7 +207,7 @@ const NewParadeForm = () => {
 				</select>
 			</div>
 
-			<div className='flex-block'>
+			<div className={styles['flex-block']}>
 				<div>
 					<label htmlFor='date-input'>Date: </label>
 					<input type='date' name='date' defaultValue={nextSaturday(new Date()).toISOString().split('T')[0]} onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} id='date-input'></input>
@@ -261,7 +262,7 @@ const NewParadeForm = () => {
 
 			<div>
 				<h3>Company Announcements:</h3>
-				<ol className='announcement-container'>
+				<ol className={styles['announcement-container']}>
 					{companyAnnouncements.map((announcement, index) => (
 						<li key={`company-${index}`}>
 							<input value={announcement.announcement} onChange={e => updateCompanyAnnouncement(e, announcement.id)} id={`company-announcement-${index}`} placeholder='Enter Announcement' />
@@ -277,22 +278,22 @@ const NewParadeForm = () => {
 						<h3>Programs:</h3>
 						<div>
 							{platoonPrograms[level].map((program, index) => (
-								<div key={`sec-${level}-program-${program.id}`} className='platoon-program-container'>
+								<div key={`sec-${level}-program-${program.id}`} className={styles['platoon-program-container']}>
 									<input type='datetime-local' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'start_time')} />
 									<p>-</p>
 									<input type='datetime-local' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'end_time')} />
 
-									<input type='text' defaultValue={program.program} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'program')} placeholder='Enter Program' />
+									<input type='text' defaultValue={program.program} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'program')} placeholder='Enter Program' id={`sec-${level}-program-${program.id}`} />
 									{index !== platoonPrograms[level].length - 1 && <i className='fa-solid fa-xmark' aria-label='Remove Platoon Program' onClick={() => deletePlatoonProgram(level, index)}></i>}
 								</div>
 							))}
 						</div>
 
 						<h3>Platoon Announcements:</h3>
-						<ol className='announcement-container'>
+						<ol className={styles['announcement-container']}>
 							{platoonAnnouncements[level].map((announcement, index) => (
 								<li key={level + announcement.id}>
-									<input value={announcement.announcement} onChange={e => updatePlatoonAnnouncement(e, level, announcement.id)} placeholder='Enter Announcement' />
+									<input value={announcement.announcement} onChange={e => updatePlatoonAnnouncement(e, level, announcement.id)} placeholder='Enter Announcement' id={`sec-${level}-announcement-${announcement.id}`} />
 									{index !== platoonAnnouncements[level].length - 1 && <i className='fa-solid fa-xmark' onClick={() => deletePlatoonAnnouncement(level, index)} aria-label='Remove Platoon Announcement'></i>}
 								</li>
 							))}
