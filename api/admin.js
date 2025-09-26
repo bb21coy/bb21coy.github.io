@@ -61,7 +61,6 @@ module.exports = async (req, res) => {
                 if (Object.keys(updateData).length === 0) return res.status(400).json({ message: 'Nothing to update' });
                 
                 await admin.auth().updateUser(uid, updateData);
-                console.log('User updated successfully');
                 return res.status(200).end();
             }
 
