@@ -14,8 +14,6 @@ const UniformInspectionResultPage = () => {
 	const [boy, setBoy] = useState();
 	const { id } = useParams()
 
-	console.log(styles)
-
 	useEffect(() => {
 		const init = async () => {
 			const componentsSnap = await getDocs(query(collection(db, "uniform_categories"), orderBy("order")));

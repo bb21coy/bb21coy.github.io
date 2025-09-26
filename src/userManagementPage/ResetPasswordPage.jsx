@@ -20,7 +20,6 @@ const ResetPasswordPage = () => {
 	useEffect(() => {
 		const unsub = onAuthStateChanged(auth, async (user) => {
 			if (user) {
-				console.log(user)
 				setEmail(user.email)
 
 				const providers = user.providerData.map(provider => provider.providerId);
