@@ -22,8 +22,6 @@ const NewParadeForm = () => {
 		'4/5': [makeEmptyAnnouncement()]
 	})
 
-	console.log(styles)
-
 	const makeEmptyProgram = () => ({ id: crypto.randomUUID(), start_time: "", end_time: "", program: "" })
 	const [platoonPrograms, setPlatoonPrograms] = useState({
 		'1': [makeEmptyProgram()],
@@ -307,4 +305,4 @@ const NewParadeForm = () => {
 	)
 }
 
-export { NewParadeForm }
+export default NewParadeForm

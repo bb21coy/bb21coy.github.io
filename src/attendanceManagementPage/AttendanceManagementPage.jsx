@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { ParadeList } from './ParadeList'
-import { NewParadeForm } from './NewParadeForm'
+import NewParadeForm from './NewParadeForm'
 import { ParadeInformation } from './ParadeInformation'
-import './AttendanceManagementPage.scss'
+import './attendanceManagementPage.scss'
 
 // To access attendance records and take new attendance
 const AttendanceManagementPage = () => {
