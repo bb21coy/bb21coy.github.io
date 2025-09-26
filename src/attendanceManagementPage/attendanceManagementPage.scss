@@ -5,6 +5,7 @@
         display: flex;
         justify-content: space-between;
         gap: 20px;
+        overflow: auto;
     }
 
 	.parade-form-popup-content{
@@ -19,9 +20,14 @@
         flex: 1;
     }
 
-    .attendance-management-page .main-block .parade-information {
-        overflow: auto;
+    .attendance-management-page .parade-information {
         height: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+        overflow: auto;
 
         .flex-block {
             display: flex;
@@ -75,6 +81,8 @@
             gap: 10px;
             margin-bottom: 10px;
             justify-content: end;
+            position: sticky;
+            left: 0;
 
             > button {
                 padding: 5px 10px;
@@ -82,14 +90,7 @@
                 color: white;
                 border-radius: 10px;
                 display: flex;
-                align-items: center;
-                outline: none;
                 gap: 10px;
-                cursor: pointer;
-            }
-    
-            > button:hover {
-                background: black;
             }
     
             > button[name='show-parade-notice']::before {

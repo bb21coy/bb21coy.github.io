@@ -49,7 +49,7 @@ const ParadeList = ({ setPageState }) => {
                 </div>
                 <div className={styles['parade-list-container']} id='parade-list-container'>
                     {parades.filter((parade) => parade.date.toDate().getFullYear() == currentYear).map((parade) => (
-                        <button tabIndex={0} key={parade.id} className={parade.id} onClick={(e) => setPageState(e.target.className)}>{parade.date.toDate().toLocaleDateString('en-GB')}</button>
+                        <button tabIndex={0} key={parade.id} onClick={(e) => setPageState(parade.id)}>{parade.date.toDate().toLocaleDateString('en-GB')}</button>
                     ))}
                 </div>
             </div>

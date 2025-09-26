@@ -1,103 +1,100 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
+import { useState, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { handleServerError } from '../general/handleServerError'
-// import { ParadeNoticePDF } from './ParadeNoticePDF'
+import ParadeNoticePDF from './ParadeNoticePDF'
 import { ParadeAttendance } from './ParadeAttendance'
 import { ParadeEditor } from './ParadeEditor'
+import Loading from '../general/Loading'
+import { db } from '../firebase'
+import { getDoc, collection, getDocs, query, orderBy, doc } from '@firebase/firestore'
+import { useUser } from '../general/UserContext'
 
 // To access attendance records and take new attendance
-const ParadeInformation = ({accountName, accountType, appointment, id, setPageState, reload, setReload}) => {
-  const [render, setRender] = useState(false)
-  const [showParadeNotice, setShowParadeNotice] = useState(true)
-  const [showParadeEditor, setShowParadeEditor] = useState(false)
-  const [parade, setParade] = useState({})
-  const [boys, setBoys] = useState([])
-  const [primers, setPrimers] = useState([])
-  const [officers, setOfficers] = useState([])
+const ParadeInformation = ({ id, setPageState, setReload }) => {
+	const [loading, setLoading] = useState(true)
+	const [showParadeNotice, setShowParadeNotice] = useState(true)
+	const [showParadeEditor, setShowParadeEditor] = useState(false)
+	const [parade, setParade] = useState({})
+	const [allUsers, setAllUsers] = useState([])
+	const { user } = useUser()
 
-  useEffect(() => {
-    axios.post('/api/parade/' + id + '/get_parade', {},
-    {withCredentials: true})
-    .then((resp) => {
-      setParade(resp.data)
-      setRender(true)
-    })
-    .catch(resp => handleServerError(resp.response.status))
-    axios.post('/api/account/0/get_accounts_by_type', {
-      account_type: "Boy"
-    }, {
-      withCredentials: true
-    })
-    .then(resp => {setBoys(resp.data)})
-    .catch(resp => handleServerError(resp.response.status))
-    axios.post('/api/account/0/get_accounts_by_type', {
-      account_type: "Primer"
-    }, {
-      withCredentials: true
-    })
-    .then(resp => {setPrimers(resp.data)})
-    .catch(resp => handleServerError(resp.response.status))
-    axios.post('/api/account/0/get_accounts_by_type', {
-      account_type: "Officer"
-    }, {
-      withCredentials: true
-    })
-    .then(resp => {setOfficers(resp.data)})
-    .catch(resp => handleServerError(resp.response.status))
-  }, [id, reload])
+	useEffect(() => {
+		const init = async () => {
+			const usersSnap = await getDocs(query(collection(db, "users"), orderBy("account_name", "asc")))
+			const usersData = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+			setAllUsers(usersData)
 
-  function toggleParadeNotice() {
-    setShowParadeNotice((prev) => {
-      if (!prev) {
-        setShowParadeEditor(false)
-        return true
-      } else {
-        return false
-      }
-    })
-  }
+			const paradeRef = doc(db, "parades", id)
+			const paradeSnap = await getDoc(paradeRef)
+			const paradeData = paradeSnap.data()
+			setParade(paradeData)
 
-  function toggleEditor() {
-    setShowParadeEditor((prev) => {
-      if (prev == false) {
-        setShowParadeNotice(false)
-        return true
-      } else {
-        return false
-      }
-    })
-  }
+			setLoading(true)
+		}
 
-  if (!render) return null
+		init()
+	}, [])
 
-  return(
-    <div className='parade-information'>
-      <div>
-        {!showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Show Parade Notice' name='show-parade-notice'>Show Parade Notice</button>}
-        {showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Hide Parade Notice' name='hide-parade-notice'>Hide Parade Notice</button>}
+	const groupedUsers = useMemo(() => {
+		const boys = []
+		const primers = []
+		const officers = []
 
-        {(['Admin', 'Officer', 'Primer'].includes(accountType) || ['CSM', 'DY CSM', 'Admin Sergeant'].includes(appointment)) && (
-          <button onClick={toggleEditor} name='edit-parade-notice'>Edit Parade Notice</button>
-        )}
-      </div>
+		allUsers.forEach(user => {
+			if (user.account_type === "Boy") boys.push(user)
+			else if (user.account_type === "Primer") primers.push(user)
+			else if (user.account_type === "Officer") officers.push(user)
+		})
 
-      {/* {showParadeNotice && <ParadeNoticePDF parade={parade} />} */}
-      {showParadeEditor && <ParadeEditor parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} setPageState={setPageState}/>}
+		return { boys, primers, officers }
+	}, [allUsers])
 
-      <ParadeAttendance accountName={accountName} appointment={appointment} parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} />
-    </div>
-  )
+	function toggleParadeNotice() {
+		setShowParadeNotice((prev) => {
+			if (!prev) {
+				setShowParadeEditor(false)
+				return true
+			} else {
+				return false
+			}
+		})
+	}
+
+	function toggleEditor() {
+		setShowParadeEditor((prev) => {
+			if (prev == false) {
+				setShowParadeNotice(false)
+				return true
+			} else {
+				return false
+			}
+		})
+	}
+
+	if (!loading) return <Loading />
+
+	return (
+		<div className='parade-information'>
+			<div>
+				{!showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Show Parade Notice' name='show-parade-notice'>Show Parade Notice</button>}
+				{showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Hide Parade Notice' name='hide-parade-notice'>Hide Parade Notice</button>}
+
+				{(['Admin', 'Officer', 'Primer'].includes(user.account_type) || ['CSM', 'DY CSM', 'Admin Sergeant'].includes(user.appointment)) && (
+					<button onClick={toggleEditor} name='edit-parade-notice'>Edit Parade Notice</button>
+				)}
+			</div>
+
+			{showParadeNotice && Object.keys(parade).length > 0 && <ParadeNoticePDF parade={parade} />}
+			{showParadeEditor && <ParadeEditor parade={parade} boys={groupedUsers.boys} primers={groupedUsers.primers} officers={groupedUsers.officers} setReload={setReload} setPageState={setPageState} />}
+
+			{/* <ParadeAttendance accountName={accountName} appointment={appointment} parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} /> */}
+		</div>
+	)
 }
 
 ParadeInformation.propTypes = {
-  accountName: PropTypes.string.isRequired,
-  accountType: PropTypes.string.isRequired,
-  appointment: PropTypes.string,
-  id: PropTypes.number.isRequired,  
-  setPageState: PropTypes.func.isRequired,
-  reload: PropTypes.bool.isRequired,
-  setReload: PropTypes.func.isRequired
+	id: PropTypes.number.isRequired,
+	setPageState: PropTypes.func.isRequired,
+	setReload: PropTypes.func.isRequired
 }
 
 export { ParadeInformation }
