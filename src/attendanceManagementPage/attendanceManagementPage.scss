@@ -118,27 +118,6 @@
         margin: 0 !important;
         padding: 0 !important;
     }
-
-    .parade-notice-page {
-        display: flex;
-        margin: 20px 30px;
-        font-family: sans-serif;
-        min-height: 500px;
-        justify-content: center;
-
-        div {
-            width: max-content;
-            display: flex;
-            flex-direction: column;
-        }
-
-        iframe {
-            max-width: 297mm;
-            height: 210mm;
-            width: 100vw;
-            border: 1px solid black;
-        }
-    }
 }
 
 @media screen and (max-width: 800px){

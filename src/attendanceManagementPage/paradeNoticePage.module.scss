@@ -1,0 +1,15 @@
+@media screen {
+    .parade-notice-page {
+        display: flex;
+        margin: 20px 30px;
+        flex-direction: column;
+        flex: 1;
+        gap: 20px;
+        align-items: flex-start;
+        overflow: auto;
+
+        > div:last-of-type {
+            width: 1123px;
+        }
+    }
+}

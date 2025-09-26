@@ -35,7 +35,7 @@ const ParadeNoticePDF = ({ parade }) => {
         <>
 
             <div className={styles['parade-notice-pdf']}>
-                <header>
+                <div className={styles.header}>
                     <img src="bb-crest.png" alt="Logo" style={{ width: "50px", height: "50px" }} />
                     <div>
                         <p><b>THE BOYS' BRIGADE</b></p>
@@ -48,7 +48,7 @@ const ParadeNoticePDF = ({ parade }) => {
                         <p>where Jesus has entered as a forerunner for us...</p>
                         <p>Hebrews 6:19-20a</p>
                     </div>
-                </header>
+                </div>
 
                 <section className={styles.title}>
                     <h1>parade notice</h1>
@@ -77,7 +77,7 @@ const ParadeNoticePDF = ({ parade }) => {
                     <span>{roles["CE Sergeant"]?.rank} {roles["CE Sergeant"]?.account_name}</span>
                 </section>
 
-                <section class={styles.company_announcements}>
+                <section className={styles.company_announcements}>
                     <p>Company Announcements</p>
                     {parade.company_announcements.length > 0 ? (
                         <ol>
@@ -86,7 +86,7 @@ const ParadeNoticePDF = ({ parade }) => {
                     ) : <p>No Company Announcements</p>}
                 </section>
 
-                <section class={styles.programs_container}>
+                <section className={styles.programs_container}>
                     {["1", "2", "3", "4/5"].map(platoon => (
                         <div className={styles.programs} key={platoon}>
                             <div>
