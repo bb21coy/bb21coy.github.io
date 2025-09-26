@@ -77,6 +77,7 @@ const ParadeInformation = ({ id, setPageState, setReload }) => {
 			<div>
 				{!showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Show Parade Notice' name='show-parade-notice'>Show Parade Notice</button>}
 				{showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Hide Parade Notice' name='hide-parade-notice'>Hide Parade Notice</button>}
+				<button onClick={() => window.print()} name='download-parade-notice'>Download Parade Notice</button>
 
 				{(['Admin', 'Officer', 'Primer'].includes(user.account_type) || ['CSM', 'DY CSM', 'Admin Sergeant'].includes(user.appointment)) && (
 					<button onClick={toggleEditor} name='edit-parade-notice'>Edit Parade Notice</button>

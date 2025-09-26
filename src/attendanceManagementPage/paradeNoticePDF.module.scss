@@ -7,16 +7,23 @@
         visibility: hidden;
     }
 
+    .pdf-container {
+        height: auto !important;
+    }
+
     .parade-notice-pdf {
-        width: 297mm;
-        height: 210mm;
+        width: 297mm !important;
+        height: 210mm !important;
         margin: 0 !important;
         aspect-ratio: auto;
-        border: none;
+        border: none !important;
         padding: 5mm 10mm;
+        overflow: hidden !important;
         visibility: visible;
         position: absolute;
         left: 0;
+        transform: unset !important;
+        transform-origin: unset !important;
         top: 0;
     }
 
@@ -27,6 +34,11 @@
     header {
         display: none;
     }
+}
+
+.pdf-container {
+    width: 100%;
+    height: calc(800px * var(--scale));   /* design height × scale */
 }
 
 .parade-notice-pdf {
@@ -40,7 +52,9 @@
     flex-direction: column;
     border: 1px solid black;
     font-size: 14px;
-    overflow-x: auto;
+    overflow: auto;
+    transform: scale(0.5);
+    transform-origin: top left;
 
     ul {
         list-style: none;

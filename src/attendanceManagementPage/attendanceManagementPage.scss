@@ -107,6 +107,11 @@
                 font: var(--fa-font-solid);
                 content: "\f044";
             }
+
+            > button[name='download-parade-notice']::before {
+                font: var(--fa-font-solid);
+                content: "\f019";
+            }
         }
 
         label[for='parade-description'], h4 {

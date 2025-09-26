@@ -17,6 +17,24 @@ const ParadeNoticePDF = ({ parade }) => {
         })
     }, [parade])
 
+    useEffect(() => {
+        function applyZoom() {
+            const container = document.getElementById('pdf-container');
+            const target = document.getElementById('parade-notice-pdf');
+
+            if (container && target) {
+                const zoomLevel = container.clientWidth / 1123;
+                target.style.transform = `scale(${zoomLevel})`;
+                container.style.setProperty('--scale', zoomLevel);
+            }
+        }
+
+        window.addEventListener('resize', applyZoom);
+        applyZoom();
+
+        return () => window.removeEventListener("resize", applyZoom);
+    }, [parade]);
+
     const formatTime = (time) => {
         if (!(time instanceof Timestamp)) throw new Error(`Invalid time format. Its type is ${typeof time}, not Timestamp.`);
         const date = time.toDate();
@@ -33,90 +51,91 @@ const ParadeNoticePDF = ({ parade }) => {
 
     return (
         <>
-
-            <div className={styles['parade-notice-pdf']}>
-                <div className={styles.header}>
-                    <img src="bb-crest.png" alt="Logo" style={{ width: "50px", height: "50px" }} />
-                    <div>
-                        <p><b>THE BOYS' BRIGADE</b></p>
-                        <p><b>21st SINGAPORE COMPANY</b></p>
-                        <p>GEYLANG METHODIST SCHOOL (SECONDARY)</p>
-                    </div>
-                    <div>
-                        <p>This hope we have as an anchor of the soul, a hope both</p>
-                        <p><strong>sure and stedfast</strong> and one which enters within the veil</p>
-                        <p>where Jesus has entered as a forerunner for us...</p>
-                        <p>Hebrews 6:19-20a</p>
-                    </div>
-                </div>
-
-                <section className={styles.title}>
-                    <h1>parade notice</h1>
-                    <h2>{date}, {day}</h2>
-                </section>
-
-                <section className={styles.details}>
-                    <p>Venue: <b>{parade.venue}</b></p>
-                    <p></p>
-                    <p>Reporting Time: <b>{formatTime(parade.reporting_time)}</b></p>
-                    <p>Dismissal Time: <b>{formatTime(parade.dismissal_time)}</b></p>
-                </section>
-
-                <section className={styles.roles}>
-                    <p>Duty Teacher:</p>
-                    <span>{roles.DT?.honorifics ?? roles.DT?.rank} {roles.DT?.account_name}</span>
-                    <p>COS:</p>
-                    <span>{roles.COS?.rank} {roles.COS?.account_name}</span>
-                    <p>CSM:</p>
-                    <span>{roles.CSM?.rank} {roles.CSM?.account_name}</span>
-                    <p>Duty Officer:</p>
-                    <span>{roles.DO?.honorifics ?? roles.DO?.rank} {roles.DO?.account_name}</span>
-                    <p>Flag Bearer:</p>
-                    <span>{roles["Flag Bearer"]?.rank} {roles["Flag Bearer"]?.account_name}</span>
-                    <p>CE:</p>
-                    <span>{roles["CE Sergeant"]?.rank} {roles["CE Sergeant"]?.account_name}</span>
-                </section>
-
-                <section className={styles.company_announcements}>
-                    <p>Company Announcements</p>
-                    {parade.company_announcements.length > 0 ? (
-                        <ol>
-                            {parade.company_announcements.map(announcement => <li key={announcement.id}>{announcement.announcement}</li>)}
-                        </ol>
-                    ) : <p>No Company Announcements</p>}
-                </section>
-
-                <section className={styles.programs_container}>
-                    {["1", "2", "3", "4/5"].map(platoon => (
-                        <div className={styles.programs} key={platoon}>
-                            <div>
-                                <h2>Sec 1 platoon</h2>
-                                <h3>Program</h3>
-                                {parade.platoon_programs[platoon].map(program => (
-                                    <p key={program.id}>{formatProgramTime(program.start_time)} - {formatProgramTime(program.end_time)}: {program.program}</p>
-                                ))}
-                            </div>
-                            <div>
-                                <h3>Platoon Announcements</h3>
-                                <div>
-                                    <p>Attire:</p>
-                                    <span>{parade[`sec-${platoon}-attire`] ?? "NIL"}</span>
-                                </div>
-
-                                <ul>
-                                    {parade.platoon_announcements[platoon].length > 0 && parade.platoon_announcements[platoon].map(announcement => (
-                                        <li key={announcement.id}>{announcement}</li>
-                                    ))}
-                                </ul>
-                            </div>
+            <div className={styles["pdf-container"]} id='pdf-container'>
+                <div className={styles['parade-notice-pdf']} id='parade-notice-pdf'>
+                    <div className={styles.header}>
+                        <img src="bb-crest.png" alt="Logo" style={{ width: "50px", height: "50px" }} />
+                        <div>
+                            <p><b>THE BOYS' BRIGADE</b></p>
+                            <p><b>21st SINGAPORE COMPANY</b></p>
+                            <p>GEYLANG METHODIST SCHOOL (SECONDARY)</p>
                         </div>
-                    ))}
-                </section>
+                        <div>
+                            <p>This hope we have as an anchor of the soul, a hope both</p>
+                            <p><strong>sure and stedfast</strong> and one which enters within the veil</p>
+                            <p>where Jesus has entered as a forerunner for us...</p>
+                            <p>Hebrews 6:19-20a</p>
+                        </div>
+                    </div>
 
-                <footer>
-                    <p>Page | 1 of 1</p>
-                    <p>Version 2025_v1.0</p>
-                </footer>
+                    <section className={styles.title}>
+                        <h1>parade notice</h1>
+                        <h2>{date}, {day}</h2>
+                    </section>
+
+                    <section className={styles.details}>
+                        <p>Venue: <b>{parade.venue}</b></p>
+                        <p></p>
+                        <p>Reporting Time: <b>{formatTime(parade.reporting_time)}</b></p>
+                        <p>Dismissal Time: <b>{formatTime(parade.dismissal_time)}</b></p>
+                    </section>
+
+                    <section className={styles.roles}>
+                        <p>Duty Teacher:</p>
+                        <span>{roles.DT?.honorifics ?? roles.DT?.rank} {roles.DT?.account_name}</span>
+                        <p>COS:</p>
+                        <span>{roles.COS?.rank} {roles.COS?.account_name}</span>
+                        <p>CSM:</p>
+                        <span>{roles.CSM?.rank} {roles.CSM?.account_name}</span>
+                        <p>Duty Officer:</p>
+                        <span>{roles.DO?.honorifics ?? roles.DO?.rank} {roles.DO?.account_name}</span>
+                        <p>Flag Bearer:</p>
+                        <span>{roles["Flag Bearer"]?.rank} {roles["Flag Bearer"]?.account_name}</span>
+                        <p>CE:</p>
+                        <span>{roles["CE Sergeant"]?.rank} {roles["CE Sergeant"]?.account_name}</span>
+                    </section>
+
+                    <section className={styles.company_announcements}>
+                        <p>Company Announcements</p>
+                        {parade.company_announcements.length > 0 ? (
+                            <ol>
+                                {parade.company_announcements.map(announcement => <li key={announcement.id}>{announcement.announcement}</li>)}
+                            </ol>
+                        ) : <p>No Company Announcements</p>}
+                    </section>
+
+                    <section className={styles.programs_container}>
+                        {["1", "2", "3", "4/5"].map(platoon => (
+                            <div className={styles.programs} key={platoon}>
+                                <div>
+                                    <h2>Sec 1 platoon</h2>
+                                    <h3>Program</h3>
+                                    {parade.platoon_programs[platoon].map(program => (
+                                        <p key={program.id}>{formatProgramTime(program.start_time)} - {formatProgramTime(program.end_time)}: {program.program}</p>
+                                    ))}
+                                </div>
+                                <div>
+                                    <h3>Platoon Announcements</h3>
+                                    <div>
+                                        <p>Attire:</p>
+                                        <span>{parade[`sec-${platoon}-attire`] ?? "NIL"}</span>
+                                    </div>
+
+                                    <ul>
+                                        {parade.platoon_announcements[platoon].length > 0 && parade.platoon_announcements[platoon].map(announcement => (
+                                            <li key={announcement.id}>{announcement}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        ))}
+                    </section>
+
+                    <footer>
+                        <p>Page | 1 of 1</p>
+                        <p>Version 2025_v1.0</p>
+                    </footer>
+                </div>
             </div>
 
             <div className={styles["parade-description"]}>

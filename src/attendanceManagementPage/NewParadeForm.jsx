@@ -8,12 +8,18 @@ import { ZodError } from 'zod'
 
 // To access attendance records and take new attendance
 const NewParadeForm = () => {
+	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
 	const [paradeType, setParadeType] = useState("Parade")
 	const [appointmentHolders, setAppointmentHolders] = useState({ DT: null, DO: null, COS: null, 'Flag Bearer': null, CSM: null, 'CE Sergeant': null })
 
-	const makeEmptyAnnouncement = () => ({ id: crypto.randomUUID(), announcement: "" })
+	function makeId() {
+		if (crypto.randomUUID) return crypto.randomUUID();
+		return Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+	}
+
+	const makeEmptyAnnouncement = () => ({ id: makeId(), announcement: "" })
 	const [companyAnnouncements, setCompanyAnnouncements] = useState([makeEmptyAnnouncement()])
 	const [platoonAnnouncements, setPlatoonAnnouncements] = useState({
 		'1': [makeEmptyAnnouncement()],
@@ -22,7 +28,7 @@ const NewParadeForm = () => {
 		'4/5': [makeEmptyAnnouncement()]
 	})
 
-	const makeEmptyProgram = () => ({ id: crypto.randomUUID(), start_time: "", end_time: "", program: "" })
+	const makeEmptyProgram = () => ({ id: makeId(), start_time: "", end_time: "", program: "" })
 	const [platoonPrograms, setPlatoonPrograms] = useState({
 		'1': [makeEmptyProgram()],
 		'2': [makeEmptyProgram()],
@@ -53,13 +59,13 @@ const NewParadeForm = () => {
 		document.getElementById('dismissal-time-input').value = `${date}T12:30`
 
 		if (paradeType == 'Parade') {
-			setCompanyAnnouncements([{ announcement: 'All to bring PT Kit', id: crypto.randomUUID() }, makeEmptyAnnouncement()])
+			setCompanyAnnouncements([{ announcement: 'All to bring PT Kit', id: makeId() }, makeEmptyAnnouncement()])
 			const makeDefaultPlatoonSchedule = (date) => [
-				{ id: crypto.randomUUID(), start_time: `${date}T08:30`, end_time: `${date}T08:45`, program: "Opening Parade" },
-				{ id: crypto.randomUUID(), start_time: `${date}T08:45`, end_time: `${date}T09:45`, program: "CE and Worship" },
-				{ id: crypto.randomUUID(), start_time: `${date}T09:45`, end_time: `${date}T11:00`, program: "" },
-				{ id: crypto.randomUUID(), start_time: `${date}T11:00`, end_time: `${date}T12:00`, program: "" },
-				{ id: crypto.randomUUID(), start_time: `${date}T12:00`, end_time: `${date}T12:15`, program: "Closing Parade" },
+				{ id: makeId(), start_time: `${date}T08:30`, end_time: `${date}T08:45`, program: "Opening Parade" },
+				{ id: makeId(), start_time: `${date}T08:45`, end_time: `${date}T09:45`, program: "CE and Worship" },
+				{ id: makeId(), start_time: `${date}T09:45`, end_time: `${date}T11:00`, program: "" },
+				{ id: makeId(), start_time: `${date}T11:00`, end_time: `${date}T12:00`, program: "" },
+				{ id: makeId(), start_time: `${date}T12:00`, end_time: `${date}T12:15`, program: "Closing Parade" },
 				makeEmptyProgram()
 			];
 
@@ -162,7 +168,7 @@ const NewParadeForm = () => {
 			data.platoon_programs = platoonPrograms;
 			data.platoon_announcements = platoonAnnouncements;
 			data.appointments = appointmentHolders;
-			
+
 			if (data.reporting_time == "") return showMessage("Please select a date and reporting time.");
 			const findDoc = await getDocs(query(collection(db, "parades"), where("date", "==", Timestamp.fromDate(new Date(data.reporting_time)))));
 			if (findDoc.docs.length) return showMessage("A parade has already been scheduled for that day.");
@@ -208,7 +214,7 @@ const NewParadeForm = () => {
 			<div className={styles['flex-block']}>
 				<div>
 					<label htmlFor='date-input'>Date: </label>
-					<input type='date' name='date' defaultValue={nextSaturday(new Date()).toISOString().split('T')[0]} onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} id='date-input'></input>
+					<input type='date' name='date' defaultValue={nextSaturday(new Date()).toISOString().split('T')[0]} onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} id='date-input'></input>
 
 					<label htmlFor='venue-input'>Venue: </label>
 					<input name='venue' defaultValue='School, GMSS' id='venue-input' placeholder='Enter Parade Venue'></input>
@@ -221,10 +227,10 @@ const NewParadeForm = () => {
 					))}
 
 					<label htmlFor='reporting-time-input'>Reporting Time: </label>
-					<input name='reporting_time' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} className='reporting-time-input' type='datetime-local' id='reporting-time-input'></input>
+					<input name='reporting_time' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} className='reporting-time-input' type='datetime-local' id='reporting-time-input'></input>
 
 					<label htmlFor='dismissal-time-input'>Dismissal Time: </label>
-					<input name='dismissal_time' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} className='dismissal-time-input' type='datetime-local' id='dismissal-time-input'></input>
+					<input name='dismissal_time' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} className='dismissal-time-input' type='datetime-local' id='dismissal-time-input'></input>
 				</div>
 
 				<div>
@@ -277,9 +283,9 @@ const NewParadeForm = () => {
 						<div>
 							{platoonPrograms[level].map((program, index) => (
 								<div key={`sec-${level}-program-${program.id}`} className={styles['platoon-program-container']}>
-									<input type='datetime-local' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'start_time')} />
+									<input type='datetime-local' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'start_time')} />
 									<p>-</p>
-									<input type='datetime-local' onMouseDown={e => e.preventDefault()} onClick={e => e.currentTarget.showPicker()} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'end_time')} />
+									<input type='datetime-local' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'end_time')} />
 
 									<input type='text' defaultValue={program.program} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'program')} placeholder='Enter Program' id={`sec-${level}-program-${program.id}`} />
 									{index !== platoonPrograms[level].length - 1 && <i className='fa-solid fa-xmark' aria-label='Remove Platoon Program' onClick={() => deletePlatoonProgram(level, index)}></i>}
