@@ -7,7 +7,7 @@ import ParadeSchema from '../schema/Parade'
 import { ZodError } from 'zod'
 
 // To access attendance records and take new attendance
-const NewParadeForm = ({ paradeId = null }) => {
+const ParadeForm = ({ paradeId = null }) => {
 	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
@@ -259,7 +259,7 @@ const NewParadeForm = ({ paradeId = null }) => {
 
 			<div className={styles['parade-selection']}>
 				<label htmlFor='parade-type-select'>Parade Type:</label>
-				<select name="parade_type" id="parade-type-select" value={paradeType || ""} onChange={e => setDefaultData(e.target.value)} defaultValue="">
+				<select name="parade_type" id="parade-type-select" value={paradeType || ""} onChange={e => setDefaultData(e.target.value)}>
 					<option value="" hidden disabled>Select Parade Type</option>
 					<option value="Parade">Parade</option>
 					<option value="Camp">Camp</option>
@@ -367,4 +367,4 @@ const NewParadeForm = ({ paradeId = null }) => {
 	)
 }
 
-export default NewParadeForm
+export default ParadeForm
