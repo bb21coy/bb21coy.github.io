@@ -316,8 +316,7 @@ const ParadeAttendance = ({accountName, appointment, parade, boys, primers, offi
 ParadeAttendance.propTypes = {
   accountName: PropTypes.string.isRequired,
   appointment: PropTypes.string,
-  id: PropTypes.number,  
-  setPageState: PropTypes.func,
+  id: PropTypes.number,
   reload: PropTypes.bool,
   setReload: PropTypes.func.isRequired,
   boys: PropTypes.arrayOf(PropTypes.shape({

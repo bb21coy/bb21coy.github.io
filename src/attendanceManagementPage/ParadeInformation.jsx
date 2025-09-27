@@ -2,14 +2,14 @@ import { useState, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import ParadeNoticePDF from './ParadeNoticePDF'
 import { ParadeAttendance } from './ParadeAttendance'
-import NewParadeForm from './NewParadeForm'
+import ParadeForm from './ParadeForm'
 import Loading from '../general/Loading'
 import { db } from '../firebase'
-import { getDoc, collection, getDocs, query, orderBy, doc, onSnapshot } from '@firebase/firestore'
+import { collection, getDocs, query, orderBy, doc, onSnapshot } from '@firebase/firestore'
 import { useUser } from '../general/UserContext'
 
 // To access attendance records and take new attendance
-const ParadeInformation = ({ id, setPageState, setReload }) => {
+const ParadeInformation = ({ id }) => {
 	const [loading, setLoading] = useState(true)
 	const [showParadeNotice, setShowParadeNotice] = useState(true)
 	const [showParadeEditor, setShowParadeEditor] = useState(false)
@@ -54,25 +54,13 @@ const ParadeInformation = ({ id, setPageState, setReload }) => {
 	}, [allUsers])
 
 	function toggleParadeNotice() {
-		setShowParadeNotice((prev) => {
-			if (!prev) {
-				setShowParadeEditor(false)
-				return true
-			} else {
-				return false
-			}
-		})
+		setShowParadeEditor(false);
+  		setShowParadeNotice((prev) => !prev);
 	}
 
 	function toggleEditor() {
-		setShowParadeEditor((prev) => {
-			if (prev == false) {
-				setShowParadeNotice(false)
-				return true
-			} else {
-				return false
-			}
-		})
+		setShowParadeNotice(false);
+  		setShowParadeEditor((prev) => !prev);
 	}
 
 	if (!loading) return <Loading />
@@ -90,8 +78,7 @@ const ParadeInformation = ({ id, setPageState, setReload }) => {
 			</div>
 
 			{showParadeNotice && Object.keys(parade).length > 0 && <ParadeNoticePDF parade={parade} />}
-			{/* {showParadeEditor && <ParadeEditor parade={parade} boys={groupedUsers.boys} primers={groupedUsers.primers} officers={groupedUsers.officers} setReload={setReload} setPageState={setPageState} />} */}
-			{showParadeEditor && <NewParadeForm paradeId={id} />}
+			{showParadeEditor && <ParadeForm paradeId={id} />}
 
 			{/* <ParadeAttendance accountName={accountName} appointment={appointment} parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} /> */}
 		</div>
@@ -100,8 +87,6 @@ const ParadeInformation = ({ id, setPageState, setReload }) => {
 
 ParadeInformation.propTypes = {
 	id: PropTypes.number.isRequired,
-	setPageState: PropTypes.func.isRequired,
-	setReload: PropTypes.func.isRequired
 }
 
-export { ParadeInformation }
+export default ParadeInformation

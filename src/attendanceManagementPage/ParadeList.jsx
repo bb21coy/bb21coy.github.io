@@ -22,7 +22,7 @@ const ParadeList = ({ setPageState }) => {
     useEffect(() => {
         if (["Admin", "Officer", "Primer", "CSM", "DY CSM", "Admin Sergeant"].includes(user.account_type)) setPageState("form")
         else {
-            if (parades.length > 0) setPageState(String(parades[parades.length - 1]?.id))
+            if (parades.length > 0) setPageState(parades[parades.length - 1]?.id)
         }
     }, [user]);
 
@@ -61,4 +61,4 @@ ParadeList.propTypes = {
     setPageState: PropTypes.func.isRequired
 }
 
-export { ParadeList }
+export default ParadeList
