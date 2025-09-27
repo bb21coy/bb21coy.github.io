@@ -3,6 +3,7 @@
     flex-direction: column;
     flex: 1;
     gap: 20px;
+    width: 100%;
 
     >div:not(:nth-of-type(-n + 2)) {
         display: flex;

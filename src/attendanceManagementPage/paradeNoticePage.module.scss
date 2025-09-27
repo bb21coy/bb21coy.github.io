@@ -5,11 +5,11 @@
         flex-direction: column;
         flex: 1;
         gap: 20px;
-        align-items: flex-start;
-        overflow: auto;
+        justify-content: center;
+        align-items: center;
 
         > div:last-of-type {
-            width: 1123px;
+            width: 100%;
         }
     }
 }
