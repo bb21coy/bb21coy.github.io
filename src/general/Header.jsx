@@ -12,7 +12,6 @@ const Header = () => {
 	const location = useLocation();
 	const { user, setUser, loggedIn, setLoggedIn, navigationViewable, setNavigationViewable } = useUser();
 	const [buttons, setButtons] = useState(2);
-	const [sidebarOpen, setSidebarOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useState(window.location.hash);
 
 	useEffect(() => {
@@ -47,14 +46,6 @@ const Header = () => {
 		console.log(acsiiArt);
 	}, [])
 
-	const toggleUserMenu = () => {
-		setNavigationViewable(prevState => !prevState);
-	};
-
-	const toggleSidebar = () => {
-		setSidebarOpen(prevState => !prevState);
-	}
-
 	const logOut = async () => {
 		try {
 			await signOut(auth);
@@ -71,7 +62,7 @@ const Header = () => {
 	return (
 		<header>
 			<div>
-				<button className={styles["menu-button"]} onClick={toggleUserMenu} aria-label='Menu'>
+				<button className={styles["menu-button"]} onClick={() => setNavigationViewable(prevState => !prevState)} aria-label='Menu'>
 					<i className="fa-solid fa-bars"></i>
 				</button>
 
@@ -114,17 +105,17 @@ const Header = () => {
 						<button onClick={() => navigate('/help')}>Help</button>
 						<button onClick={logOut}>Logout</button>
 
-						<button aria-label='Open Sidebar' onClick={toggleSidebar}>
+						<button aria-label='Open Sidebar' onClick={() => setNavigationViewable(prevState => !prevState)}>
 							<i className='fa-solid fa-bars'></i>
 						</button>
 					</>
 				}
 			</div>
 
-			<div className={styles.sidebar} data-open={sidebarOpen}>
+			<div className={styles.sidebar} data-open={navigationViewable}>
 				<div>
 					<h2>Menu</h2>
-					<button aria-label='Close Sidebar' onClick={toggleSidebar}>
+					<button aria-label='Close Sidebar' onClick={() => setNavigationViewable(prevState => !prevState)}>
 						<i className='fa-solid fa-xmark'></i>
 					</button>
 				</div>
