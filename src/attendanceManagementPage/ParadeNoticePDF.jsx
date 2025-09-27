@@ -123,7 +123,7 @@ const ParadeNoticePDF = ({ parade }) => {
 
                                     <ul>
                                         {parade.platoon_announcements[platoon].length > 0 && parade.platoon_announcements[platoon].map(announcement => (
-                                            <li key={announcement.id}>{announcement}</li>
+                                            <li key={announcement.id}>{announcement.announcement}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -140,8 +140,7 @@ const ParadeNoticePDF = ({ parade }) => {
 
             <div className={styles["parade-description"]}>
                 <label htmlFor="parade-description">Description:</label>
-                <br />
-                <textarea disabled value={parade.description} id="parade-description"></textarea>
+                <textarea disabled value={parade.description} placeholder='Parade Description' id="parade-description"></textarea>
             </div>
         </>
     )
