@@ -2,12 +2,12 @@ import { useState, useEffect, useMemo, Fragment } from 'react'
 import { showMessage } from '../general/handleServerError'
 import { db } from '../firebase'
 import styles from './newParadeForm.module.scss'
-import { getDocs, collection, query, orderBy, doc, getDoc, where, Timestamp, addDoc } from '@firebase/firestore'
+import { getDocs, collection, query, orderBy, doc, getDoc, where, Timestamp, addDoc, setDoc, FieldPath, deleteField } from '@firebase/firestore'
 import ParadeSchema from '../schema/Parade'
 import { ZodError } from 'zod'
 
 // To access attendance records and take new attendance
-const NewParadeForm = () => {
+const NewParadeForm = ({ paradeId = null }) => {
 	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
@@ -17,6 +17,24 @@ const NewParadeForm = () => {
 	function makeId() {
 		if (crypto.randomUUID) return crypto.randomUUID();
 		return Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+	}
+
+	const convertDate = (dateObject) => {
+		const year = dateObject.getFullYear();
+		const month = (dateObject.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed
+		const day = dateObject.getDate().toString().padStart(2, '0');
+		const hours = dateObject.getHours().toString().padStart(2, '0');
+		const minutes = dateObject.getMinutes().toString().padStart(2, '0');
+
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
+	}
+
+	function convertPrograms(programs = []) {
+		return programs.map((p) => ({
+			...p,
+			start_time: convertDate(p.start_time.toDate()),
+			end_time: convertDate(p.end_time?.toDate())
+		}));
 	}
 
 	const makeEmptyAnnouncement = () => ({ id: makeId(), announcement: "" })
@@ -46,6 +64,40 @@ const NewParadeForm = () => {
 			Object.entries(appointmentDoc.data()).map(([appt, id]) => {
 				if (["CE Sergeant", "CSM"].includes(appt)) setAppointmentHolders(prev => ({ ...prev, [appt]: id.id }))
 			})
+
+			if (paradeId) {
+				const paradeDoc = await getDoc(doc(db, "parades", paradeId));
+				const paradeData = paradeDoc.data();
+				setParadeType(paradeData.parade_type)
+				document.getElementById('date-input').value = convertDate(paradeData.date.toDate()).split('T')[0]
+				document.getElementById('reporting-time-input').value = convertDate(paradeData.reporting_time.toDate())
+				document.getElementById('dismissal-time-input').value = convertDate(paradeData.dismissal_time.toDate())
+
+				Object.entries(paradeData.appointments).map(([appointment, ref]) => {
+					setAppointmentHolders(prev => ({ ...prev, [appointment]: ref.id }))
+				})
+
+				setCompanyAnnouncements([...paradeData.company_announcements, makeEmptyAnnouncement()])
+				setPlatoonPrograms({
+					'1': [...convertPrograms(paradeData.platoon_programs["1"]), makeEmptyProgram()],
+					'2': [...convertPrograms(paradeData.platoon_programs["2"]), makeEmptyProgram()],
+					'3': [...convertPrograms(paradeData.platoon_programs["3"]), makeEmptyProgram()],
+					'4/5': [...convertPrograms(paradeData.platoon_programs["4/5"]), makeEmptyProgram()],
+				})
+				setPlatoonAnnouncements({
+					'1': [...paradeData.platoon_announcements['1'], makeEmptyAnnouncement()],
+					'2': [...paradeData.platoon_announcements['2'], makeEmptyAnnouncement()],
+					'3': [...paradeData.platoon_announcements['3'], makeEmptyAnnouncement()],
+					'4/5': [...paradeData.platoon_announcements['4/5'], makeEmptyAnnouncement()],
+				})
+
+				levels.map(level => {
+					document.getElementById(`sec-${level}-attire`).value = paradeData[`sec-${level}-attire`] || ""
+				})
+
+				document.getElementById('venue-input').value = paradeData.venue || ""
+				document.getElementById('description').value = paradeData.description || ""
+			}
 		}
 
 		init()
@@ -174,11 +226,16 @@ const NewParadeForm = () => {
 			if (findDoc.docs.length) return showMessage("A parade has already been scheduled for that day.");
 
 			const result = await ParadeSchema(db).parseAsync(data);
-			await addDoc(collection(db, "parades"), result);
-			showMessage("Parade created successfully", "success");
+			if (paradeId == null) {
+				await addDoc(collection(db, "parades"), result);
+				showMessage("Parade created successfully", "success");
+			} else {
+				await setDoc(doc(db, "parades", paradeId), result, { merge: true });
+				showMessage("Parade updated successfully", "success");
+			}
 		} catch (e) {
+			console.error(e)
 			if (e instanceof ZodError) {
-				console.error(e)
 				const issue = e.issues[0];
 				const path = issue.path;
 				if (path[0] === "platoon_programs") {
@@ -191,7 +248,6 @@ const NewParadeForm = () => {
 					showMessage(`Error at ${path.join(" → ")}: ${issue.message}`);
 				}
 			} else {
-				console.error(e)
 				showMessage("Failed to create parade");
 			}
 		}
@@ -203,7 +259,7 @@ const NewParadeForm = () => {
 
 			<div className={styles['parade-selection']}>
 				<label htmlFor='parade-type-select'>Parade Type:</label>
-				<select name="parade_type" id="parade-type-select" onChange={e => setDefaultData(e.target.value)} defaultValue="">
+				<select name="parade_type" id="parade-type-select" value={paradeType || ""} onChange={e => setDefaultData(e.target.value)} defaultValue="">
 					<option value="" hidden disabled>Select Parade Type</option>
 					<option value="Parade">Parade</option>
 					<option value="Camp">Camp</option>
@@ -306,7 +362,7 @@ const NewParadeForm = () => {
 				))}
 			</div>
 
-			<button>Add Parade</button>
+			<button>{paradeId ? "Update" : "Create"} Parade</button>
 		</form>
 	)
 }

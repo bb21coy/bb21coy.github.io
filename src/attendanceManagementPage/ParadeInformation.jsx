@@ -2,10 +2,10 @@ import { useState, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import ParadeNoticePDF from './ParadeNoticePDF'
 import { ParadeAttendance } from './ParadeAttendance'
-import { ParadeEditor } from './ParadeEditor'
+import NewParadeForm from './NewParadeForm'
 import Loading from '../general/Loading'
 import { db } from '../firebase'
-import { getDoc, collection, getDocs, query, orderBy, doc } from '@firebase/firestore'
+import { getDoc, collection, getDocs, query, orderBy, doc, onSnapshot } from '@firebase/firestore'
 import { useUser } from '../general/UserContext'
 
 // To access attendance records and take new attendance
@@ -18,20 +18,25 @@ const ParadeInformation = ({ id, setPageState, setReload }) => {
 	const { user } = useUser()
 
 	useEffect(() => {
+		let loading1 = false
+		let loading2 = false
 		const init = async () => {
 			const usersSnap = await getDocs(query(collection(db, "users"), orderBy("account_name", "asc")))
 			const usersData = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
 			setAllUsers(usersData)
-
-			const paradeRef = doc(db, "parades", id)
-			const paradeSnap = await getDoc(paradeRef)
-			const paradeData = paradeSnap.data()
-			setParade(paradeData)
-
-			setLoading(true)
+			loading1 = true
 		}
 
+		const unsubscribe = onSnapshot(doc(db, "parades", id), (paradeSnap) => {
+				if (paradeSnap.exists()) {
+					setParade(paradeSnap.data());
+					loading2 = true
+				}
+			});
+
 		init()
+		if (loading1 && loading2) setLoading(false)
+		return () => unsubscribe()
 	}, [])
 
 	const groupedUsers = useMemo(() => {
@@ -75,17 +80,18 @@ const ParadeInformation = ({ id, setPageState, setReload }) => {
 	return (
 		<div className='parade-information'>
 			<div>
-				{!showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Show Parade Notice' name='show-parade-notice'>Show Parade Notice</button>}
-				{showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Hide Parade Notice' name='hide-parade-notice'>Hide Parade Notice</button>}
-				<button onClick={() => window.print()} name='download-parade-notice'>Download Parade Notice</button>
+				{!showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Show Parade Notice' name='show-parade-notice'>Show</button>}
+				{showParadeNotice && <button onClick={toggleParadeNotice} aria-label='Hide Parade Notice' name='hide-parade-notice'>Hide</button>}
+				<button onClick={() => window.print()} name='download-parade-notice'>Download</button>
 
 				{(['Admin', 'Officer', 'Primer'].includes(user.account_type) || ['CSM', 'DY CSM', 'Admin Sergeant'].includes(user.appointment)) && (
-					<button onClick={toggleEditor} name='edit-parade-notice'>Edit Parade Notice</button>
+					<button onClick={toggleEditor} name='edit-parade-notice'>Edit</button>
 				)}
 			</div>
 
 			{showParadeNotice && Object.keys(parade).length > 0 && <ParadeNoticePDF parade={parade} />}
-			{showParadeEditor && <ParadeEditor parade={parade} boys={groupedUsers.boys} primers={groupedUsers.primers} officers={groupedUsers.officers} setReload={setReload} setPageState={setPageState} />}
+			{/* {showParadeEditor && <ParadeEditor parade={parade} boys={groupedUsers.boys} primers={groupedUsers.primers} officers={groupedUsers.officers} setReload={setReload} setPageState={setPageState} />} */}
+			{showParadeEditor && <NewParadeForm paradeId={id} />}
 
 			{/* <ParadeAttendance accountName={accountName} appointment={appointment} parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} /> */}
 		</div>
