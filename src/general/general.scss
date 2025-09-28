@@ -9,6 +9,10 @@
     }
 }
 
+html {
+    background: black;
+}
+
 button {
     background: transparent;
     outline: none;
@@ -46,6 +50,7 @@ textarea {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background: white;
 }
 
 .loading {

@@ -11,7 +11,10 @@ export default defineConfig(({ mode }) => {
       react(),
       visualizer({
         open: true,
-        filename: 'stats.html'
+        filename: 'stats.html',
+        gzipSize: true,
+        brotliSize: true,
+        sizes: ['gzip', 'brotli']
       })
     ],
     server: {
