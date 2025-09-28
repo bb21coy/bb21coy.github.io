@@ -1,6 +1,6 @@
 import { initializeApp } from "@firebase/app";
 import { getAuth, setPersistence, browserLocalPersistence } from "@firebase/auth";
-import { getFirestore } from "@firebase/firestore";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "@firebase/firestore";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyAISfmXUtURhQg78JjB6duTTluS_yCfV10",
@@ -13,7 +13,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+const db = initializeFirestore(app, {
+	localCache: persistentLocalCache({
+		tabManager: persistentMultipleTabManager() // allow multi-tab
+	})
+});
 setPersistence(auth, browserLocalPersistence);
 
 export { auth, db };

@@ -1,4 +1,4 @@
-const version = "1.1.2";
+const version = "1.1.5";
 const CACHE_NAME = `bb21coy-cache-v${version}`;
 
 // These are the known root files and folders
@@ -9,7 +9,7 @@ const STATIC_ASSETS = [
 
 // Regex patterns for runtime caching
 const ASSETS_PATTERN = /^\/assets\//;      // built CSS/JS
-const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico)$/; // direct children of /public
+const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico|woff2|ttf|css)$/; // direct children of /public
 
 self.addEventListener("install", (event) => {
     self.skipWaiting();
@@ -36,28 +36,57 @@ self.addEventListener("activate", (event) => {
     );
 });
 
-// Cache-first strategy for known files, network fallback for everything else
 self.addEventListener("fetch", (event) => {
     const req = event.request;
     const url = new URL(req.url);
 
-    // only cache same-origin requests
     if (url.origin !== location.origin) return;
 
-    if (ASSETS_PATTERN.test(url.pathname) || IMAGES_PATTERN.test(url.pathname)) {
-        event.respondWith(
-            caches.match(req).then((cached) => {
-                return cached || fetch(req).then((res) => {
-                    return caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(req, res.clone());
-                        return res;
+    event.respondWith((async () => {
+        try {
+            // SPA navigation → always serve cached index.html
+            if (req.mode === "navigate") {
+                const cached = await caches.match("/index.html");
+                // Try network if online, but fall back to cache
+                try {
+                    const fresh = await fetch("/index.html");
+                    const cache = await caches.open(CACHE_NAME);
+                    cache.put("/index.html", fresh.clone());
+                    return fresh;
+                } catch {
+                    return cached;
+                }
+            }
+
+            // Cache-first for assets/images
+            if (ASSETS_PATTERN.test(url.pathname) || IMAGES_PATTERN.test(url.pathname)) {
+                const cached = await caches.match(req);
+                if (cached) return cached;
+
+                const res = await fetch(req);
+                const cache = await caches.open(CACHE_NAME);
+                cache.put(req, res.clone());
+                return res;
+            }
+
+            // Default: network with cache fallback
+            return await fetch(req);
+
+        } catch (err) {
+            // Only notify update if online
+            if (navigator.onLine) {
+                console.warn("Likely update issue:", req.url, err);
+                self.clients.matchAll().then((clients) => {
+                    clients.forEach((client) => {
+                        client.postMessage({ type: "SW_UPDATE_AVAILABLE" });
                     });
                 });
-            })
-        );
-    } else if (STATIC_ASSETS.includes(url.pathname)) {
-        event.respondWith(
-            caches.match(req).then((cached) => cached || fetch(req))
-        );
-    }
+            } else {
+                console.warn("Offline mode:", req.url);
+            }
+
+            // Fallback to index.html for SPA
+            return caches.match("/index.html");
+        }
+    })());
 });

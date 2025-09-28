@@ -66,8 +66,31 @@ createRoot(document.body).render(
 	</StrictMode>
 );
 
-if ('serviceWorker' in navigator) {
-	window.addEventListener('load', () => {
-		navigator.serviceWorker.register('/sw.js?v=' + Date.now()).catch(console.error);
+let refreshInProgress = false;
+if ("serviceWorker" in navigator) {
+	window.addEventListener("load", () => {
+		navigator.serviceWorker.register("/sw.js").catch(console.error);
+	});
+
+	navigator.serviceWorker.addEventListener("message", async (event) => {
+		if (event.data?.type === "SW_FETCH_FAILED" && !refreshInProgress) {
+			refreshInProgress = true; // prevent duplicate alerts
+			alert("The site has been updated. Refreshing to get the latest version...");
+
+			// Unregister the service worker
+			const regs = await navigator.serviceWorker.getRegistrations();
+			for (const reg of regs) {
+				await reg.unregister();
+			}
+
+			// Clear caches
+			if (window.caches) {
+				const keys = await caches.keys();
+				await Promise.all(keys.map((key) => caches.delete(key)));
+			}
+
+			// Force reload bypassing cache
+			location.reload(true);
+		}
 	});
 }
