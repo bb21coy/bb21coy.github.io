@@ -62,7 +62,7 @@ const UserManagementPage = () => {
 				{pageState !== "appointments" && <>
 					<div className={usersListStyles.usersList} data-class='usersList'>
 						<div>
-							<i className='fa-solid fa-magnifying-glass'></i>
+							<i className='fa-solid fa-search'></i>
 							<input type="search" id="search" placeholder='Find someone' onInput={filter} />
 							<i onClick={showForm} className='fa-solid fa-user-plus'></i>
 						</div>

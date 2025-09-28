@@ -20,7 +20,7 @@ const AwardsFilter = () => {
     useEffect(() => {
         const rows = document.querySelectorAll("tr[data-row]");
         const normalisedRank = rankSelected.map(r => r.split("(")[1].replace(")", ""));
-        
+
         rows.forEach(row => {
             const sec = row.dataset.sec;   // e.g. "Sec 1"
             const rank = row.dataset.rank; // e.g. "PTE"
@@ -29,7 +29,7 @@ const AwardsFilter = () => {
             const searchOk = search === "" || rowName.includes(search.trim().toLowerCase());
             const levelOk = !levelSelected.includes(sec);
             const rankOk = !normalisedRank.includes(rank);
-     
+
             if (searchOk && levelOk && rankOk) {
                 row.style.display = "table-row";
             } else {
@@ -47,13 +47,13 @@ const AwardsFilter = () => {
     return (
         <div className={styles['awards-filter']}>
             <div>
-                <label htmlFor="search"><i className="fa-solid fa-magnifying-glass"></i></label>
+                <label htmlFor="search"><i className="fa-solid fa-search"></i></label>
                 <input type="search" id="search" placeholder="Search..." onChange={e => setSearch(e.target.value)} value={search} />
             </div>
 
             <MultiSelectDropDown label="Rank" options={rankOptions} selected={rankSelected} setSelected={(value) => toggle(value, "rank")} openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />
             <MultiSelectDropDown label="Level" options={levelOptions} selected={levelSelected} setSelected={(value) => toggle(value, "level")} openDropdown={openDropdown} setOpenDropdown={setOpenDropdown} />
-        
+
             <button onClick={clearFilters}>Clear</button>
         </div>
     )

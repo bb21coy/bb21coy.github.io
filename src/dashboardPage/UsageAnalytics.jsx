@@ -19,6 +19,7 @@ const AdminUsageAnalytics = () => {
         try {
             const resp = await axios.get(`usage.json`);
             let usage = resp.data.data.usage;
+            if (!usage) return;
             const keysToRemove = ["ISR Reads", "ISR Writes", "Function Duration"];
             usage = usage.filter(item => !keysToRemove.includes(item.title));
             const simplified = usage.map(item => ({

@@ -70,7 +70,7 @@ const UniformInspectionPage = () => {
 			<div className={styles['uniform-inspection-filter']}>
 				<div>
 					<label htmlFor="search">
-						<i className='fa-solid fa-magnifying-glass'></i>
+						<i className='fa-solid fa-search'></i>
 					</label>
 					<input type="search" id="search" placeholder="Search Boy" onInput={filter} ref={search} />
 				</div>

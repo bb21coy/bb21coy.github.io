@@ -39,8 +39,8 @@ const UserAwards = () => {
                 doc.style.display = "flex";
             } else {
                 doc.style.display = "none";
-            }   
-        })   
+            }
+        })
     }, [search])
 
     const order = useMemo(() => {
@@ -68,7 +68,7 @@ const UserAwards = () => {
             <h2>My Awards</h2>
 
             <div>
-                <label htmlFor="search"><i className="fa-solid fa-magnifying-glass"></i></label>
+                <label htmlFor="search"><i className="fa-solid fa-search"></i></label>
                 <input type="search" name="search" id="search" placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} />
             </div>
 
