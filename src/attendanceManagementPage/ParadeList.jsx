@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { HandleDownloadWithExcelJS } from './AnnualAttendanceExcel'
+// import { HandleDownloadWithExcelJS } from './AnnualAttendanceExcel'
 import { db } from '../firebase'
 import { onSnapshot, orderBy, collection, query } from '@firebase/firestore'
 import { useUser } from '../general/UserContext'
@@ -44,7 +44,7 @@ const ParadeList = ({ setPageState }) => {
                         {(["Admin", "Officer", "Primer"].includes(user.account_type) || ["CSM", "DY CSM", "Admin Sergeant"].includes(user.appointment)) &&
                             <i className='fa-solid fa-plus' onClick={() => setPageState('form')} title='Add Parade'></i>
                         }
-                        <HandleDownloadWithExcelJS key={currentYear} year={currentYear} />
+                        {/* <HandleDownloadWithExcelJS key={currentYear} year={currentYear} /> */}
                     </div>
                 </div>
                 <div className={styles['parade-list-container']} id='parade-list-container'>
