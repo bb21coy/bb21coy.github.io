@@ -12,7 +12,7 @@ const ParadeNoticePDF = ({ parade, users }) => {
             const account = users.find(u => u.id === user.id)
             setRoles(prev => ({ ...prev, [role]: account }))
         })
-    }, [parade])
+    }, [parade, users]);
 
     useEffect(() => {
         function applyZoom() {
