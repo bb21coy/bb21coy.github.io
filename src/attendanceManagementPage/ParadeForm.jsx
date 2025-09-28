@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo, Fragment } from 'react'
 import { showMessage } from '../general/handleServerError'
 import { db } from '../firebase'
-import styles from './newParadeForm.module.scss'
-import { getDocs, collection, query, orderBy, doc, getDoc, where, Timestamp, addDoc, setDoc, FieldPath, deleteField } from '@firebase/firestore'
+import styles from './paradeForm.module.scss'
+import { getDocs, collection, query, orderBy, doc, getDoc, where, Timestamp, addDoc, setDoc } from '@firebase/firestore'
 import ParadeSchema from '../schema/Parade'
 import { ZodError } from 'zod'
 
 // To access attendance records and take new attendance
-const ParadeForm = ({ paradeId = null }) => {
+const ParadeForm = ({ paradeData = null }) => {
 	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
@@ -65,9 +65,7 @@ const ParadeForm = ({ paradeId = null }) => {
 				if (["CE Sergeant", "CSM"].includes(appt)) setAppointmentHolders(prev => ({ ...prev, [appt]: id.id }))
 			})
 
-			if (paradeId) {
-				const paradeDoc = await getDoc(doc(db, "parades", paradeId));
-				const paradeData = paradeDoc.data();
+			if (paradeData) {
 				setParadeType(paradeData.parade_type)
 				document.getElementById('date-input').value = convertDate(paradeData.date.toDate()).split('T')[0]
 				document.getElementById('reporting-time-input').value = convertDate(paradeData.reporting_time.toDate())
@@ -226,11 +224,11 @@ const ParadeForm = ({ paradeId = null }) => {
 			if (findDoc.docs.length) return showMessage("A parade has already been scheduled for that day.");
 
 			const result = await ParadeSchema(db).parseAsync(data);
-			if (paradeId == null) {
+			if (paradeData == null) {
 				await addDoc(collection(db, "parades"), result);
 				showMessage("Parade created successfully", "success");
 			} else {
-				await setDoc(doc(db, "parades", paradeId), result, { merge: true });
+				await setDoc(doc(db, "parades", paradeData.id), result, { merge: true });
 				showMessage("Parade updated successfully", "success");
 			}
 		} catch (e) {
@@ -362,7 +360,7 @@ const ParadeForm = ({ paradeId = null }) => {
 				))}
 			</div>
 
-			<button>{paradeId ? "Update" : "Create"} Parade</button>
+			<button>{paradeData !== null ? "Update" : "Create"} Parade</button>
 		</form>
 	)
 }

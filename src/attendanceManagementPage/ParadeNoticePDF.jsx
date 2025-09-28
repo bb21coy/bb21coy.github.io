@@ -1,18 +1,15 @@
 import { useEffect, useState } from 'react';
 import styles from './paradeNoticePDF.module.scss';
-import { doc, getDoc, Timestamp } from '@firebase/firestore';
-import { db } from '../firebase';
+import { Timestamp } from '@firebase/firestore';
 
-const ParadeNoticePDF = ({ parade }) => {
+const ParadeNoticePDF = ({ parade, users }) => {
     const day = parade.date.toDate().toLocaleDateString("en-US", { weekday: "long" });
     const date = parade.date.toDate().toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
     const [roles, setRoles] = useState({})
 
     useEffect(() => {
         Object.entries(parade.appointments).map(async ([role, user]) => {
-            const userRef = await getDoc(doc(db, 'users', user.id))
-            if (!userRef.exists()) return
-            const account = userRef.data()
+            const account = users.find(u => u.id === user.id)
             setRoles(prev => ({ ...prev, [role]: account }))
         })
     }, [parade])
