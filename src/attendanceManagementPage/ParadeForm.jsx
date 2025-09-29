@@ -225,7 +225,13 @@ const ParadeForm = ({ paradeData = null }) => {
 
 			const result = await ParadeSchema(db).parseAsync(data);
 			if (paradeData == null) {
-				await addDoc(collection(db, "parades"), result);
+				result.cos_finalized = false;
+				result.csm_finalized = false;
+				result.do_finalized = false;
+				result.captain_finalized = false;
+
+				const paradeData = await addDoc(collection(db, "parades"), result);
+				await setDoc(doc(db, "parades", paradeData.id), {});
 				showMessage("Parade created successfully", "success");
 			} else {
 				await setDoc(doc(db, "parades", paradeData.id), result, { merge: true });

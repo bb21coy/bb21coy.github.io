@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import ParadeNoticePDF from './ParadeNoticePDF'
-import { ParadeAttendance } from './ParadeAttendance'
+import ParadeAttendance from './ParadeAttendance'
 import ParadeForm from './ParadeForm'
 import Loading from '../general/Loading'
 import { db } from '../firebase'
@@ -24,9 +24,7 @@ const ParadeInformation = ({ id }) => {
 		const init = async () => {
 			const usersSnap = await getDocs(query(collection(db, "users"), orderBy("account_name", "asc")))
 			const usersData = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-			setAllUsers(usersData)
-			loading1 = true
-		}
+			setAllUsers(usersData)		}
 
 		const unsubscribe = onSnapshot(doc(db, "parades", id), (paradeSnap) => {
 			if (paradeSnap.exists()) {
@@ -39,20 +37,6 @@ const ParadeInformation = ({ id }) => {
 		if (loading1 && loading2) setLoading(false)
 		return () => unsubscribe()
 	}, [])
-
-	const groupedUsers = useMemo(() => {
-		const boys = []
-		const primers = []
-		const officers = []
-
-		allUsers.forEach(user => {
-			if (user.account_type === "Boy") boys.push(user)
-			else if (user.account_type === "Primer") primers.push(user)
-			else if (user.account_type === "Officer") officers.push(user)
-		})
-
-		return { boys, primers, officers }
-	}, [allUsers])
 
 	function toggleParadeNotice() {
 		setShowParadeEditor(false);
@@ -80,7 +64,7 @@ const ParadeInformation = ({ id }) => {
 			{showParadeNotice && Object.keys(parade).length > 0 && <ParadeNoticePDF parade={parade} users={allUsers}/>}
 			{showParadeEditor && <ParadeForm paradeData={parade} />}
 
-			{/* <ParadeAttendance accountName={accountName} appointment={appointment} parade={parade} boys={boys} primers={primers} officers={officers} setReload={setReload} /> */}
+			<ParadeAttendance parade={parade} users={allUsers} />
 		</div>
 	)
 }

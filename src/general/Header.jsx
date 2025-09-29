@@ -28,7 +28,7 @@ const Header = () => {
 			const ref = doc(db, "users", user.uid);
 			const snap = await getDoc(ref);
 			const data = snap.data();
-			if (snap.exists()) setUser(data);
+			if (snap.exists()) setUser({ id: user.uid, ...data });
 			else return
 
 			let count = 5;

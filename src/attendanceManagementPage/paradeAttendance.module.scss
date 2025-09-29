@@ -1,0 +1,49 @@
+.parade-attendance {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    table {
+        border-collapse: collapse;
+        height: min-content;
+
+        &::before {
+            content: var(--tablename);
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+    }
+
+    td {
+        border: 1px solid black;
+        padding-right: 10px;
+
+        &:not(:has(select)) {
+            padding: 5px 10px;
+        }
+
+        &:last-of-type {
+            width: 80px;
+            text-align: center;
+        }
+    }
+
+    select {
+        width: 100%;
+        padding: 5px 10px;
+    }
+
+    .flex-block {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .flex-block {
+        grid-template-columns: 1fr !important;
+    }   
+}
