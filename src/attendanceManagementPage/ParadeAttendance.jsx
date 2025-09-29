@@ -22,7 +22,7 @@ const ParadeAttendance = ({ parade, users }) => {
 		if (parade.date.toDate().getFullYear() !== new Date().getFullYear()) return setTakingAttendance(false);
 
 		const appointments = (await getDoc(doc(db, "appointments", "HJbxljYligJkryXpA7sh"))).data();
-		const userAppt = Object.entries(appointments).find(([_, v]) => v?.id === user.id);
+		const userAppt = Object.entries(appointments).find(([, v]) => v?.id === user.id);
 		let rank = null;
 
 		const ROLE_MAP = [
@@ -57,14 +57,7 @@ const ParadeAttendance = ({ parade, users }) => {
 			setCurrentAttendance({ ...paradeSnap.docs[0].data() })
 		})
 
-		const unsub1 = onSnapshot(query(collection(db, "parades"), where("parade_id", "==", parade.id)), (paradeSnap) => {
-			setPositions(paradeSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-		})
-
-		return () => {
-			unsub();
-			unsub1();
-		}
+		return () => unsub();
 	}, [parade])
 
 	const platoonTotals = useMemo(() => {

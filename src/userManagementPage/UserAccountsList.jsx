@@ -44,21 +44,21 @@ const UserAccountsList = ({ usersList, setUsersList, showUser, pageState }) => {
 			<p>Current Users</p>
 			{["Admin", "Officer"].includes(user.account_type) && groupedUsers.officers.map(user => (
 				<React.Fragment key={user.id}>
-					<input type="radio" name="users-list" id={user.id} onChange={(e) => showUser(user.id)} />
+					<input type="radio" name="users-list" id={user.id} onChange={() => showUser(user.id)} />
 					<label htmlFor={user.id}>{user.account_type} {user.rank} {user.account_name}</label>
 				</React.Fragment>
 			))}
 
 			{["Admin", "Officer", "Primer"].includes(user.account_type) && groupedUsers.primers.map(user => (
 				<React.Fragment key={user.id}>
-					<input type="radio" name="users-list" id={user.id} onChange={(e) => showUser(user.id)} />
+					<input type="radio" name="users-list" id={user.id} onChange={() => showUser(user.id)} />
 					<label htmlFor={user.id}>{user.account_type} {user.rank} {user.account_name}</label>
 				</React.Fragment>
 			))}
 
 			{groupedUsers.boys.map(user => (
 				<React.Fragment key={user.id}>
-					<input type="radio" name="users-list" id={user.id} onChange={(e) => showUser(user.id)} checked={pageState === user.id} />
+					<input type="radio" name="users-list" id={user.id} onChange={() => showUser(user.id)} checked={pageState === user.id} />
 					<label htmlFor={user.id}>{user.account_type} Sec {user.level} {user.rank} {user.account_name}</label>
 				</React.Fragment>
 			))}
@@ -66,7 +66,7 @@ const UserAccountsList = ({ usersList, setUsersList, showUser, pageState }) => {
 			<p>Graduated Boys</p>
 			{groupedUsers.graduated.map(user => (
 				<React.Fragment key={user.id}>
-					<input type="radio" name="users-list" id={user.id} onChange={(e) => showUser(user.id)} checked={pageState === user.id} />
+					<input type="radio" name="users-list" id={user.id} onChange={() => showUser(user.id)} checked={pageState === user.id} />
 					<label htmlFor={user.id}>{user.account_type} Sec {user.level} {user.rank} {user.account_name}</label>
 				</React.Fragment>
 			))}

@@ -36,7 +36,7 @@ const ParadeInformation = ({ id }) => {
 		init()
 		if (loading1 && loading2) setLoading(false)
 		return () => unsubscribe()
-	}, [])
+	}, [id])
 
 	function toggleParadeNotice() {
 		setShowParadeEditor(false);

@@ -55,7 +55,7 @@ const ResourcePage = () => {
         <div className={styles["resource-page"]}>
             <div className={styles.sidebar}>
                 <div>
-                    <input type="radio" name="selector" id="target" checked={selectedResource === 'target'} onChange={(e) => setSelectedResource('target')} />
+                    <input type="radio" name="selector" id="target" checked={selectedResource === 'target'} onChange={() => setSelectedResource('target')} />
                     <label htmlFor="target">Target</label>
                 </div>
             </div>
