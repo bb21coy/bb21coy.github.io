@@ -42,7 +42,7 @@ const ParadeList = ({ setPageState }) => {
                     </div>
                     <div>
                         {(["Admin", "Officer", "Primer"].includes(user.account_type) || ["CSM", "DY CSM", "Admin Sergeant"].includes(user.appointment)) &&
-                            <i className='fa-solid fa-plus' onClick={() => setPageState('form')} title='Add Parade'></i>
+                            <i className='fa-solid fa-file-plus' onClick={() => setPageState('form')} title='Add Parade'></i>
                         }
                         {/* <HandleDownloadWithExcelJS key={currentYear} year={currentYear} /> */}
                     </div>

@@ -11,7 +11,7 @@ const ParadeForm = ({ paradeData = null }) => {
 	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
-	const [paradeType, setParadeType] = useState("Parade")
+	const [paradeType, setParadeType] = useState("")
 	const [appointmentHolders, setAppointmentHolders] = useState({ DT: null, DO: null, COS: null, 'Flag Bearer': null, CSM: null, 'CE Sergeant': null })
 
 	function makeId() {
@@ -108,7 +108,7 @@ const ParadeForm = ({ paradeData = null }) => {
 		document.getElementById('reporting-time-input').value = `${date}T08:30`
 		document.getElementById('dismissal-time-input').value = `${date}T12:30`
 
-		if (paradeType == 'Parade') {
+		if (type === 'Parade') {
 			setCompanyAnnouncements([{ announcement: 'All to bring PT Kit', id: makeId() }, makeEmptyAnnouncement()])
 			const makeDefaultPlatoonSchedule = (date) => [
 				{ id: makeId(), start_time: `${date}T08:30`, end_time: `${date}T08:45`, program: "Opening Parade" },

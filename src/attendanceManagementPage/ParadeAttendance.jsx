@@ -183,7 +183,7 @@ const ParadeAttendance = ({ parade, users }) => {
 
 			{['cos', 'csm', 'do', 'captain'].includes(paradeAppointment) && (
 				<button onClick={() => sendFinalizeAttendance(!parade[`${paradeAppointment}_finalized`], paradeAppointment)}>
-					{parade[`${paradeAppointment}_finalized`] ? 'Unfinalize Attendance' : 'Finalize Attendance'}
+					{parade[`${paradeAppointment}_finalized`] ? 'Unfinalise Attendance' : 'Finalise Attendance'}
 				</button>
 			)}
 		</div>
