@@ -3,7 +3,6 @@ import Header from "./Header";
 import Footer from "./Footer";
 import "./general.scss";
 import "./errorContainer.scss"
-import "./icons.css"
 
 const Layout = () => {
 	return (
