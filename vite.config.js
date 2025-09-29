@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer';
-import checker from 'vite-plugin-checker';
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -17,11 +16,6 @@ export default defineConfig(({ mode }) => {
         brotliSize: true,
         sizes: ['gzip', 'brotli']
       }),
-      checker({
-        eslint: {
-          lintCommand: "eslint ./src --ext .js,.jsx,.ts,.tsx"
-        }
-      })
     ],
     server: {
       host: true,

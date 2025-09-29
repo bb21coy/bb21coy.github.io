@@ -50,6 +50,7 @@ const ResourcePage = () => {
     };
 
     if (loading) return <Loading />
+    console.log(import.meta.env)
 
     return (
         <div className={styles["resource-page"]}>
