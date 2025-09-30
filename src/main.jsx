@@ -99,5 +99,11 @@ if ("serviceWorker" in navigator) {
 			// Force reload bypassing cache
 			location.reload(true);
 		}
+
+		if (event.data?.type === "SW_UPDATE_AVAILABLE" && !refreshInProgress) {
+			refreshInProgress = true;
+			alert("The site has been updated. Refreshing to get the latest version...");
+			// unregister + clear caches + reload
+		}
 	});
 }

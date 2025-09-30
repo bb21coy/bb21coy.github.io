@@ -9,17 +9,17 @@
   <meta property="og:image" content="https://bb21coy.github.io/slide%203.webp" />
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-	<meta property="og:image:alt" content="BB 21st Portal preview" />
+  <meta property="og:image:alt" content="BB 21st Portal preview" />
   <meta property="og:type" content="website" />
   <meta property="og:locale" content="en_SG" />
-	<meta property="article:section" content="Boys' Brigade Admin Portal" />
-	<meta property="article:tag" content="BB 21st" />
-	<meta property="article:tag" content="Boys' Brigade" />
-	<meta property="article:tag" content="Singapore" />
-	<meta property="article:tag" content="Admin Portal" />
-	<meta property="article:author" content="Bryan Lee & Dylan Yeo" />
-	<meta property="article:published_time" content="2023-07-25T12:00:00+08:00" />
-	<meta property="article:modified_time" content="2025-09-28T14:30:00+08:00" />
+  <meta property="article:section" content="Boys' Brigade Admin Portal" />
+  <meta property="article:tag" content="BB 21st" />
+  <meta property="article:tag" content="Boys' Brigade" />
+  <meta property="article:tag" content="Singapore" />
+  <meta property="article:tag" content="Admin Portal" />
+  <meta property="article:author" content="Bryan Lee & Dylan Yeo" />
+  <meta property="article:published_time" content="2023-07-25T12:00:00+08:00" />
+  <meta property="article:modified_time" content="2025-09-28T14:30:00+08:00" />
   <meta property="og:url" content="https://bb21coy.github.io" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="BB 21st Portal" />
@@ -34,5 +34,50 @@
 <body>
   <script type="module" src="/src/main.jsx"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <noscript style="font-family: sans-serif; line-height: 1.2; display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center;">
+    <style>
+      ul>li {
+        font-weight: bold;
+        margin: 10px 0;
+      }
+    </style>
+    <img src="error.png" alt="error" width="200">
+    <h3>You need to enable JavaScript to access the BB 21st Portal</h3>
+
+    <ul>
+      <li>Google Chrome:</li>
+      <ol>
+        <li>Open Chrome and click the three-dot menu in the top-right corner.</li>
+        <li>Select "Settings."</li>
+        <li>Navigate to "Privacy and security" > "Site Settings."</li>
+        <li>Under "Content," click "JavaScript."</li>
+        <li>Choose to "Sites can use JavaScript" (enabled) or "Don't allow sites to use JavaScript" (disabled). You can also manage exceptions for specific websites.</li>
+      </ol>
+      <li>Mozilla Firefox:</li>
+      <ol>
+        <li>Open Firefox and type about:config in the address bar, then press Enter.</li>
+        <li>Accept the warning message if prompted.</li>
+        <li>In the search bar, type javascript.enabled.</li>
+        <li>Double-click the javascript.enabled preference to toggle its value between true (enabled) and false (disabled).</li>
+      </ol>
+      <li>Microsoft Edge:</li>
+      <ol>
+        <li>Open Edge and click the three-dot menu in the top-right corner.</li>
+        <li>Select "Settings."</li>
+        <li>Navigate to "Cookies and site permissions."</li>
+        <li>Scroll down and click "JavaScript."</li>
+        <li>Toggle the switch to enable or disable JavaScript for all sites, or manage exceptions for specific websites.</li>
+      </ol>
+      <li>Safari (macOS):</li>
+      <ol>
+        <li>Open Safari and click "Safari" in the menu bar, then select "Settings" (or "Preferences").</li>
+        <li>Go to the "Security" tab.</li>
+        <li>Check or uncheck the "Enable JavaScript" box to enable or disable it.</li>
+      </ol>
+    </ul>
+  </noscript>
+  <script>
+    document.querySelector("noscript").remove();
+  </script>
 </body>
 </html>
