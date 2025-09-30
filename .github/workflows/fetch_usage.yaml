@@ -23,6 +23,12 @@ jobs:
             "https://vercel.com/api/usage-summary?teamId=bb21coys-projects" \
             > public/usage.json
 
+      - name: Pull latest changes
+        run: |
+          git fetch origin frontend
+          git checkout frontend
+          git pull --rebase origin frontend
+
       - name: Commit & push JSON
         run: |
           git config user.name "github-actions[bot]"
