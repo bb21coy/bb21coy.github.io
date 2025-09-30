@@ -38,8 +38,8 @@ const PendingTasks = ({ accountType, appointment, userId, paradesAfterToday, sty
 
                 {paradesAfterToday.length === 0 &&
                 <div>
-                    <i className="fa-solid fa-party-horn"></i>
-                    <p>No Pending Tasks</p>
+                    {/* <i className="fa-solid fa-party-horn"></i> */}
+                    <p>This feature is still bring worked on. Please check back later</p>
                 </div>}
             </div>
         </div>
