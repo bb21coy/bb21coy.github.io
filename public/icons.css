@@ -63,6 +63,7 @@
 .fa-search { --fa: "\f002"; }
 .fa-check { --fa: "\f00c"; }
 .fa-upload { --fa: "\f093"; }
+.fa-chevron-up { --fa: "\f077"; }
 .fa-chevron-down { --fa: "\f078"; }
 .fa-party-horn { --fa: "\e31b"; }
 .fa-exclamation-circle { --fa: "\f06a"; }
@@ -87,6 +88,8 @@
 .fa-user-plus { --fa: "\f234"; }
 .fa-arrow-left { --fa: "\f060"; }
 .fa-file-plus { --fa: "\f319"; }
+.fa-copy { --fa: "\f0c5"; }
+.fa-arrow-turn-down { --fa: "\f149"; }
 
 .fa-instagram { --fa: "\f16d"; }
 .fa-microsoft { --fa: "\f3ca"; }

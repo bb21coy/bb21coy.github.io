@@ -12,6 +12,7 @@ const ParadeForm = ({ paradeData = null }) => {
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
 	const [paradeType, setParadeType] = useState("")
+	const [date, setDate] = useState(new Date())
 	const [appointmentHolders, setAppointmentHolders] = useState({ DT: null, DO: null, COS: null, 'Flag Bearer': null, CSM: null, 'CE Sergeant': null })
 
 	function makeId() {
@@ -46,7 +47,7 @@ const ParadeForm = ({ paradeData = null }) => {
 		'4/5': [makeEmptyAnnouncement()]
 	})
 
-	const makeEmptyProgram = () => ({ id: makeId(), start_time: "", end_time: "", program: "" })
+	const makeEmptyProgram = (startTime = null, endTime = null) => ({ id: makeId(), start_time: startTime || convertDate(date), end_time: endTime || convertDate(date), program: "" })
 	const [platoonPrograms, setPlatoonPrograms] = useState({
 		'1': [makeEmptyProgram()],
 		'2': [makeEmptyProgram()],
@@ -116,7 +117,7 @@ const ParadeForm = ({ paradeData = null }) => {
 				{ id: makeId(), start_time: `${date}T09:45`, end_time: `${date}T11:00`, program: "" },
 				{ id: makeId(), start_time: `${date}T11:00`, end_time: `${date}T12:00`, program: "" },
 				{ id: makeId(), start_time: `${date}T12:00`, end_time: `${date}T12:15`, program: "Closing Parade" },
-				makeEmptyProgram()
+				makeEmptyProgram(`${date}T12:15`, `${date}T12:45`)
 			];
 
 			setPlatoonPrograms({
@@ -172,12 +173,12 @@ const ParadeForm = ({ paradeData = null }) => {
 		})
 	};
 
-	const updatePlatoonProgram = (e, level, id, field) => {
+	const updatePlatoonProgram = (e, level, program, field) => {
 		const value = e.target.value
 		setPlatoonPrograms((prev) => {
-			const updated = prev[level].map((program) => program.id === id ? { ...program, [field]: value } : program)
+			const updated = prev[level].map(p => p.id === program.id ? { ...p, [field]: value } : p)
 			const last = updated[updated.length - 1]
-			if (last.start_time && last.end_time && last.program) updated.push(makeEmptyProgram())
+			if (last.start_time && last.end_time && last.program) updated.push(makeEmptyProgram(program.end_time))
 			return { ...prev, [level]: updated }
 		})
 	}
@@ -229,9 +230,10 @@ const ParadeForm = ({ paradeData = null }) => {
 				result.csm_finalized = false;
 				result.do_finalized = false;
 				result.captain_finalized = false;
+				console.log(result)
 
 				const paradeData = await addDoc(collection(db, "parades"), result);
-				await setDoc(doc(db, "parades", paradeData.id), {});
+				await setDoc(doc(db, "attendance", paradeData.id), {});
 				showMessage("Parade created successfully", "success");
 			} else {
 				await setDoc(doc(db, "parades", paradeData.id), result, { merge: true });
@@ -257,6 +259,67 @@ const ParadeForm = ({ paradeData = null }) => {
 		}
 	}
 
+	const copyDate = (e) => {
+		e.preventDefault();
+		navigator.clipboard.writeText(e.target.value);
+	}
+
+	const pasteDate = async (e) => {
+		e.preventDefault();
+		const text = await navigator.clipboard.readText();
+		e.target.value = text;
+	}
+
+	const copyPlatoonPrograms = (level) => {
+		setPlatoonPrograms((prev) => {
+			const programs = prev[level];
+			return { "1": programs, "2": programs, "3": programs, "4/5": programs }
+		})
+	}
+
+	const moveProgramUp = (level, programId) => {
+		setPlatoonPrograms((prev) => {
+			const programs = [...prev[level]];
+			const index = programs.findIndex(program => program.id === programId);
+			if (index > 0) [programs[index - 1], programs[index]] = [programs[index], programs[index - 1]];
+			return { ...prev, [level]: programs }
+		})
+	}
+
+	const moveProgramDown = (level, programId) => {
+		setPlatoonPrograms((prev) => {
+			const programs = [...prev[level]];
+			const index = programs.findIndex(program => program.id === programId);
+			if (index < programs.length - 2) [programs[index], programs[index + 1]] = [programs[index + 1], programs[index]];
+			return { ...prev, [level]: programs }
+		})
+	}
+
+	const addProgramBelow = (level, programId) => {
+		setPlatoonPrograms((prev) => {
+			const programs = prev[level];
+			const index = programs.findIndex(program => program.id === programId);
+			console.log(index, programs.length - 1)
+			if (index === -1 || index === programs.length - 2) return prev;
+			const newProgram = makeEmptyProgram();
+			const newPrograms = [
+				...programs.slice(0, index + 1),
+				newProgram,
+				...programs.slice(index + 1),
+			];
+
+			return { ...prev, [level]: newPrograms }
+		})
+	}
+
+	const getPreviousProgramTime = (e) => {
+		const allTimes = document.querySelectorAll('input[type="datetime-local"]');
+		const index = Array.from(allTimes).indexOf(e.target);
+		const previousTime = allTimes[index - 1];
+		console.log(previousTime)
+		return previousTime ? previousTime.value : null;
+	}
+
 	return (
 		<form onSubmit={submitForm} className={styles['new-parade-form']}>
 			<h2>New Parade Notice</h2>
@@ -274,7 +337,7 @@ const ParadeForm = ({ paradeData = null }) => {
 			<div className={styles['flex-block']}>
 				<div>
 					<label htmlFor='date-input'>Date: </label>
-					<input type='date' name='date' defaultValue={nextSaturday(new Date()).toISOString().split('T')[0]} onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} id='date-input'></input>
+					<input type='date' name='date' onChange={(e) => { setDefaultData(paradeType); setDate(new Date(e.target.value)) }} defaultValue={nextSaturday(new Date()).toISOString().split('T')[0]} id='date-input'></input>
 
 					<label htmlFor='venue-input'>Venue: </label>
 					<input name='venue' defaultValue='School, GMSS' id='venue-input' placeholder='Enter Parade Venue'></input>
@@ -287,10 +350,10 @@ const ParadeForm = ({ paradeData = null }) => {
 					))}
 
 					<label htmlFor='reporting-time-input'>Reporting Time: </label>
-					<input name='reporting_time' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} className='reporting-time-input' type='datetime-local' id='reporting-time-input'></input>
+					<input name='reporting_time' className='reporting-time-input' type='datetime-local' id='reporting-time-input'></input>
 
 					<label htmlFor='dismissal-time-input'>Dismissal Time: </label>
-					<input name='dismissal_time' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} className='dismissal-time-input' type='datetime-local' id='dismissal-time-input'></input>
+					<input name='dismissal_time' className='dismissal-time-input' type='datetime-local' id='dismissal-time-input'></input>
 				</div>
 
 				<div>
@@ -339,16 +402,24 @@ const ParadeForm = ({ paradeData = null }) => {
 			<div>
 				{levels.map((level) => (
 					<div key={level}>
-						<h3>Programs:</h3>
+						<div className={styles['flex-block']}>
+							<h3>Programs:</h3>
+							<i className="fa-solid fa-copy" title='Copy all programs to other platoons' onClick={() => copyPlatoonPrograms(level)}></i>
+						</div>
 						<div>
 							{platoonPrograms[level].map((program, index) => (
 								<div key={`sec-${level}-program-${program.id}`} className={styles['platoon-program-container']}>
-									<input type='datetime-local' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'start_time')} />
+									<input type='datetime-local' onCopy={e => copyDate(e)} onPaste={e => pasteDate(e)} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program, 'start_time')} />
 									<p>-</p>
-									<input type='datetime-local' onMouseDown={e => (!isIOS) ? e.preventDefault() : null} onClick={e => e.currentTarget.showPicker()} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'end_time')} />
+									<input type='datetime-local' onCopy={e => copyDate(e)} onPaste={e => pasteDate(e)} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program, 'end_time')} />
 
-									<input type='text' defaultValue={program.program} onChange={(e) => updatePlatoonProgram(e, level, program.id, 'program')} placeholder='Enter Program' id={`sec-${level}-program-${program.id}`} />
-									{index !== platoonPrograms[level].length - 1 && <i className='fa-solid fa-xmark' aria-label='Remove Platoon Program' onClick={() => deletePlatoonProgram(level, index)}></i>}
+									<input type='text' defaultValue={program.program} onChange={(e) => updatePlatoonProgram(e, level, program, 'program')} placeholder='Enter Program' id={`sec-${level}-program-${program.id}`} />
+									{index !== platoonPrograms[level].length - 1 && <>
+										<i className='fa-solid fa-xmark' title='Remove Platoon Program' onClick={() => deletePlatoonProgram(level, index)}></i>
+										<i className='fa-solid fa-arrow-turn-down' title='Add new program below' onClick={() => addProgramBelow(level, program.id)}></i>
+										<i className='fa-solid fa-chevron-up' title='Move program up' onClick={() => moveProgramUp(level, program.id)}></i>
+										<i className='fa-solid fa-chevron-down' title='Move program down' onClick={() => moveProgramDown(level, program.id)}></i>
+									</>}
 								</div>
 							))}
 						</div>
