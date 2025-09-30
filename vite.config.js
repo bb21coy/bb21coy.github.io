@@ -37,19 +37,12 @@ export default defineConfig(({ mode }) => {
     build: {
       chunkSizeWarningLimit: 1500,
       rollupOptions: {
-        input: {
-          main: 'index.html',
-          sw: './src/sw.js'
-        },
         output: {
           manualChunks: {
             firebase: ["@firebase/app", "@firebase/firestore", "@firebase/auth"]
           }
         }
       }
-    },
-    define: {
-      __BUILD_ID__: JSON.stringify(Date.now()),
     }
   }
 })
