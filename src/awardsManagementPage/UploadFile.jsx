@@ -2,7 +2,7 @@ import { useState } from "react";
 import { showMessage } from "../general/handleServerError";
 import styles from "./uploadFile.module.scss"
 import { db } from "../firebase";
-import XLSX from "xlsx";
+import { read, utils } from "xlsx";
 import { doc, deleteDoc, writeBatch } from "@firebase/firestore";
 
 function UploadFile({ attained, boys }) {
@@ -76,12 +76,12 @@ function UploadFile({ attained, boys }) {
         if (file.size > MAX_BYTES) return showMessage("File too large.");
 
         const fileBuffer = await file.arrayBuffer();
-        const workbook = XLSX.read(fileBuffer, { type: "array" });
+        const workbook = read(fileBuffer, { type: "array" });
         const totalData = {};
 
         for (const sheetName of workbook.SheetNames) {
             if (['Sheet7', 'Sheet8', 'Sheet9'].includes(sheetName)) continue
-            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+            const rows = utils.sheet_to_json(workbook.Sheets[sheetName], {
                 header: 1, defval: null,
                 blankrows: false,
                 range: 1
