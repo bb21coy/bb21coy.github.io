@@ -1,10 +1,8 @@
-import readXlsxFile, { readSheetNames } from 'read-excel-file';
 import { useState } from "react";
 import { showMessage } from "../general/handleServerError";
 import styles from "./uploadFile.module.scss"
-import axios from "axios";
-import BASE_URL from "../Constants";
 import { db } from "../firebase";
+import XLSX from "xlsx";
 import { doc, deleteDoc, writeBatch } from "@firebase/firestore";
 
 function UploadFile({ attained, boys }) {
@@ -15,29 +13,6 @@ function UploadFile({ attained, boys }) {
     const [data, setData] = useState();
     const [conflicts, setConflicts] = useState();
     const [toAdd, setToAdd] = useState([]);
-
-    async function handleFile(data) {
-        try {
-            const totalData = {};
-            const sheetNames = await readSheetNames(data);
-
-            for (const sheetName of sheetNames) {
-                if (['Sheet7', 'Sheet8', 'Sheet9'].includes(sheetName)) continue
-                const rows = (await readXlsxFile(data, { sheet: sheetName })).slice(1);
-
-                const result = transformData(rows);
-                for (const [name, badges] of Object.entries(result)) {
-                    totalData[name] = totalData[name] || {};
-                    Object.assign(totalData[name], badges);
-                }
-            }
-
-            setData(totalData);
-        } catch (err) {
-            console.error(err);
-            showMessage("Failed to parse .xls file.");
-        }
-    }
 
     function transformData(json) {
         const badgeRow = json[0];
@@ -101,22 +76,25 @@ function UploadFile({ attained, boys }) {
         if (file.size > MAX_BYTES) return showMessage("File too large.");
 
         const fileBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(fileBuffer, { type: "array" });
+        const totalData = {};
 
-        try {
-            const resp = await axios.post(`${BASE_URL}/awards`, fileBuffer, {
-                headers: {
-                    "Content-Type": "application/octet-stream",
-                    "Content-Disposition": `attachment; filename="${file.name}"`,
-                },
-                responseType: "arraybuffer"
-            })
+        for (const sheetName of workbook.SheetNames) {
+            if (['Sheet7', 'Sheet8', 'Sheet9'].includes(sheetName)) continue
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+                header: 1, defval: null,
+                blankrows: false,
+                range: 1
+            });
 
-            const data = new Uint8Array(resp.data);
-            handleFile(data);
-        } catch (e) {
-            console.error(e)
-            showMessage("Failed to convert to XLSX")
+            const result = transformData(rows);
+            for (const [name, badges] of Object.entries(result)) {
+                totalData[name] = totalData[name] || {};
+                Object.assign(totalData[name], badges);
+            }
         }
+
+        setData(totalData);
     }
 
     const checkMergeIssues = async () => {
