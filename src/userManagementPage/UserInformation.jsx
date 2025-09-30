@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
-import axios from 'axios'
+import axios from 'redaxios'
 import BASE_URL from '../Constants'
 import UserSchema from '../schema/Users'
 import { showMessage } from '../general/handleServerError'

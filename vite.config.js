@@ -39,8 +39,7 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            firebase: ["@firebase/app", "@firebase/firestore", "@firebase/auth"],
-            react: ["react", "react-dom"],
+            firebase: ["@firebase/app", "@firebase/firestore", "@firebase/auth"]
           }
         }
       }

@@ -5,7 +5,7 @@ import UserSchema from '../schema/Users'
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
 import { doc, setDoc } from "@firebase/firestore";
 import { db } from "../firebase";
-import axios from 'axios';
+import axios from 'redaxios';
 import BASE_URL from '../Constants';
 import styles from './accountCreationForm.module.scss'
 

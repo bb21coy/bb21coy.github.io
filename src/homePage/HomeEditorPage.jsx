@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "redaxios";
 import { handleServerError } from "../general/handleServerError";
 import HomeEditorText from "./HomeEditorText";
 import { HomeEditorImage } from "./HomeEditorImage";

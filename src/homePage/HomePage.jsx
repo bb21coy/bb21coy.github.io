@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios';
+import axios from 'redaxios';
 import { handleServerError } from "../general/handleServerError";
 
 function HomePage() {
@@ -10,44 +10,44 @@ function HomePage() {
 
 	useEffect(() => {
 		axios.get('/api/home_editor/0/show_images', { headers: { "Content-Type": "application/json" }, withCredentials: true })
-        .then(resp => setImages(resp.data))
-        .catch(resp => handleServerError(resp.response.status))
+			.then(resp => setImages(resp.data))
+			.catch(resp => handleServerError(resp.response.status))
 
 		const interval = setInterval(() => {
 			setCurrentImage((prevImage) => (prevImage % 9) + 1);
 		}, 4000);
 
-		axios.get("/api/home_editor/0/all_achievements", { headers: { "Content-Type": "application/json" }}) 
-		.then(resp => {
-			if (resp.data != false) {
-				let data = {}
-				resp.data.forEach(record => {
-					if (data[record.year]) {
-						data[record.year].push(record.achievement);
-					} else {
-						data[record.year] = [record.achievement];
-					}
-				})
+		axios.get("/api/home_editor/0/all_achievements", { headers: { "Content-Type": "application/json" } })
+			.then(resp => {
+				if (resp.data != false) {
+					let data = {}
+					resp.data.forEach(record => {
+						if (data[record.year]) {
+							data[record.year].push(record.achievement);
+						} else {
+							data[record.year] = [record.achievement];
+						}
+					})
 
-				setAchievements(data)
-			}
-		})
-		.catch(err => handleServerError(err.response.status))
+					setAchievements(data)
+				}
+			})
+			.catch(err => handleServerError(err.response.status))
 
-		axios.get("/api/home_editor/0/all_testimonies", { headers: { "Content-Type": "application/json" }}) 
-		.then(resp => {
-			if (resp.data != false) {
-				const duplicatedData = [...resp.data, ...resp.data];
-				setTestimonies(duplicatedData)
-			}
-		})
-		.catch(err => handleServerError(err.response.status))
+		axios.get("/api/home_editor/0/all_testimonies", { headers: { "Content-Type": "application/json" } })
+			.then(resp => {
+				if (resp.data != false) {
+					const duplicatedData = [...resp.data, ...resp.data];
+					setTestimonies(duplicatedData)
+				}
+			})
+			.catch(err => handleServerError(err.response.status))
 
 		return () => clearInterval(interval);
 	}, []);
 
 	return (<>
-		<img className='slider' src={`data:image/webp;base64,${images[currentImage - 1]?.image}`} /> 
+		<img className='slider' src={`data:image/webp;base64,${images[currentImage - 1]?.image}`} />
 
 		<section className='achievements'>
 			<h2>Our Achievements</h2>
@@ -55,9 +55,9 @@ function HomePage() {
 				<div key={year}>
 					<h3>{year}</h3>
 					<ul>
-					{achievements?.map((achievement, index) => (
-						<li key={`${year}-${index}`}>{achievement}</li>
-					))}
+						{achievements?.map((achievement, index) => (
+							<li key={`${year}-${index}`}>{achievement}</li>
+						))}
 					</ul>
 				</div>
 			))}

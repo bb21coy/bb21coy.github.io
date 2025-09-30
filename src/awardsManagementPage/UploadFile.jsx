@@ -2,7 +2,6 @@ import { useState } from "react";
 import { showMessage } from "../general/handleServerError";
 import styles from "./uploadFile.module.scss"
 import { db } from "../firebase";
-import { read, utils } from "xlsx";
 import { doc, deleteDoc, writeBatch } from "@firebase/firestore";
 
 function UploadFile({ attained, boys }) {
@@ -75,6 +74,7 @@ function UploadFile({ attained, boys }) {
         if (!ALLOWED_EXT.includes(ext)) return showMessage("Invalid file type.");
         if (file.size > MAX_BYTES) return showMessage("File too large.");
 
+        const { read, utils } = await import("xlsx");
         const fileBuffer = await file.arrayBuffer();
         const workbook = read(fileBuffer, { type: "array" });
         const totalData = {};

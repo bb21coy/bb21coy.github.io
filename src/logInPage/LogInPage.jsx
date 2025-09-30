@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { showMessage } from '../general/handleServerError';
 import styles from './logInPage.module.scss'
 import { auth } from "../firebase";
-import axios from 'axios';
+import axios from 'redaxios';
 import { signInWithEmailAndPassword, onAuthStateChanged, fetchSignInMethodsForEmail, signInWithCredential, signInWithPopup, OAuthProvider, GoogleAuthProvider } from "@firebase/auth";
 
 // To log in, accounts can only be created by existing users
