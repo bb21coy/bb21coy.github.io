@@ -11,6 +11,7 @@ const ResourcePage = () => {
     const [appointments, setAppointments] = useState({});
     const [blocked, setBlocked] = useState();
     const [loading, setLoading] = useState(true);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
     const [selectedResource, setSelectedResource] = useState('target');
     const { user } = useUser();
 
@@ -36,6 +37,9 @@ const ResourcePage = () => {
             setLoading(false);
         })
 
+        window.addEventListener('online', () => setIsOnline(true));
+        window.addEventListener('offline', () => setIsOnline(false));
+
         return () => unsubscribe();
     }, [])
 
@@ -49,8 +53,7 @@ const ResourcePage = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 
-    if (loading) return <Loading />
-    console.log(import.meta.env)
+    if (loading || !isOnline) return <Loading />
 
     return (
         <div className={styles["resource-page"]}>
