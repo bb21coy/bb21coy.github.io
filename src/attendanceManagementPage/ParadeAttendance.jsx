@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { showMessage } from '../general/handleServerError'
 import { useUser } from '../general/UserContext'
 import { db } from '../firebase'
@@ -14,7 +14,6 @@ const ParadeAttendance = ({ parade, users }) => {
 	const levels = { 'Sec 1': [1], 'Sec 2': [2], 'Sec 3': [3], 'Sec 4/5': [4, 5], 'Primer': ['Primer'], 'Officer/VAL': ['Officer'] }
 	const ROLE_RANK = { PS: 1, COS: 2, CSM: 3, DO: 4, Captain: 5 };
 
-	const attendanceOrder = useRef([]);
 	const [selectedInput, setSelectedInput] = useState();
 
 	async function canTakeAttendance(parade) {
@@ -102,30 +101,30 @@ const ParadeAttendance = ({ parade, users }) => {
 	}
 
 	function handleKeyDown(e, boyId) {
-		e.preventDefault();
 		if (!takingAttendance) return;
-		const currentIndex = attendanceOrder.current.indexOf(boyId);
+		const attendanceOrder = Array.from(document.querySelectorAll("select")).map(s => s.id);
+		const currentIndex = attendanceOrder.indexOf(boyId);
 		
+		if (e.key === "a" || e.key === "d") e.preventDefault();
 		let nextId;
 		if (e.key === "a") {
-			nextId = attendanceOrder.current[(currentIndex - 1 + attendanceOrder.current.length) % attendanceOrder.current.length];
+			nextId = attendanceOrder[(currentIndex - 1 + attendanceOrder.length) % attendanceOrder.length];
 		} else if (e.key === "d") {
-			nextId = attendanceOrder.current[(currentIndex + 1) % attendanceOrder.current.length];
+			nextId = attendanceOrder[(currentIndex + 1) % attendanceOrder.length];
 		}
 
 		setSelectedInput(nextId);
-		document.getElementById(nextId).focus();
+		document.getElementById(nextId)?.focus();
 	}
 
 	return (
 		<div className={styles['parade-attendance']}>
 			<div className={styles["flex-block"]}>
-				{Object.keys(levels).map(level => (
+				{Object.keys(levels).flatMap(level => (
 					<table key={level} style={{ "--tablename": `'${level} Attendance:'` }}>
 						<tbody>
-							{users.filter(boy => levels[level].includes(level.includes("Sec") ? boy.level : boy.account_type)).filter(boy => (!takingAttendance ? boy.id in currentAttendance : boy.roll_call)).map((boy) => {
-								attendanceOrder.current.push(boy.id);
-								return <tr key={boy.id}>
+							{users.filter(boy => levels[level].includes(level.includes("Sec") ? boy.level : boy.account_type)).filter(boy => (!takingAttendance ? boy.id in currentAttendance : boy.roll_call)).map(boy => (
+								<tr key={boy.id}>
 									<td>{boy.rank != 'Teacher' ? boy.rank : boy.honorifics} {boy.account_name}</td>
 									{!takingAttendance ?
 										<td>{currentAttendance[boy.id] || "-"}</td> :
@@ -140,7 +139,7 @@ const ParadeAttendance = ({ parade, users }) => {
 										</td>
 									}
 								</tr>
-							})}
+							))}
 							<tr className='total-strength'>
 								<td>{level.includes("Sec") ? "Platoon" : level} Strength</td>
 								<td>{platoonTotals[level == '4/5' ? '4' : level]?.current || "0"} / {platoonTotals[level == '4/5' ? '4' : level]?.total || "0"}</td>
