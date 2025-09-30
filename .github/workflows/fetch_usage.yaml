@@ -23,19 +23,10 @@ jobs:
             "https://vercel.com/api/usage-summary?teamId=bb21coys-projects" \
             > public/usage.json
 
-      - name: Pull latest changes
-        run: |
-          git fetch origin frontend
-          git checkout frontend
-          git pull --rebase origin frontend
-
       - name: Commit & push JSON
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/usage.json
-          git commit -m "Update usage.json [skip ci]" || echo "No changes"
-          git push
-
-
-
+          git commit -m "Update Vercel Usage" || echo "No changes"
+          git push --force
