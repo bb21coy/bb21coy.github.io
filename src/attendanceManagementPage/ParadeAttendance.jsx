@@ -39,7 +39,10 @@ const ParadeAttendance = ({ parade, users }) => {
 				break;
 			}
 		}
-		if (!rank) return setTakingAttendance(false)
+		if (!rank) {
+			setParadeAppointment(null);
+			return setTakingAttendance(false)
+		}
 
 		if (parade.captain_finalized && rank < ROLE_RANK.Captain) return setTakingAttendance(false);
 		if (parade.do_finalized && rank < ROLE_RANK.DO) return setTakingAttendance(false);
