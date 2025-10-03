@@ -7,6 +7,8 @@ import Layout from './general/Layout';
 import Loading from './general/Loading';
 import ErrorBoundary from "./general/ErrorBoundary";
 
+// const HomePage = lazy(() => import('./homePage/HomePage'));
+
 const LogInPage = lazy(() => import('./logInPage/LogInPage'));
 const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
 const AwardsManagementPage = lazy(() => import('./awardsManagementPage/AwardsManagementPage'));
