@@ -10,7 +10,9 @@
   "description": "",
   "dependencies": {
     "dotenv": "^17.2.0",
-    "firebase-admin": "^13.5.0"
+    "firebase-admin": "^13.5.0",
+    "multiparty": "^4.2.3",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "vercel": "^48.1.6"
