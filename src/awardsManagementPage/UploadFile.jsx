@@ -3,6 +3,8 @@ import { showMessage } from "../general/handleServerError";
 import styles from "./uploadFile.module.scss"
 import { db } from "../firebase";
 import { doc, deleteDoc, writeBatch } from "@firebase/firestore";
+import readXlsxFile, { readSheetNames } from "read-excel-file";
+import BASE_URL from "../Constants";
 
 function UploadFile({ attained, boys }) {
     const MAX_BYTES = 200 * 1024;
@@ -13,10 +15,34 @@ function UploadFile({ attained, boys }) {
     const [conflicts, setConflicts] = useState();
     const [toAdd, setToAdd] = useState([]);
 
+    async function handleFile(data) {
+        try {
+            const totalData = {};
+            const sheetNames = await readSheetNames(data);
+
+            for (const sheetName of sheetNames) {
+                if (['Sheet7', 'Sheet8', 'Sheet9'].includes(sheetName)) continue
+                const rows = (await readXlsxFile(data, { sheet: sheetName })).slice(1);
+                
+                const result = transformData(rows);
+                for (const [name, badges] of Object.entries(result)) {
+                    totalData[name] = totalData[name] || {};
+                    Object.assign(totalData[name], badges);
+                }
+            }
+
+            setData(totalData);
+        } catch (err) {
+            console.error(err);
+            showMessage("Failed to parse .xls file.");
+        }
+    }
+
     function transformData(json) {
         const badgeRow = json[0];
         const headerRow = json[1];
         const result = {};
+        console.log(json, badgeRow, headerRow)
 
         for (let col = 0; col < badgeRow.length; col++) {
             if (!badgeRow[col] && col > 0) {
@@ -74,27 +100,26 @@ function UploadFile({ attained, boys }) {
         if (!ALLOWED_EXT.includes(ext)) return showMessage("Invalid file type.");
         if (file.size > MAX_BYTES) return showMessage("File too large.");
 
-        const { read, utils } = await import("xlsx");
-        const fileBuffer = await file.arrayBuffer();
-        const workbook = read(fileBuffer, { type: "array" });
-        const totalData = {};
+        try {
+            const formData = new FormData();
+            formData.append("file", file, file.name);
 
-        for (const sheetName of workbook.SheetNames) {
-            if (['Sheet7', 'Sheet8', 'Sheet9'].includes(sheetName)) continue
-            const rows = utils.sheet_to_json(workbook.Sheets[sheetName], {
-                header: 1, defval: null,
-                blankrows: false,
-                range: 1
+            const resp = await fetch(`${BASE_URL}/awards`, {
+                method: "POST",
+                headers: {
+                    "x-filename": file.name,
+                },
+                body: file, // send the File object directly
             });
 
-            const result = transformData(rows);
-            for (const [name, badges] of Object.entries(result)) {
-                totalData[name] = totalData[name] || {};
-                Object.assign(totalData[name], badges);
-            }
+            if (!resp.ok) throw new Error("Upload failed");
+            const arrayBuffer = await resp.arrayBuffer();
+            const data = new Uint8Array(arrayBuffer);
+            handleFile(data);
+        } catch (e) {
+            console.error(e)
+            showMessage("Failed to convert to XLSX")
         }
-
-        setData(totalData);
     }
 
     const checkMergeIssues = async () => {

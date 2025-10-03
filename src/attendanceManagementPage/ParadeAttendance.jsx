@@ -39,7 +39,10 @@ const ParadeAttendance = ({ parade, users }) => {
 				break;
 			}
 		}
-		if (!rank) return setTakingAttendance(false)
+		if (!rank) {
+			setParadeAppointment(null);
+			return setTakingAttendance(false)
+		}
 
 		if (parade.captain_finalized && rank < ROLE_RANK.Captain) return setTakingAttendance(false);
 		if (parade.do_finalized && rank < ROLE_RANK.DO) return setTakingAttendance(false);
@@ -129,7 +132,7 @@ const ParadeAttendance = ({ parade, users }) => {
 									{!takingAttendance ?
 										<td>{currentAttendance[boy.id] || "-"}</td> :
 										<td>
-											<select name="attendance" id={boy.id} value={currentAttendance[boy.id] || ''} onChange={(e) => setAttendance(boy.id, e.target.value)} onClick={() => console.log(boy.id)} onFocus={() => setSelectedInput(boy.id)} onKeyDown={e => handleKeyDown(e, boy.id)} style={{ backgroundColor: selectedInput === boy.id ? "lightgrey" : "white" }} >
+											<select name="attendance" id={boy.id} value={currentAttendance[boy.id] || ''} onChange={(e) => setAttendance(boy.id, e.target.value)} onFocus={() => setSelectedInput(boy.id)} onKeyDown={e => handleKeyDown(e, boy.id)} style={{ backgroundColor: selectedInput === boy.id ? "lightgrey" : "white" }} >
 												<option value="">-</option>
 												<option value="1">1</option>
 												<option value="S">S</option>

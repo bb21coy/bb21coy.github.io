@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet
+	xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+	xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+	<dimension ref="A1:F4"/>
+	<sheetViews>
+		<sheetView workbookViewId="0" showGridLines="0"/>
+	</sheetViews>
+	<cols>
+		<col min="1" max="1" width="3.36" customWidth="1"/>
+		<col min="2" max="2" width="5.36" customWidth="1"/>
+		<col min="3" max="3" width="0" customWidth="1"/>
+		<col min="4" max="4" width="39.36" customWidth="1"/>
+        <col min="5" max="6" width="9.36" customWidth="1"/>
+        <col min="7" max="7" width="19.36" customWidth="1"/>
+        {{SEC_Officer_ACTUAL_TOTAL_WIDTH}}
+        {{SEC_Officer_TOTAL_PARADES_ATTENDED_WIDTH}}
+	</cols>
+	<sheetData>
+		<row r="1" ht="64" customHeight="1">
+            <c r="B1" t="inlineStr" s="1">
+                <is><t>VOLUNTEERS' ATTENDANCE</t></is>
+            </c>
+		</row>
+		<row r="3">
+			<c r="F3" t="inlineStr" s="10">
+				<is><t>Date Updated</t></is>
+			</c>
+            {{OFFICER_DATE_UPDATED}}
+		</row>
+		<row r="4" ht="40" customHeight="1">
+            <c r="B4" t="inlineStr" s="2" >
+                <is><t>YEAR {{CURRENT_YEAR}}</t></is>
+            </c>
+            <c r="G4" t="inlineStr" s="3">
+                <is><t>TOTAL %&#10;(weighted)</t></is>
+            </c>
+
+            {{OFFICER_DAY}}
+
+            {{SEC_Officer_ACTUAL_TOTAL}}
+
+            {{SEC_Officer_TOTAL_PARADES_ATTENDED}}
+		</row>
+        <row r="5">
+            <c r="B5" t="inlineStr" s="3">
+                <is><t>NO.</t></is>
+            </c>
+            <c r="C5" t="inlineStr" s="4">
+                <is><t>VOLUNTEER'S NAME</t></is>
+            </c>
+            <c r="D5" s="4"/>
+            <c r="E5" t="inlineStr" s="3">
+                <is><t>CLASS</t></is>
+            </c>
+            <c r="F5" t="inlineStr" s="3">
+                <is><t>RANK</t></is>
+            </c>
+            <c r="G5" s="8" />
+
+            {{OFFICER_PARADE_DATES}}
+
+            {{SEC_Officer_ACTUAL_TOTAL_BOTTOM}}
+
+            {{SEC_Officer_TOTAL_PARADES_ATTENDED_BOTTOM}}
+        </row>
+        <row r="6">
+            <c r="B6" s="3" />
+            <c r="C6" s="3" />
+            <c r="D6" s="4" />
+            <c r="E6" s="3" />
+            <c r="F6" s="3" />
+            <c r="G6" s="8" />
+
+            {{OFFICER_PARADE_TYPE}}
+
+            {{SEC_Officer_ACTUAL_TOTAL_BOTTOM_1}}
+
+            {{SEC_Officer_TOTAL_PARADES_ATTENDED_BOTTOM_1}}
+        </row>
+
+        {{OFFICER_DATA}}
+
+        {{OFFICER_ATTENDANCE_PER_PARADE}}
+
+        {{SEC_Officer_STATS_BELOW}}
+	</sheetData>
+	<mergeCells count="2">
+        <!-- platoon -->
+        <mergeCell ref="B1:G1"/>
+
+        <!-- year -->
+        <mergeCell ref="B4:F4"/>
+
+        <!-- S/N -->
+        <mergeCell ref="B5:B6"/>
+
+        <!-- name -->
+        <mergeCell ref="C5:D6"/>
+
+        <!-- class -->
+        <mergeCell ref="E5:E6"/>
+
+        <!-- rank -->
+        <mergeCell ref="F5:F6"/>
+
+        <!-- total percentage weighted -->
+        <mergeCell ref="G4:G6"/>
+
+        <!-- merge member id and name -->
+        {{OFFICER_OMIT_MEMBER_ID}}
+
+        <!-- ending headers -->
+        {{SEC_Officer_ACTUAL_TOTAL_MERGE}}
+        {{SEC_Officer_TOTAL_PARADES_ATTENDED_MERGE}}
+
+        <!-- legend -->
+        {{SEC_Officer_STATS_BELOW_MERGE}}
+	</mergeCells>
+</worksheet>

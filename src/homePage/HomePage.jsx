@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'redaxios';
 import { handleServerError } from "../general/handleServerError";
+import "./homePage.css"
 
 function HomePage() {
 	const [images, setImages] = useState([]);
@@ -47,7 +48,8 @@ function HomePage() {
 	}, []);
 
 	return (<>
-		<img className='slider' src={`data:image/webp;base64,${images[currentImage - 1]?.image}`} />
+	{/* src={`data:image/webp;base64,${images[currentImage - 1]?.image}`} */}
+		<img className='slider' src="slide 3.webp"  />
 
 		<section className='achievements'>
 			<h2>Our Achievements</h2>
@@ -88,4 +90,4 @@ function HomePage() {
 	</>)
 }
 
-export { HomePage }
+export default HomePage

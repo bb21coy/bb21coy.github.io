@@ -7,8 +7,7 @@ import Layout from './general/Layout';
 import Loading from './general/Loading';
 import ErrorBoundary from "./general/ErrorBoundary";
 
-import ExportExcelButton from './attendanceManagementPage/test';
-import DevExcelPreview from './attendanceManagementPage/test2';
+// const HomePage = lazy(() => import('./homePage/HomePage'));
 
 const LogInPage = lazy(() => import('./logInPage/LogInPage'));
 const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
@@ -59,10 +58,6 @@ createRoot(document.body).render(
 								<Route path='/help' element={<HelpPage />} />
 								<Route path='/home_editor' element={<HomeEditorPage />} />
 								<Route path='/resources' element={<ResourcePage />} />
-
-								<Route path='/export' element={<ExportExcelButton />} />
-								<Route path='/dev_excel_preview' element={<DevExcelPreview />} />
-
 								<Route path="*" element={<NotFound />} />
 							</Route>
 						</Routes>

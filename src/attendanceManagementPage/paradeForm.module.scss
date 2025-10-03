@@ -157,7 +157,7 @@
 
     .flex-block {
         display: flex;
-        flex-direction: row !important;
+        flex-direction: row;
         justify-content: space-between;
         gap: 20px;
         align-items: center;
@@ -166,7 +166,8 @@
 
 @media screen and (max-width: 800px) {
     .flex-block {
-        flex-direction: column;
+        flex-direction: column !important;
+        align-items: unset !important;
     }
 
     .platoon-program-container {

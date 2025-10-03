@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook
+	xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+	xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+	<bookViews>
+		<workbookView xWindow="0" yWindow="0" windowWidth="12000" windowHeight="8000"/>
+	</bookViews>
+	<sheets>
+		<sheet name="Sec 1 ({{CURRENT_YEAR}})" sheetId="1" r:id="rId1"/>
+        <sheet name="Sec 2 ({{CURRENT_YEAR}})" sheetId="2" r:id="rId2"/>
+		<sheet name="Sec 3 ({{CURRENT_YEAR}})" sheetId="5" r:id="rId5"/>
+		<sheet name="Sec 4 and 5 ({{CURRENT_YEAR}})" sheetId="6" r:id="rId6"/>
+		<sheet name="Primers ({{CURRENT_YEAR}})" sheetId="7" r:id="rId7"/>
+		<sheet name="Officers and Volunteers ({{CURRENT_YEAR}})" sheetId="8" r:id="rId8"/>
+	</sheets>
+	<calcPr calcId="191029"/>
+</workbook>
