@@ -8,7 +8,7 @@ import styles from './paradeAttendance.module.scss'
 // To access attendance records and take new attendance
 const ParadeAttendance = ({ parade, users }) => {
 	const { user } = useUser()
-	const [paradeAppointment, setParadeAppointment] = useState()
+	const [paradeAppointment, setParadeAppointment] = useState(null)
 	const [takingAttendance, setTakingAttendance] = useState(false)
 	const [currentAttendance, setCurrentAttendance] = useState({})
 	const levels = { 'Sec 1': [1], 'Sec 2': [2], 'Sec 3': [3], 'Sec 4/5': [4, 5], 'Primer': ['Primer'], 'Officer/VAL': ['Officer'] }
@@ -39,7 +39,7 @@ const ParadeAttendance = ({ parade, users }) => {
 				break;
 			}
 		}
-		if (!rank) {
+		if (!rank && user.account_type !== "Admin") {
 			setParadeAppointment(null);
 			return setTakingAttendance(false)
 		}
@@ -54,6 +54,7 @@ const ParadeAttendance = ({ parade, users }) => {
 
 	useEffect(() => {
 		if (!parade || !parade.id) return;
+		setParadeAppointment(null);
 		canTakeAttendance(parade)
 		const unsub = onSnapshot(query(collection(db, "attendance"), where(documentId(), "==", parade.id), limit(1)), (paradeSnap) => {
 			setCurrentAttendance({ ...paradeSnap.docs[0].data() })
@@ -107,7 +108,7 @@ const ParadeAttendance = ({ parade, users }) => {
 		if (!takingAttendance) return;
 		const attendanceOrder = Array.from(document.querySelectorAll("select")).map(s => s.id);
 		const currentIndex = attendanceOrder.indexOf(boyId);
-		
+
 		if (e.key === "a" || e.key === "d") e.preventDefault();
 		let nextId;
 		if (e.key === "a") {
@@ -145,7 +146,12 @@ const ParadeAttendance = ({ parade, users }) => {
 							))}
 							<tr className='total-strength'>
 								<td>{level.includes("Sec") ? "Platoon" : level} Strength</td>
-								<td>{platoonTotals[level == '4/5' ? '4' : level]?.current || "0"} / {platoonTotals[level == '4/5' ? '4' : level]?.total || "0"}</td>
+								<td>
+									{level === "Sec 4/5"
+										? `${(platoonTotals["Sec 4"]?.current || 0) + (platoonTotals["Sec 5"]?.current || 0)} / ${(platoonTotals["Sec 4"]?.total || 0) + (platoonTotals["Sec 5"]?.total || 0)}`
+										: `${platoonTotals[level]?.current || 0} / ${platoonTotals[level]?.total || 0}`}
+								</td>
+
 							</tr>
 						</tbody>
 					</table>
@@ -156,23 +162,26 @@ const ParadeAttendance = ({ parade, users }) => {
 						{Object.keys(levels).map(level => (
 							<tr key={level}>
 								<td>{level} Strength</td>
-								<td>{platoonTotals[level == '4/5' ? '4' : level]?.current || "0"} / {platoonTotals[level == '4/5' ? '4' : level]?.total || "0"}</td>
+								<td title='This number may differ depending on whether on can take attendance'>
+									{level === "Sec 4/5"
+										? `${(platoonTotals["Sec 4"]?.current || 0) + (platoonTotals["Sec 5"]?.current || 0)} / ${(platoonTotals["Sec 4"]?.total || 0) + (platoonTotals["Sec 5"]?.total || 0)}`
+										: `${platoonTotals[level]?.current || 0} / ${platoonTotals[level]?.total || 0}`}
+								</td>
 							</tr>
 						))}
 						<tr>
 							<td>Total Strength</td>
-							<td>{platoonTotals.totalCurrent || "0"} / {platoonTotals.totalStrength || "0"}</td>
+							<td title='This number may differ depending on whether on can take attendance'>{platoonTotals.totalCurrent || "0"} / {platoonTotals.totalStrength || "0"}</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 
 			{(() => {
-				const finalized = ['COS', 'CSM', 'DO', 'Captain'].filter(role => parade[`${role.toLowerCase()}_finalized`]);
-
+				const finalized = ['COS', 'CSM', 'DO', 'Captain'].filter(role => parade[`${role.toLowerCase()}_finalized`] === true);
 				return finalized.length > 0 ? (<>
 					<hr />
-					<h4 style={{ width: '100%' }}>{finalized.join(' | ')} Finalized</h4>
+					<h4 style={{ width: '100%' }}>{finalized.join(' | ')} Finalised</h4>
 				</>) : null;
 			})()}
 

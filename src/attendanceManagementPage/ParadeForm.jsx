@@ -8,7 +8,6 @@ import { ZodError } from 'zod'
 
 // To access attendance records and take new attendance
 const ParadeForm = ({ paradeData = null }) => {
-	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
 	const [paradeType, setParadeType] = useState("")
@@ -65,42 +64,44 @@ const ParadeForm = ({ paradeData = null }) => {
 			Object.entries(appointmentDoc.data()).map(([appt, id]) => {
 				if (["CE Sergeant", "CSM"].includes(appt)) setAppointmentHolders(prev => ({ ...prev, [appt]: id.id }))
 			})
-
-			if (paradeData) {
-				setParadeType(paradeData.parade_type)
-				document.getElementById('date-input').value = convertDate(paradeData.date.toDate()).split('T')[0]
-				document.getElementById('reporting-time-input').value = convertDate(paradeData.reporting_time.toDate())
-				document.getElementById('dismissal-time-input').value = convertDate(paradeData.dismissal_time.toDate())
-
-				Object.entries(paradeData.appointments).map(([appointment, ref]) => {
-					setAppointmentHolders(prev => ({ ...prev, [appointment]: ref.id }))
-				})
-
-				setCompanyAnnouncements([...paradeData.company_announcements, makeEmptyAnnouncement()])
-				setPlatoonPrograms({
-					'1': [...convertPrograms(paradeData.platoon_programs["1"]), makeEmptyProgram()],
-					'2': [...convertPrograms(paradeData.platoon_programs["2"]), makeEmptyProgram()],
-					'3': [...convertPrograms(paradeData.platoon_programs["3"]), makeEmptyProgram()],
-					'4/5': [...convertPrograms(paradeData.platoon_programs["4/5"]), makeEmptyProgram()],
-				})
-				setPlatoonAnnouncements({
-					'1': [...paradeData.platoon_announcements['1'], makeEmptyAnnouncement()],
-					'2': [...paradeData.platoon_announcements['2'], makeEmptyAnnouncement()],
-					'3': [...paradeData.platoon_announcements['3'], makeEmptyAnnouncement()],
-					'4/5': [...paradeData.platoon_announcements['4/5'], makeEmptyAnnouncement()],
-				})
-
-				levels.map(level => {
-					document.getElementById(`sec-${level}-attire`).value = paradeData[`sec-${level}-attire`] || ""
-				})
-
-				document.getElementById('venue-input').value = paradeData.venue || ""
-				document.getElementById('description').value = paradeData.description || ""
-			}
 		}
 
 		init()
 	}, [])
+
+	useEffect(() => {
+		if (paradeData) {
+			setParadeType(paradeData.parade_type)
+			document.getElementById('date-input').value = convertDate(paradeData.date.toDate()).split('T')[0]
+			document.getElementById('reporting-time-input').value = convertDate(paradeData.reporting_time.toDate())
+			document.getElementById('dismissal-time-input').value = convertDate(paradeData.dismissal_time.toDate())
+
+			Object.entries(paradeData.appointments).map(([appointment, ref]) => {
+				setAppointmentHolders(prev => ({ ...prev, [appointment]: ref?.id }))
+			})
+
+			setCompanyAnnouncements([...paradeData.company_announcements, makeEmptyAnnouncement()])
+			setPlatoonPrograms({
+				'1': [...convertPrograms(paradeData.platoon_programs["1"]), makeEmptyProgram()],
+				'2': [...convertPrograms(paradeData.platoon_programs["2"]), makeEmptyProgram()],
+				'3': [...convertPrograms(paradeData.platoon_programs["3"]), makeEmptyProgram()],
+				'4/5': [...convertPrograms(paradeData.platoon_programs["4/5"]), makeEmptyProgram()],
+			})
+			setPlatoonAnnouncements({
+				'1': [...paradeData.platoon_announcements['1'], makeEmptyAnnouncement()],
+				'2': [...paradeData.platoon_announcements['2'], makeEmptyAnnouncement()],
+				'3': [...paradeData.platoon_announcements['3'], makeEmptyAnnouncement()],
+				'4/5': [...paradeData.platoon_announcements['4/5'], makeEmptyAnnouncement()],
+			})
+
+			levels.map(level => {
+				document.getElementById(`sec-${level}-attire`).value = paradeData[`sec-${level}-attire`] || ""
+			})
+
+			document.getElementById('venue-input').value = paradeData.venue || ""
+			document.getElementById('description').value = paradeData.description || ""
+		}
+	}, [paradeData])
 
 	const setDefaultData = (type) => {
 		setParadeType(type)
@@ -230,7 +231,6 @@ const ParadeForm = ({ paradeData = null }) => {
 				result.csm_finalized = false;
 				result.do_finalized = false;
 				result.captain_finalized = false;
-				console.log(result)
 
 				const paradeData = await addDoc(collection(db, "parades"), result);
 				await setDoc(doc(db, "attendance", paradeData.id), {});

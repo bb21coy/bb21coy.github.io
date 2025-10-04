@@ -50,7 +50,7 @@ const ProgramWithFilter = z.object({
 }).strict()
     .transform((obj, ctx) => {
         const values = [obj.program, obj.start_time, obj.end_time].map(v => (v ?? "").trim());
-        const allEmpty = values.every(v => v === "");
+        const allEmpty = values.every(v => v === "") || obj.program === "";
 
         if (allEmpty) return null;
 
