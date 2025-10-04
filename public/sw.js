@@ -9,7 +9,7 @@ const STATIC_ASSETS = [
 
 // Regex patterns for runtime caching
 const ASSETS_PATTERN = /^\/assets\//;      // built CSS/JS
-const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico|woff2|ttf|css)$/; // direct children of /public
+const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico|woff2|ttf|css|xml)$/; // direct children of /public
 
 self.addEventListener("install", (event) => {
     self.skipWaiting();
