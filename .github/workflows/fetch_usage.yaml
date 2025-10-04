@@ -23,9 +23,9 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ secrets.MY_APP_ID }}
-          private-key: ${{ secrets.MY_APP_PRIVATE_KEY }}
-          installation-id: ${{ secrets.MY_APP_INSTALLATION_ID }}
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          installation-id: ${{ secrets.APP_INSTALLATION_ID }}
 
       - name: Fetch usage from Vercel API
         run: |
@@ -35,8 +35,18 @@ jobs:
 
       - name: Commit & push JSON
         run: |
-          git config user.name "vercel-usage-fetcher[bot]"
-          git config user.email "vercel-usage-fetcher[bot]@users.noreply.github.com"
+          git config --local user.name "vercel-usage-fetcher[bot]"
+          git config --local user.email "vercel-usage-fetcher[bot]@users.noreply.github.com"
+
+          git fetch origin frontend
+          git checkout frontend
+          git reset --hard origin/frontend
           git add public/usage.json
           git commit -m "Update Vercel Usage" || echo "No changes"
-          git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:main
+          git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:frontend
+
+          git checkout staging || git checkout -b staging origin/staging
+          git pull origin staging
+          git add public/usage.json
+          git commit -m "Update Vercel Usage" || echo "No changes"
+          git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:staging
