@@ -35,6 +35,9 @@ jobs:
 
       - name: Commit & push JSON
         run: |
+          git config --local user.name "vercel-usage-fetcher[bot]"
+          git config --local user.email "vercel-usage-fetcher[bot]@users.noreply.github.com"
+
           git fetch origin frontend
           git checkout frontend
           git reset --hard origin/frontend
