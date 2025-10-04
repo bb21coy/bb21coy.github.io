@@ -35,9 +35,15 @@ jobs:
 
       - name: Commit & push JSON
         run: |
-          git config user.name "vercel-usage-fetcher[bot]"
-          git config user.email "vercel-usage-fetcher[bot]@users.noreply.github.com"
+          git fetch origin frontend
+          git checkout frontend
+          git reset --hard origin/frontend
           git add public/usage.json
           git commit -m "Update Vercel Usage" || echo "No changes"
           git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:frontend
+
+          git checkout staging || git checkout -b staging origin/staging
+          git pull origin staging
+          git add public/usage.json
+          git commit -m "Update Vercel Usage" || echo "No changes"
           git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:staging
