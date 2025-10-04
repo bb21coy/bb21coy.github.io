@@ -184,7 +184,7 @@
         }
     }
 
-    .company_announcements p {
+    .company_announcements p:first-of-type {
         font-weight: bold;
         text-decoration: underline;
         margin: 5px 0;
