@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import ExportButton from './AnnualAttendanceFile'
 import { db } from '../firebase'
@@ -49,7 +49,10 @@ const ParadeList = ({ setPageState }) => {
                 </div>
                 <div className={styles['parade-list-container']} id='parade-list-container'>
                     {parades.filter((parade) => parade.date.toDate().getFullYear() == currentYear).map((parade) => (
-                        <button tabIndex={0} key={parade.id} onClick={() => setPageState(parade.id)}>{parade.date.toDate().toLocaleDateString('en-GB')}</button>
+                        <Fragment key={parade.id}>
+                            <input type="radio" id={parade.id} name="parade" onChange={() => setPageState(parade.id)} />
+                            <label htmlFor={parade.id}>{parade.date.toDate().toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</label>
+                        </Fragment>
                     ))}
                 </div>
             </div>
