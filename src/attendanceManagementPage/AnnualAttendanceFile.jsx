@@ -72,7 +72,7 @@ const userAttendanceTemplate = (index, userInfo, userAttendance, excelColumnLett
 	`
 }
 
-const ExportButton = ({ year }) => {
+const ExportButton = ({ year, parades }) => {
 	const [users, setUsers] = useState([]);
 	const [paradeAttendance, setParadeAttendance] = useState({});
 	const [paradeData, setParadeData] = useState([]);
@@ -102,8 +102,8 @@ const ExportButton = ({ year }) => {
 		let levelUsers;
 		if (typeof normalisedLevel !== "number") levelUsers = users.filter(u => u.account_type === normalisedLevel).map(u => u.account_name);
 		else levelUsers = users.filter(u => u.level === normalisedLevel).map(u => u.account_name);
-		const filteredAttedance = Object.entries(paradeAttendance).filter(([user, attendance]) => levelUsers.includes(user)).reduce((acc, [user, attendance]) => ({ ...acc, [user]: attendance }), {});
-		const uniqueDates = Object.entries(filteredAttedance).flatMap(([user, attendance]) => Object.keys(attendance));
+		const filteredAttendance = Object.entries(paradeAttendance).filter(([user, attendance]) => levelUsers.includes(user)).reduce((acc, [user, attendance]) => ({ ...acc, [user]: attendance }), {});
+		const uniqueDates = Object.entries(filteredAttendance).flatMap(([user, attendance]) => Object.keys(attendance));
 		return [...new Set(uniqueDates)];
 	}
 
@@ -408,8 +408,10 @@ const ExportButton = ({ year }) => {
 				const start = new Date(y, 0, 1);
 				const end = new Date(y + 1, 0, 1);
 
-				const parades = await getDocs(query(collection(db, "parades"), where("date", ">=", start), where("date", "<", end), orderBy("date", "asc")))
-				const paradesData = parades.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+				const paradesData = parades.filter(parade => {
+					const date = parade.date.toDate();
+					return date >= start && date < end;
+				});
 				setParadeData(paradesData)
 
 				for (const parade of paradesData) {
@@ -446,7 +448,7 @@ const ExportButton = ({ year }) => {
 		}
 
 		getYearAttendanceRecord();
-	}, [year, users])
+	}, [year, users, parades])
 
 	const handleExport = () => {
 		const files = {
