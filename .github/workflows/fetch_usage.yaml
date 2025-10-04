@@ -16,6 +16,16 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false # important so we can use our own token
+
+      - name: Create GitHub App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.MY_APP_ID }}
+          private-key: ${{ secrets.MY_APP_PRIVATE_KEY }}
+          installation-id: ${{ secrets.MY_APP_INSTALLATION_ID }}
 
       - name: Fetch usage from Vercel API
         run: |
@@ -25,8 +35,8 @@ jobs:
 
       - name: Commit & push JSON
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "vercel-usage-fetcher[bot]"
+          git config user.email "vercel-usage-fetcher[bot]@users.noreply.github.com"
           git add public/usage.json
           git commit -m "Update Vercel Usage" || echo "No changes"
-          git push --force
+          git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:main
