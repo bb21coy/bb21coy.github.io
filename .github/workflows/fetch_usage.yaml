@@ -23,9 +23,9 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ secrets.MY_APP_ID }}
-          private-key: ${{ secrets.MY_APP_PRIVATE_KEY }}
-          installation-id: ${{ secrets.MY_APP_INSTALLATION_ID }}
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          installation-id: ${{ secrets.APP_INSTALLATION_ID }}
 
       - name: Fetch usage from Vercel API
         run: |
