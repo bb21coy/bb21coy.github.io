@@ -42,7 +42,6 @@ function UploadFile({ attained, boys }) {
         const badgeRow = json[0];
         const headerRow = json[1];
         const result = {};
-        console.log(json, badgeRow, headerRow)
 
         for (let col = 0; col < badgeRow.length; col++) {
             if (!badgeRow[col] && col > 0) {

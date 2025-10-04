@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import PropTypes from 'prop-types'
 import ExportButton from './AnnualAttendanceFile'
 import { db } from '../firebase'
@@ -6,7 +6,7 @@ import { onSnapshot, orderBy, collection, query } from '@firebase/firestore'
 import { useUser } from '../general/UserContext'
 import styles from './paradeList.module.scss'
 
-const ParadeList = ({ setPageState }) => {
+const ParadeList = ({ setPageState, pageState }) => {
     const { user } = useUser()
     const [parades, setParades] = useState([])
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
@@ -44,12 +44,15 @@ const ParadeList = ({ setPageState }) => {
                         {(["Admin", "Officer", "Primer"].includes(user.account_type) || ["CSM", "DY CSM", "Admin Sergeant"].includes(user.appointment)) &&
                             <i className='fa-solid fa-file-plus' onClick={() => setPageState('form')} title='Add Parade'></i>
                         }
-                        <ExportButton key={currentYear} year={parseInt(currentYear)} />
+                        <ExportButton key={currentYear} year={parseInt(currentYear)} parades={[...parades].reverse()} />
                     </div>
                 </div>
                 <div className={styles['parade-list-container']} id='parade-list-container'>
                     {parades.filter((parade) => parade.date.toDate().getFullYear() == currentYear).map((parade) => (
-                        <button tabIndex={0} key={parade.id} onClick={() => setPageState(parade.id)}>{parade.date.toDate().toLocaleDateString('en-GB')}</button>
+                        <Fragment key={parade.id}>
+                            <input type="radio" id={parade.id} name="parade" onChange={() => setPageState(parade.id)} checked={parade.id === pageState}/>
+                            <label htmlFor={parade.id}>{parade.date.toDate().toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</label>
+                        </Fragment>
                     ))}
                 </div>
             </div>

@@ -1,13 +1,23 @@
 .not-found {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
-    justify-items: center;
+    justify-content: center;
     margin: auto;
     align-items: center;
     background: white;
+    height: 100vh;
+
+    &:has(+ footer) {
+        height: 100% !important;
+    }
 
     p {
         font-size: 18px;
         text-align: center;
+    }
+
+    pre {
+        color: red;
     }
 }

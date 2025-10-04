@@ -4,27 +4,28 @@ import styles from "./notFound.module.scss";
 class ErrorBoundary extends Component {
     constructor(props) {
         super(props);
-        this.state = { hasError: false };
+        this.state = { hasError: false, errorMessage: "", errorStack: "" };
     }
 
     static getDerivedStateFromError(error) {
-        // Update state so next render shows fallback UI
-        return { hasError: true };
+        return { hasError: true, errorMessage: error.message };
     }
 
     componentDidCatch(error, errorInfo) {
         console.error("Error caught by boundary:", error, errorInfo);
-        // You could also log to a service here
+        this.setState({ errorStack: error?.stack || "" });
     }
 
     render() {
         if (this.state.hasError) {
-            // Show your custom error page
             return (
                 <div className={styles["not-found"]}>
                     <img src="error.png" alt="An Error Has Occurred" width={"200px"} height={"200px"}/>
                     <h2>An Error Has Occurred</h2>
                     <p>Please notify the developer and try again later</p>
+                    <br />
+                    {this.state.errorMessage && <pre>{this.state.errorMessage}</pre>}
+                    {this.state.errorStack && <pre>{this.state.errorStack}</pre>}
                 </div>
             );
         }

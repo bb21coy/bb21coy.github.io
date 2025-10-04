@@ -3,8 +3,10 @@ import { doc, getDoc, Timestamp } from "@firebase/firestore";
 
 const makeRefSchema = (db, collection) =>
     z.union([z.string(), z.null()])
-        .refine((val) => typeof val === "string" && val.trim() !== "", { message: "This appointment is required" })
+        .optional()
         .transform((id, ctx) => {
+            if (!id || id.trim() === "") return null;
+
             try {
                 return doc(db, collection, id);
             } catch {
@@ -17,6 +19,7 @@ const makeRefSchema = (db, collection) =>
         })
         .refine(
             async (ref) => {
+                if (ref === null) return true;
                 const snap = await getDoc(ref);
                 return snap.exists();
             },
@@ -50,7 +53,7 @@ const ProgramWithFilter = z.object({
 }).strict()
     .transform((obj, ctx) => {
         const values = [obj.program, obj.start_time, obj.end_time].map(v => (v ?? "").trim());
-        const allEmpty = values.every(v => v === "");
+        const allEmpty = values.every(v => v === "") || obj.program === "";
 
         if (allEmpty) return null;
 

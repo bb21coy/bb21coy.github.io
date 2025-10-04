@@ -10,7 +10,7 @@ const AttendanceManagementPage = () => {
 
 	return (
 		<div className='attendance-management-page'>
-			<ParadeList setPageState={setPageState} />
+			<ParadeList setPageState={setPageState} pageState={pageState} />
 			{pageState == 'form' ? <ParadeForm /> : <ParadeInformation id={pageState} />}
 		</div>
 	)

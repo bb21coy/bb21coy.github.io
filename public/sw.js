@@ -1,4 +1,4 @@
-const version = "1.3.9";
+const version = "1.3.11";
 const CACHE_NAME = `bb21coy-cache-v${version}`;
 
 // These are the known root files and folders
@@ -9,7 +9,7 @@ const STATIC_ASSETS = [
 
 // Regex patterns for runtime caching
 const ASSETS_PATTERN = /^\/assets\//;      // built CSS/JS
-const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico|woff2|ttf|css)$/; // direct children of /public
+const IMAGES_PATTERN = /^\/[^/]+\.(png|jpg|jpeg|webp|gif|svg|ico|woff2|ttf|css|xml)$/; // direct children of /public
 
 self.addEventListener("install", (event) => {
     self.skipWaiting();

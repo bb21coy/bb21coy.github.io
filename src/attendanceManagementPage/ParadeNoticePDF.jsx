@@ -9,7 +9,7 @@ const ParadeNoticePDF = ({ parade, users }) => {
 
     useEffect(() => {
         Object.entries(parade.appointments).map(async ([role, user]) => {
-            const account = users.find(u => u.id === user.id)
+            const account = users.find(u => u.id === user?.id)
             setRoles(prev => ({ ...prev, [role]: account }))
         })
     }, [parade, users]);
@@ -105,7 +105,7 @@ const ParadeNoticePDF = ({ parade, users }) => {
                         {["1", "2", "3", "4/5"].map(platoon => (
                             <div className={styles.programs} key={platoon}>
                                 <div>
-                                    <h2>Sec 1 platoon</h2>
+                                    <h2>Sec {platoon} platoon</h2>
                                     <h3>Program</h3>
                                     {parade.platoon_programs[platoon].map(program => (
                                         <p key={program.id}>{formatProgramTime(program.start_time)} - {formatProgramTime(program.end_time)}: {program.program}</p>

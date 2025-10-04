@@ -8,7 +8,6 @@ import { ZodError } from 'zod'
 
 // To access attendance records and take new attendance
 const ParadeForm = ({ paradeData = null }) => {
-	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	const levels = ['1', '2', '3', '4/5']
 	const [allUsers, setAllUsers] = useState([])
 	const [paradeType, setParadeType] = useState("")
@@ -65,42 +64,44 @@ const ParadeForm = ({ paradeData = null }) => {
 			Object.entries(appointmentDoc.data()).map(([appt, id]) => {
 				if (["CE Sergeant", "CSM"].includes(appt)) setAppointmentHolders(prev => ({ ...prev, [appt]: id.id }))
 			})
-
-			if (paradeData) {
-				setParadeType(paradeData.parade_type)
-				document.getElementById('date-input').value = convertDate(paradeData.date.toDate()).split('T')[0]
-				document.getElementById('reporting-time-input').value = convertDate(paradeData.reporting_time.toDate())
-				document.getElementById('dismissal-time-input').value = convertDate(paradeData.dismissal_time.toDate())
-
-				Object.entries(paradeData.appointments).map(([appointment, ref]) => {
-					setAppointmentHolders(prev => ({ ...prev, [appointment]: ref.id }))
-				})
-
-				setCompanyAnnouncements([...paradeData.company_announcements, makeEmptyAnnouncement()])
-				setPlatoonPrograms({
-					'1': [...convertPrograms(paradeData.platoon_programs["1"]), makeEmptyProgram()],
-					'2': [...convertPrograms(paradeData.platoon_programs["2"]), makeEmptyProgram()],
-					'3': [...convertPrograms(paradeData.platoon_programs["3"]), makeEmptyProgram()],
-					'4/5': [...convertPrograms(paradeData.platoon_programs["4/5"]), makeEmptyProgram()],
-				})
-				setPlatoonAnnouncements({
-					'1': [...paradeData.platoon_announcements['1'], makeEmptyAnnouncement()],
-					'2': [...paradeData.platoon_announcements['2'], makeEmptyAnnouncement()],
-					'3': [...paradeData.platoon_announcements['3'], makeEmptyAnnouncement()],
-					'4/5': [...paradeData.platoon_announcements['4/5'], makeEmptyAnnouncement()],
-				})
-
-				levels.map(level => {
-					document.getElementById(`sec-${level}-attire`).value = paradeData[`sec-${level}-attire`] || ""
-				})
-
-				document.getElementById('venue-input').value = paradeData.venue || ""
-				document.getElementById('description').value = paradeData.description || ""
-			}
 		}
 
 		init()
 	}, [])
+
+	useEffect(() => {
+		if (paradeData != null) {
+			setParadeType(paradeData.parade_type)
+			document.getElementById('date-input').value = convertDate(paradeData.date.toDate()).split('T')[0]
+			document.getElementById('reporting-time-input').value = convertDate(paradeData.reporting_time.toDate())
+			document.getElementById('dismissal-time-input').value = convertDate(paradeData.dismissal_time.toDate())
+
+			Object.entries(paradeData.appointments).map(([appointment, ref]) => {
+				setAppointmentHolders(prev => ({ ...prev, [appointment]: ref?.id }))
+			})
+
+			setCompanyAnnouncements([...paradeData.company_announcements, makeEmptyAnnouncement()])
+			setPlatoonPrograms({
+				'1': [...convertPrograms(paradeData.platoon_programs["1"]), makeEmptyProgram()],
+				'2': [...convertPrograms(paradeData.platoon_programs["2"]), makeEmptyProgram()],
+				'3': [...convertPrograms(paradeData.platoon_programs["3"]), makeEmptyProgram()],
+				'4/5': [...convertPrograms(paradeData.platoon_programs["4/5"]), makeEmptyProgram()],
+			})
+			setPlatoonAnnouncements({
+				'1': [...paradeData.platoon_announcements['1'], makeEmptyAnnouncement()],
+				'2': [...paradeData.platoon_announcements['2'], makeEmptyAnnouncement()],
+				'3': [...paradeData.platoon_announcements['3'], makeEmptyAnnouncement()],
+				'4/5': [...paradeData.platoon_announcements['4/5'], makeEmptyAnnouncement()],
+			})
+
+			levels.map(level => {
+				document.getElementById(`sec-${level}-attire`).value = paradeData[`sec-${level}-attire`] || ""
+			})
+
+			document.getElementById('venue-input').value = paradeData.venue || ""
+			document.getElementById('description').value = paradeData.description || ""
+		}
+	}, [paradeData])
 
 	const setDefaultData = (type) => {
 		setParadeType(type)
@@ -128,13 +129,13 @@ const ParadeForm = ({ paradeData = null }) => {
 			})
 		} else {
 			setCompanyAnnouncements([makeEmptyAnnouncement()])
-			setPlatoonPrograms({
+			setPlatoonAnnouncements({
 				'1': [makeEmptyAnnouncement()],
 				'2': [makeEmptyAnnouncement()],
 				'3': [makeEmptyAnnouncement()],
 				'4/5': [makeEmptyAnnouncement()]
 			})
-			setPlatoonAnnouncements({
+			setPlatoonPrograms({
 				'1': [makeEmptyProgram()],
 				'2': [makeEmptyProgram()],
 				'3': [makeEmptyProgram()],
@@ -223,14 +224,13 @@ const ParadeForm = ({ paradeData = null }) => {
 			if (data.reporting_time == "") return showMessage("Please select a date and reporting time.");
 			const findDoc = await getDocs(query(collection(db, "parades"), where("date", "==", Timestamp.fromDate(new Date(data.reporting_time)))));
 			if (findDoc.docs.length) return showMessage("A parade has already been scheduled for that day.");
-
+			
 			const result = await ParadeSchema(db).parseAsync(data);
 			if (paradeData == null) {
 				result.cos_finalized = false;
 				result.csm_finalized = false;
 				result.do_finalized = false;
 				result.captain_finalized = false;
-				console.log(result)
 
 				const paradeData = await addDoc(collection(db, "parades"), result);
 				await setDoc(doc(db, "attendance", paradeData.id), {});
@@ -264,10 +264,15 @@ const ParadeForm = ({ paradeData = null }) => {
 		navigator.clipboard.writeText(e.target.value);
 	}
 
-	const pasteDate = async (e) => {
+	const pasteDate = async (e, level, id, field) => {
 		e.preventDefault();
 		const text = await navigator.clipboard.readText();
-		e.target.value = text;
+		setPlatoonPrograms(prev => {
+			const programs = prev[level];
+			const program = programs.find(program => program.id === id);
+			program[field] = text;
+			return { ...prev, [level]: programs }
+		})
 	}
 
 	const copyPlatoonPrograms = (level) => {
@@ -299,9 +304,8 @@ const ParadeForm = ({ paradeData = null }) => {
 		setPlatoonPrograms((prev) => {
 			const programs = prev[level];
 			const index = programs.findIndex(program => program.id === programId);
-			console.log(index, programs.length - 1)
 			if (index === -1 || index === programs.length - 2) return prev;
-			const newProgram = makeEmptyProgram();
+			const newProgram = makeEmptyProgram(getPreviousProgramTime(programId));
 			const newPrograms = [
 				...programs.slice(0, index + 1),
 				newProgram,
@@ -312,12 +316,11 @@ const ParadeForm = ({ paradeData = null }) => {
 		})
 	}
 
-	const getPreviousProgramTime = (e) => {
-		const allTimes = document.querySelectorAll('input[type="datetime-local"]');
-		const index = Array.from(allTimes).indexOf(e.target);
-		const previousTime = allTimes[index - 1];
-		console.log(previousTime)
-		return previousTime ? previousTime.value : null;
+	const getPreviousProgramTime = (id) => {
+		const allTimes = document.querySelectorAll('input[type="datetime-local"][data-id]');
+		const index = Array.from(allTimes).findIndex(el => el.getAttribute("data-id") === id);
+		const previousTime = allTimes[index].value;
+		return previousTime;
 	}
 
 	return (
@@ -374,7 +377,7 @@ const ParadeForm = ({ paradeData = null }) => {
 						<Fragment key={holder}>
 							<label htmlFor={`${holder.toLowerCase()}-select`}>{holder}:</label>
 							<select id={`${holder.toLowerCase()}-select`} value={appointmentHolders[holder] || ""} onChange={(e) => setAppt(holder, e)}>
-								<option value='' disabled>Select {holder}</option>
+								<option value='' disabled={holder !== "COS" && holder !== "Flag Bearer"}>Select {holder}</option>
 								{users.boys.map(boy => <option key={boy.id} value={boy.id}>{boy.account_name}</option>)}
 							</select>
 						</Fragment>
@@ -409,11 +412,11 @@ const ParadeForm = ({ paradeData = null }) => {
 						<div>
 							{platoonPrograms[level].map((program, index) => (
 								<div key={`sec-${level}-program-${program.id}`} className={styles['platoon-program-container']}>
-									<input type='datetime-local' onCopy={e => copyDate(e)} onPaste={e => pasteDate(e)} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program, 'start_time')} />
+									<input type='datetime-local' onCopy={e => copyDate(e)} onPaste={e => pasteDate(e, level, program.id, 'start_time')} value={program.start_time} onChange={(e) => updatePlatoonProgram(e, level, program, 'start_time')} />
 									<p>-</p>
-									<input type='datetime-local' onCopy={e => copyDate(e)} onPaste={e => pasteDate(e)} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program, 'end_time')} />
+									<input type='datetime-local' onCopy={e => copyDate(e)} onPaste={e => pasteDate(e, level, program.id, 'end_time')} value={program.end_time} onChange={(e) => updatePlatoonProgram(e, level, program, 'end_time')} data-id={program.id} />
 
-									<input type='text' defaultValue={program.program} onChange={(e) => updatePlatoonProgram(e, level, program, 'program')} placeholder='Enter Program' id={`sec-${level}-program-${program.id}`} />
+									<input type='text' value={program.program} onChange={(e) => updatePlatoonProgram(e, level, program, 'program')} placeholder='Enter Program' id={`sec-${level}-program-${program.id}`} />
 									{index !== platoonPrograms[level].length - 1 && <>
 										<i className='fa-solid fa-xmark' title='Remove Platoon Program' onClick={() => deletePlatoonProgram(level, index)}></i>
 										<i className='fa-solid fa-arrow-turn-down' title='Add new program below' onClick={() => addProgramBelow(level, program.id)}></i>
