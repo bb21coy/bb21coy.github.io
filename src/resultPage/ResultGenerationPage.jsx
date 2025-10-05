@@ -5,8 +5,6 @@ import ResultPage from './ResultPage'
 import styles from './resultGenerationPage.module.scss'
 import { getDocs, collection, orderBy, query } from '@firebase/firestore'
 import { db } from '../firebase'
-
-// To manually create 32A results
 const ResultGenerationPage = () => {
 	const [allUsers, setAllUsers] = useState([])
 	const [awards, setAwards] = useState([]) // awards list with masteries
