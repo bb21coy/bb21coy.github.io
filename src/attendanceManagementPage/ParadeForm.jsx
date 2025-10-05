@@ -323,6 +323,32 @@ const ParadeForm = ({ paradeData = null }) => {
 		return previousTime;
 	}
 
+	const copyProgram = (level, id, index) => {
+		setPlatoonPrograms((prev) => {
+			const programs = prev[level];
+			const program = programs.find(program => program.id === id);
+			if (!program) return prev;
+			const newProgram = { ...program, id: crypto.randomUUID() };
+
+			const updated = { ...prev };
+			Object.keys(prev).forEach(lvl => {
+				if (lvl === level) return;
+				const currentPrograms = [...prev[lvl]];
+				currentPrograms.splice(index, 0, { ...newProgram, id: crypto.randomUUID() });
+				updated[lvl] = currentPrograms;
+			})
+
+			return updated;
+		})
+	}
+	
+	const deletePlatoonPrograms = (level) => {
+		setPlatoonPrograms((prev) => {
+			const programs = prev[level];
+			return { ...prev, [level]: [makeEmptyProgram()] }
+		})
+	}
+
 	return (
 		<form onSubmit={submitForm} className={styles['new-parade-form']}>
 			<h2>New Parade Notice</h2>
@@ -408,6 +434,7 @@ const ParadeForm = ({ paradeData = null }) => {
 						<div className={styles['flex-block']}>
 							<h3>Programs:</h3>
 							<i className="fa-solid fa-copy" title='Copy all programs to other platoons' onClick={() => copyPlatoonPrograms(level)}></i>
+							<i className='fa-solid fa-trash' title='Delete all programs from this platoon' onClick={() => deletePlatoonPrograms(level)}></i>
 						</div>
 						<div>
 							{platoonPrograms[level].map((program, index) => (
@@ -422,6 +449,7 @@ const ParadeForm = ({ paradeData = null }) => {
 										<i className='fa-solid fa-arrow-turn-down' title='Add new program below' onClick={() => addProgramBelow(level, program.id)}></i>
 										<i className='fa-solid fa-chevron-up' title='Move program up' onClick={() => moveProgramUp(level, program.id)}></i>
 										<i className='fa-solid fa-chevron-down' title='Move program down' onClick={() => moveProgramDown(level, program.id)}></i>
+										<i className='fa-solid fa-copy' title='Copy this program to other platoons' onClick={() => copyProgram(level, program.id, index)}></i>
 									</>}
 								</div>
 							))}
