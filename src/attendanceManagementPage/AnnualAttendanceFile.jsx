@@ -66,7 +66,7 @@ const userAttendanceTemplate = (index, userInfo, userAttendance, excelColumnLett
 				<f>IFERROR(100*COUNTIF(${startCol}${rowNum}:${endCol}${rowNum},"1")/(COUNTIF(${startCol}${rowNum}:${endCol}${rowNum},"0")+COUNTIF(${startCol}${rowNum}:${endCol}${rowNum},"1")+COUNTIF(${startCol}${rowNum}:${endCol}${rowNum},"S")+COUNTIF(${startCol}${rowNum}:${endCol}${rowNum},"E")),0)</f>
 			</c>
 			<c t="n" s="6" r="${excelColumnLetter(uniqueDates.length + 8)}${rowNum}">
-				<f>COUNTA(${startCol}${rowNum}:${endCol}${rowNum})</f>
+				<f>COUNTIF(${startCol}${rowNum}:${endCol}${rowNum}, 1)</f>
 			</c>
 		</row>
 	`
