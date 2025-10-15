@@ -77,6 +77,8 @@ const Header = () => {
 
 				{loggedIn &&
 					<>
+						<button onClick={() => navigate('/user_attendance')}>My Attendance</button>
+						
 						{(user.account_type !== "Boy" || user.appointment !== null) &&
 							<button onClick={() => navigate('/user_management')}>Users Management</button>}
 
@@ -128,6 +130,11 @@ const Header = () => {
 						<button onClick={() => navigate('/home')} className={currentPage === '#/home' ? styles.active : ''}>
 							<i className='fa-solid fa-house'></i>
 							Dashboard
+						</button>
+
+						<button onClick={() => navigate('/user_attendance')} className={currentPage === '#/user_attendance' ? styles.active : ''}>
+							<i className='fa-solid fa-user-clock'></i>
+							My Attendance
 						</button>
 
 						{(user.account_type !== "Boy" || user.appointment !== null) &&
