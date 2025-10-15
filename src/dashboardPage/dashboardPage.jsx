@@ -43,6 +43,7 @@ const DashboardPage = () => {
             <h2>Hello, {!user ? "" : `${(user.account_type !== "Admin" && user.rank === null) ? user.honorifics : (user.account_type == "Admin" ? "" : user.rank)} ${user.account_name}`}</h2>
 
             <div className={styles['dashboard-routes']}>
+                <DashboardOptions title="My Attendance" icon="user-clock" url="/user_attendance" />
                 {user.account_type === "Boy" && <>
                     <DashboardOptions title="My Awards" icon="award" url="/user_awards" />
                     <DashboardOptions title="My Inspections Results" icon="shirt-long-sleeve" url="/user_inspections" />
