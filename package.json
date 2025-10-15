@@ -11,7 +11,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@firebase/app": "^0.14.3",
+    "@firebase/app": "^0.14.4",
     "@firebase/auth": "^1.11.0",
     "@firebase/firestore": "^4.9.2",
     "fflate": "^0.8.2",
@@ -21,7 +21,7 @@
     "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.3",
+    "react-router-dom": "^7.9.4",
     "read-excel-file": "^6.0.1",
     "redaxios": "^0.5.1",
     "sass": "^1.93.2",
@@ -31,10 +31,10 @@
     "@eslint/js": "^9.37.0",
     "@vitejs/plugin-react": "^5.0.4",
     "eslint": "^9.37.0",
-    "eslint-plugin-react-hooks": "^6.1.1",
+    "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-react-refresh": "^0.4.23",
     "globals": "^16.4.0",
     "rollup-plugin-visualizer": "^6.0.4",
-    "vite": "^7.1.9"
+    "vite": "^7.1.10"
   }
 }
