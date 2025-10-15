@@ -283,7 +283,7 @@ const ResourcePage = () => {
 
                     <h4>Founder's Award</h4>
                     <div className={styles['badge-explanation']}>
-                        <img src="public/founder's-award-(only-ssgs-and-wos-can-apply)-badge.webp" alt="Founder's Award Badge" />
+                        <img src="founder's-award-badge.webp" alt="Founder's Award Badge" />
                         <div>
                             <p>Criteria:</p>
                             <ul>
@@ -313,7 +313,7 @@ const ResourcePage = () => {
 
                     <h4>One Year Service</h4>
                     <div className={styles['badge-explanation']}>
-                        <img src="1-year-service-(first-year)-badge.webp" alt="One Year Service Badge" />
+                        <img src="1-year-service-badge.webp" alt="One Year Service Badge" />
                         <div>
                             <p>Attainment Criteria:</p>
                             <p>Awarded to Boys who have served with good conduct and have attended a minimum of 25 parades</p>
