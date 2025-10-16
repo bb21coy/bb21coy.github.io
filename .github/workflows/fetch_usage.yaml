@@ -2,7 +2,7 @@ name: Fetch Vercel Usage
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * *"   # 00:00 UTC (08:00 Asia/Singapore)
   workflow_dispatch:
 
 permissions:
@@ -14,10 +14,11 @@ jobs:
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
-      - name: Checkout repo
+      - name: Checkout repo (fetch all branches)
         uses: actions/checkout@v4
         with:
-          persist-credentials: false # important so we can use our own token
+          persist-credentials: false         # we'll use the App token for pushing
+          fetch-depth: 0                     # IMPORTANT: get all history & branches
 
       - name: Create GitHub App Token
         id: app-token
@@ -33,20 +34,47 @@ jobs:
             "https://vercel.com/api/usage-summary?teamId=bb21coys-projects" \
             > public/usage.json
 
-      - name: Commit & push JSON
+      - name: Commit & push to frontend and staging
+        env:
+          PUSH_URL: https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
         run: |
+          set -euo pipefail
+
           git config --local user.name "vercel-usage-fetcher[bot]"
           git config --local user.email "vercel-usage-fetcher[bot]@users.noreply.github.com"
 
-          git fetch origin frontend
-          git checkout frontend
-          git reset --hard origin/frontend
-          git add public/usage.json
-          git commit -m "Update Vercel Usage" || echo "No changes"
-          git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:frontend
+          # Make sure we know ALL remote branches (defense-in-depth)
+          git fetch --all --prune
 
-          git checkout staging || git checkout -b staging origin/staging
-          git pull origin staging
+          #### Update frontend ####
+          git switch frontend || git switch -c frontend origin/frontend
+          git reset --hard origin/frontend
+
           git add public/usage.json
-          git commit -m "Update Vercel Usage" || echo "No changes"
-          git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }} HEAD:staging
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Vercel Usage"
+            git push "$PUSH_URL" HEAD:frontend
+          else
+            echo "No changes for frontend"
+          fi
+
+          #### Update staging ####
+          # Ensure origin/staging exists locally; if not fetched yet, fetch that ref explicitly.
+          if ! git ls-remote --exit-code --heads origin staging >/dev/null 2>&1; then
+            echo "Remote branch 'staging' not found; creating it from frontend…"
+            git switch frontend
+            git switch -C staging
+            git push -u "$PUSH_URL" staging
+          else
+            # Track remote staging if not already
+            git switch -c staging --track origin/staging || git switch staging
+            git pull --ff-only origin staging || true
+          fi
+
+          git add public/usage.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Vercel Usage"
+            git push "$PUSH_URL" HEAD:staging
+          else
+            echo "No changes for staging"
+          fi
