@@ -47,12 +47,11 @@ const UserAttendance = () => {
         const totalCountActual = totalPresent + totalAbsent + totalExcused;
         const actualPercentage = totalCountActual > 0 ? (totalPresent / totalCountActual) * 100 : 0;
 
-        // For weighted % (excludes S and E)
         const totalCountWeighted = totalPresent + totalAbsent;
         const weightedPercentage = totalCountWeighted > 0 ? (totalPresent / totalCountWeighted) * 100 : 0;
 
         return { actualPercentage, weightedPercentage };
-    }, [user])
+    }, [user, attendance]);
 
     function getAttendanceColor(percentage) {
         const passThreshold = 75;
