@@ -106,7 +106,7 @@ createRoot(document.body).render(
 								} />
 
 								<Route path='/user_inspections' element={
-									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']}>
+									<UserPermissions allowedAccountTypes={['Admin', 'Boy']}>
 										<UniformInspectionUser />
 									</UserPermissions>
 								} />

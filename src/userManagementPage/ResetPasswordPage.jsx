@@ -70,6 +70,7 @@ const ResetPasswordPage = () => {
 			showMessage("Microsoft account has been linked", "success");
 			setLinkedWithMicrosoft(true);
 		} catch (err) {
+			if (err.code === "auth/credential-already-in-use") return showMessage("This Microsoft account is already linked with another user.");
 			console.error("Failed to link Microsoft:", err);
 			showMessage("Error linking Microsoft: " + err.message);
 		}
@@ -91,6 +92,7 @@ const ResetPasswordPage = () => {
 			showMessage("Google account has been linked", "success");
 			setLinkedWithGoogle(true);
 		} catch (err) {
+			if (err.code === "auth/credential-already-in-use") return showMessage("This Google account is already linked with another user.");
 			console.error("Failed to link Google:", err);
 			showMessage("Error linking Google: " + err.message);
 		}
