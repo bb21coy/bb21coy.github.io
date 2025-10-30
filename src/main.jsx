@@ -38,10 +38,10 @@ createRoot(document.body).render(
 				<Suspense fallback={<Loading />}>
 					<UserProvider>
 						<Routes>
+							<Route path='/login' element={<LogInPage />} />
 							<Route element={<Layout />}>
 								{/* Temporarily disable home page since its filled with filler data */}
 								{/* <Route path='/' element={<HomePage/>}/> */}
-								<Route path='/login' element={<LogInPage />} />
 								<Route path='/' element={<LogInPage />} />
 								<Route path='/parade_notice' element={<ParadeNoticePage />} />
 								
