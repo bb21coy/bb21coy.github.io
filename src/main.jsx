@@ -7,6 +7,7 @@ import Layout from './general/Layout';
 import Loading from './general/Loading';
 import ErrorBoundary from "./general/ErrorBoundary";
 import UserPermissions from './general/UserPermissions';
+import NotFound from "./general/NotFound";
 
 // const HomePage = lazy(() => import('./homePage/HomePage'));
 
@@ -21,7 +22,6 @@ const UniformInspectionForm = lazy(() => import('./uniformInspectionPage/Uniform
 const UserManagementPage = lazy(() => import('./userManagementPage/UserManagementPage'));
 const UserManagementSmallPage = lazy(() => import('./userManagementPage/UserManagementSmallPage'));
 const ResetPasswordPage = lazy(() => import('./userManagementPage/ResetPasswordPage'));
-const NotFound = lazy(() => import('./general/NotFound'));
 const DashboardPage = lazy(() => import('./dashboardPage/dashboardPage'));
 const ParadeNoticePage = lazy(() => import('./attendanceManagementPage/ParadeNoticePage'));
 const UserAwards = lazy(() => import('./awardsManagementPage/UserAwards'));

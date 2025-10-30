@@ -75,7 +75,7 @@ const DashboardPage = () => {
 
             <div className={styles['others']}>
                 <div>
-                    <input type="search" placeholder='What are you looking for?' onChange={(e) => filter(e.target.value)} />
+                    <input type="search" name="search" placeholder='What are you looking for?' onChange={(e) => filter(e.target.value)} />
                 </div>
 
                 <div>
