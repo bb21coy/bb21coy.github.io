@@ -203,11 +203,11 @@
     .dashboard {
         grid-template-columns: 1fr;
         grid-template-areas:
+            "welcome"   
             "search"
-            "welcome"
             "routes"
-            "pending"
             "legend"
+            "pending"
             "usage";
     }
 
