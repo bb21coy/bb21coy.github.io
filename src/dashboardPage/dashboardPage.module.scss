@@ -213,6 +213,7 @@
 
     .dashboard-routes {
         grid-area: routes;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
     .others {
@@ -237,5 +238,11 @@
 
     .others>div:nth-child(5) {
         grid-area: usage;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .routes {
+        height: max-content;   
     }
 }
