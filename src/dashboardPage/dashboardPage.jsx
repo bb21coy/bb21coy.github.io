@@ -57,14 +57,14 @@ const DashboardPage = () => {
                     <DashboardOptions title="My Inspection Results" icon="shirt-long-sleeve" url="/user_inspections" color="C1876B" description='View your results from recent inspections' />
                 </>}
 
+                {(user.account_type === "Officer" || user.appointment?.toLowerCase().includes("tech")) && <DashboardOptions title="Home Page Editor" icon="edit" url="home_editor" color='DC9D00' />}
+                {user.account_type !== "Boy" && <DashboardOptions title="Uniform Inspection" icon="shirt-long-sleeve" url="/uniform_inspection" color="D53032" description='Record uniform inspection results for Boys' />}
+
                 {(user.account_type !== "Boy" || user.appointment !== null) && <>
                     <DashboardOptions title="User Management" icon="users" url="/user_management" color="252850" description='View and Edit Portal Members, as well update Appointment Holders' />
                     <DashboardOptions title="Awards Management" url="/awards" image="awards_tracker.webp" color="252850" description="Manage Boys' awards, eligibility, and find award requirements all in one place" />
                     <DashboardOptions title="Results Generation" icon="file-invoice" url="/generate_result" color="252850" description='Make 32A Submissions easier by automatically generating results' />
                 </>}
-
-                {user.account_type !== "Boy" && <DashboardOptions title="Uniform Inspection" icon="shirt-long-sleeve" url="/uniform_inspection" color="D53032" description='Record uniform inspection results for Boys' />}
-                {(user.account_type === "Officer" || user.appointment?.toLowerCase().includes("tech")) && <DashboardOptions title="Home Page Editor" icon="edit" url="home_editor" color='DC9D00' />}
 
                 <DashboardOptions title="Parade & Attendance" icon="file" url="/attendance_management" color="1E5945" description='Manage parade schedules and record attendance seamlessly' />
                 <DashboardOptions title="Resources" icon="book" url="/resources" color="1E5945" description='View Resources for Badgeworks that you are studying for' />
