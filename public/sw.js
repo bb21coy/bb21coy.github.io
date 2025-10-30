@@ -1,4 +1,4 @@
-const version = "1.4.15";
+const version = "1.4.16";
 const CACHE_NAME = `bb21coy-cache-v${version}`;
 
 // These are the known root files and folders
