@@ -80,10 +80,10 @@ const DashboardPage = () => {
 
                 <div>
                     <p>Welcome back,</p>
-                    <h2>{user.account_name}</h2>
+                    <h2>{!user ? "" : `${(user.account_type !== "Admin" && user.rank === null) ? account.honorifics : (user.account_type == "Admin" ? "" : user.rank)} ${user.account_name}`}</h2>
 
                     <br />
-                    <p>{user?.account_type} | {user?.rank || "NA Rank"}</p>
+                    <p>{user?.account_type}</p>
                 </div>
 
                 <PendingTasks accountType={user.account_type} appointment={user.appointment} userId={userId} paradesAfterToday={paradesAfterToday} styles={styles} />
@@ -92,7 +92,7 @@ const DashboardPage = () => {
                     <div style={{ '--legend': '#DC9D00' }}></div>
                     <p>Officers Only</p>
                     <div style={{ '--legend': '#D53032' }}></div>
-                    <p>Primers and Above</p>
+                    <p>Primers and Officers</p>
                     <div style={{ '--legend': '#252850' }}></div>
                     <p>Boys with Appointments and Above</p>
                     <div style={{ '--legend': '#C1876B' }}></div>
