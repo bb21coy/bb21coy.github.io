@@ -10,7 +10,7 @@ const PendingTasks = ({ accountType, appointment, userId, paradesAfterToday, sty
 
     return (
         <div className={styles["pending-tasks"]}>
-            <h2>Pending Tasks</h2>
+            <h3>Pending Tasks</h3>
 
             <div className={styles["tasks"]}>
                 {paradesAfterToday.length > 0 && <ol>

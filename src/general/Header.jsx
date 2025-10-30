@@ -154,7 +154,7 @@ const Header = () => {
 							Parades & Attendance
 						</button>
 
-						{(user.account_type === "Boy") && <>
+						{(user.account_type === "Boy" || user.account_type === "Admin") && <>
 							<button onClick={() => navigate('/user_awards')} className={currentPage === '#/user_awards' ? styles.active : ''}>
 								<i className='fa-solid fa-award'></i>
 								My Awards
