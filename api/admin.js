@@ -53,7 +53,6 @@ module.exports = async (req, res) => {
 
             case 'PUT': {
                 const { uid, email, password } = req.body;
-                console.log(req.body);
                 if (!uid || !(email || password)) return res.status(400).json({ message: 'Missing uid, email or password' });
                 const updateData = {};
                 if (email) updateData.email = email;
