@@ -26,6 +26,7 @@ const LogInPage = () => {
 		link.href = "/slide 2.webp";
 		document.head.appendChild(link);
 
+		if (!window.google) return;
 		clientRef.current = window.google.accounts.oauth2.initTokenClient({
 			client_id: "788369154043-ksf02t5m4loi87o8svgfpdqmr79aq4tj.apps.googleusercontent.com",
 			scope: "email openid",
