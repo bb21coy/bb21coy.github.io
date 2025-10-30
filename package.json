@@ -15,6 +15,6 @@
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
-    "vercel": "^48.2.0"
+    "vercel": "^48.6.7"
   }
 }
