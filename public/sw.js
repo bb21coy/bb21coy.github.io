@@ -1,4 +1,4 @@
-const version = "1.5.16";
+const version = "1.5.17";
 const CACHE_NAME = `bb21coy-cache-v${version}`;
 
 // These are the known root files and folders
@@ -70,7 +70,20 @@ self.addEventListener("fetch", (event) => {
             }
 
             // Default: network with cache fallback
-            return await fetch(req);
+            try {
+                return await fetch(req);
+            } catch (err) {
+                // <-- NEW: Notify client that update is needed *before* serving fallback
+                self.clients.matchAll().then((clients) => {
+                    clients.forEach((client) => {
+                        client.postMessage({ type: "SW_FETCH_FAILED" });
+                    });
+                });
+
+                // Fallback to SPA shell only for navigation
+                if (req.mode === "navigate") return caches.match("/index.html");
+                return caches.match(req);
+            }
 
         } catch (err) {
             // Only notify update if online
