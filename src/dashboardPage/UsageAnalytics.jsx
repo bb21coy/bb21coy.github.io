@@ -42,9 +42,8 @@ const AdminUsageAnalytics = () => {
         <div className={styles["vercel-usage"]}>
             {vercelUsage.map((item, index) => (
                 <div key={index}>
-                    <p>{item.title}</p>
                     <span className="ring" style={{ background: `conic-gradient(#ff5733 0deg ${item.value / item.limit * 360}deg, #ccc ${item.value / item.limit * 360}deg 360deg)` }}></span>
-                    <p>{(item.value / item.limit * 100).toFixed(2)}%</p>
+                    <p>{item.title} <span>{(item.value / item.limit * 100).toFixed(2)}%</span></p>
                 </div>
             ))}
         </div>
