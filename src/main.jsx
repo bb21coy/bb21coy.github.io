@@ -143,37 +143,37 @@ createRoot(document.body).render(
 	</StrictMode>
 );
 
-let refreshInProgress = false;
-if ("serviceWorker" in navigator) {
-	window.addEventListener("load", () => {
-		navigator.serviceWorker.register("/sw.js").catch(console.error);
-	});
+// let refreshInProgress = false;
+// if ("serviceWorker" in navigator) {
+// 	window.addEventListener("load", () => {
+// 		navigator.serviceWorker.register("/sw.js").catch(console.error);
+// 	});
 
-	navigator.serviceWorker.addEventListener("message", async (event) => {
-		if (event.data?.type === "SW_FETCH_FAILED" && !refreshInProgress) {
-			refreshInProgress = true; // prevent duplicate alerts
-			alert("The site has been updated. Refreshing to get the latest version...");
+// 	navigator.serviceWorker.addEventListener("message", async (event) => {
+// 		if (event.data?.type === "SW_FETCH_FAILED" && !refreshInProgress) {
+// 			refreshInProgress = true; // prevent duplicate alerts
+// 			alert("The site has been updated. Refreshing to get the latest version...");
 
-			// Unregister the service worker
-			const regs = await navigator.serviceWorker.getRegistrations();
-			for (const reg of regs) {
-				await reg.unregister();
-			}
+// 			// Unregister the service worker
+// 			const regs = await navigator.serviceWorker.getRegistrations();
+// 			for (const reg of regs) {
+// 				await reg.unregister();
+// 			}
 
-			// Clear caches
-			if (window.caches) {
-				const keys = await caches.keys();
-				await Promise.all(keys.map((key) => caches.delete(key)));
-			}
+// 			// Clear caches
+// 			if (window.caches) {
+// 				const keys = await caches.keys();
+// 				await Promise.all(keys.map((key) => caches.delete(key)));
+// 			}
 
-			// Force reload bypassing cache
-			location.reload(true);
-		}
+// 			// Force reload bypassing cache
+// 			location.reload(true);
+// 		}
 
-		if (event.data?.type === "SW_UPDATE_AVAILABLE" && !refreshInProgress) {
-			refreshInProgress = true;
-			alert("The site has been updated. Refreshing to get the latest version...");
-			// unregister + clear caches + reload
-		}
-	});
-}
+// 		if (event.data?.type === "SW_UPDATE_AVAILABLE" && !refreshInProgress) {
+// 			refreshInProgress = true;
+// 			alert("The site has been updated. Refreshing to get the latest version...");
+// 			// unregister + clear caches + reload
+// 		}
+// 	});
+// }
