@@ -100,11 +100,12 @@ textarea {
 @media screen and (max-width: 250px) {
     .layout *,
     footer,
-    header {
+    header,
+    #server_loading * {
         display: none !important;
     }
 
-    .layout::before {
+    .layout::before, #server_loading::before {
         display: flex;
         content: "You are seeing this because your screen is too small";
         justify-content: center;

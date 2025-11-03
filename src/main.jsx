@@ -10,6 +10,7 @@ import UserPermissions from './general/UserPermissions';
 import NotFound from "./general/NotFound";
 
 // const HomePage = lazy(() => import('./homePage/HomePage'));
+import App from './general/serverLoading';
 
 const LogInPage = lazy(() => import('./logInPage/LogInPage'));
 const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
@@ -38,6 +39,7 @@ createRoot(document.body).render(
 				<Suspense fallback={<Loading />}>
 					<UserProvider>
 						<Routes>
+							<Route path="/loading" element={<App />} />
 							<Route path='/login' element={<LogInPage />} />
 							<Route path='/' element={<LogInPage />} />
 							<Route element={<Layout />}>
