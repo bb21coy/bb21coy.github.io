@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer';
+import sitemap from 'vite-plugin-sitemap'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -16,6 +17,9 @@ export default defineConfig(({ mode }) => {
         brotliSize: true,
         sizes: ['gzip', 'brotli']
       }),
+      sitemap({
+        hostname: 'https://bb21coy.pages.dev'
+      })
     ],
     server: {
       host: true,
