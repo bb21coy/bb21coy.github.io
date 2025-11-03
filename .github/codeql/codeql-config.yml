@@ -1,0 +1,20 @@
+paths-ignore:
+  # Dependency + build outputs
+  - node_modules
+  - build
+  - dist
+  - out
+
+  # Frontend framework outputs
+  - .next
+  - .vite
+  - vite.config.*
+  - public
+  - assets
+  - coverage
+
+  # Tooling / scripts / infra
+  - scripts
+  - docs
+  - .github
+  - .husky
