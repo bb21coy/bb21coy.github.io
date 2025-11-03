@@ -34,8 +34,14 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-        config-file: ./.github/codeql/codeql-config.yml
         queries: security-extended
+        config: |
+          paths-ignore:
+            - node_modules
+            - dist
+            - public
+            - vite.config.*
+            - .github
      
     - name: Run manual build steps
       if: matrix.build-mode == 'manual'
