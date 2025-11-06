@@ -43,8 +43,8 @@ const generatePDF = ({ award, mastery, boys, instructor, description }) => {
 				{boys.map((account, index) => (
 					<React.Fragment key={account.id}>
 						<p>{index + 1}</p>
-						<p>{account?.account_name}</p>
-						<p>Sec {account?.level}</p>
+						<p>{account?.n}</p>
+						<p>Sec {account?.l}</p>
 						<p>Pass</p>
 					</React.Fragment>
 				))}

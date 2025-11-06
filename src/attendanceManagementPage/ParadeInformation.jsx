@@ -22,7 +22,7 @@ const ParadeInformation = ({ id }) => {
 		let loading1 = false
 		let loading2 = false
 		const init = async () => {
-			const usersSnap = await getDocs(query(collection(db, "users"), orderBy("account_name", "asc")))
+			const usersSnap = await getDocs(query(collection(db, "users"), orderBy("n", "asc")))
 			const usersData = usersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
 			setAllUsers(usersData)		}
 
@@ -56,7 +56,7 @@ const ParadeInformation = ({ id }) => {
 				<button onClick={toggleParadeNotice} name={showParadeNotice ? 'hide' : 'show'}>{showParadeNotice ? 'Hide' : 'Show'}</button>
 				<button onClick={() => window.print()} name='download'>Download</button>
 
-				{(['Admin', 'Officer', 'Primer'].includes(user.account_type) || ['CSM', 'DY CSM', 'Admin Sergeant'].includes(user.appointment)) && (
+				{(['Admin', 'Officer', 'Primer'].includes(user.t) || ['CSM', 'DY CSM', 'Admin Sergeant'].includes(user.appointment)) && (
 					<button onClick={toggleEditor} name='edit'>Edit</button>
 				)}
 			</div>
