@@ -82,7 +82,7 @@ const AppointmentHoldersList = ({ account_type, usersList }) => {
 					<select id="holder" defaultValue={""} required name='account_id'>
 						<option value="" disabled hidden>Select Appointment Holder</option>
 						{usersList.filter(user => user.account_type === accountType).map(user => (
-							<option key={user.id} value={user.id}>{user.account_name}</option>
+							<option key={user.id} value={user.id}>{user.n}</option>
 						))}
 					</select>
 				</>}

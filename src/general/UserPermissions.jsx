@@ -9,13 +9,14 @@ function UserPermissions({ allowedAccountTypes = [], apptAllowed = false, childr
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        console.log(user);
         if (user && user.account_name !== null) setLoading(false);
     }, [user]);
 
     if (loading) return <Loading />;
     if (!user) return <Navigate to="/login" replace />;
 
-    const ok = allowedAccountTypes.includes(user.account_type) || (apptAllowed && user.appointment !== null);
+    const ok = allowedAccountTypes.includes(user.t) || (apptAllowed && user.appointment !== null);
     return ok ? children : <NotFound />;
 }
 

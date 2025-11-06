@@ -46,6 +46,16 @@ const ParadeNoticePDF = ({ parade, users }) => {
         return date.toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit' });
     }
 
+    const convert = (rank, type) => {
+        const OFFICER_RANK_MAP = { O: "OCT", J: "2LT", L: "LTA" };
+		const PRIMER_RANK_MAP = { C: "CLT", S: "SCL" };
+		const BOY_RANK_MAP = { R: "REC", P: "PTE", L: "LCP", C: "CPL", S: "SGT", W: "SSG", O: "WO" };
+
+        if (type === "Officer") return OFFICER_RANK_MAP[rank];
+        if (type === "Primer") return PRIMER_RANK_MAP[rank];
+        if (type === "Boy") return BOY_RANK_MAP[rank];
+    }
+
     return (
         <>
             <div className={styles["pdf-container"]} id='pdf-container'>
@@ -79,17 +89,17 @@ const ParadeNoticePDF = ({ parade, users }) => {
 
                     <section className={styles.roles}>
                         <p>Duty Teacher:</p>
-                        <span>{roles.DT?.honorifics ?? roles.DT?.rank} {roles.DT?.account_name}</span>
+                        <span>{roles.DT?.h ?? convert(roles.DT?.r, roles.DT?.t)} {roles.DT?.n}</span>
                         <p>COS:</p>
-                        <span>{roles.COS?.rank} {roles.COS?.account_name}</span>
+                        <span>{convert(roles.COS?.r, roles.COS?.t)} {roles.COS?.n}</span>
                         <p>CSM:</p>
-                        <span>{roles.CSM?.rank} {roles.CSM?.account_name}</span>
+                        <span>{convert(roles.CSM?.r, roles.CSM?.t)} {roles.CSM?.n}</span>
                         <p>Duty Officer:</p>
-                        <span>{roles.DO?.honorifics ?? roles.DO?.rank} {roles.DO?.account_name}</span>
+                        <span>{roles.DO?.h ?? convert(roles.DO?.r, roles.DO?.t)} {roles.DO?.n}</span>
                         <p>Flag Bearer:</p>
-                        <span>{roles["Flag Bearer"]?.rank} {roles["Flag Bearer"]?.account_name}</span>
+                        <span>{convert(roles["Flag Bearer"]?.r, roles["Flag Bearer"]?.t)} {roles["Flag Bearer"]?.n}</span>
                         <p>CE:</p>
-                        <span>{roles["CE Sergeant"]?.rank} {roles["CE Sergeant"]?.account_name}</span>
+                        <span>{convert(roles["CE Sergeant"]?.r, roles["CE Sergeant"]?.t)} {roles["CE Sergeant"]?.n}</span>
                     </section>
 
                     <section className={styles.company_announcements}>

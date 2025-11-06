@@ -35,9 +35,9 @@ const AppointmentInformation = ({ accountType, appointment, appointment_name, us
 		<>
 			<label htmlFor={`${appointment.id}_${appointment_name}`}>{appointment_name}:</label>
 			<select id={`${appointment.id}_${appointment_name}`} defaultValue={appointment.id} onChange={(e) => setAccountId(e.target.value)}>
-				<option value={appointment.id}>{appointment.account_name}</option>
+				<option value={appointment.id}>{appointment.n}</option>
 				{["Officer", "Admin"].includes(accountType) && usersList.filter(user => user.account_type === appointment.account_type && user.id !== appointment.id).map(user => (
-					<option key={user.id} value={user.id}>{user.account_name}</option>
+					<option key={user.id} value={user.id}>{user.n}</option>
 				))}
 			</select>
 

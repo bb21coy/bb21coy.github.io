@@ -15,32 +15,40 @@ const Header = () => {
 	const [currentPage, setCurrentPage] = useState(window.location.hash);
 
 	useEffect(() => {
-		const unsub = onAuthStateChanged(auth, (user) => {
-			if (!user) {
-				if (!["/", "/login", "/parade_notice"].includes(location.pathname)) return navigate('/login?next=' + location.pathname);
-			} else {
-				setLoggedIn(!!user);
-				getData(user);
+		const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+			if (!firebaseUser) {
+				if (!["/", "/login", "/parade_notice"].includes(location.pathname)) {
+					return navigate('/login?next=' + location.pathname);
+				}
+				return;
 			}
-		})
 
-		async function getData(user) {
-			const ref = doc(db, "users", user.uid);
+			setLoggedIn(true);
+			const tokenResult = await firebaseUser.getIdTokenResult();
+			const claims = tokenResult.claims;
+			const ref = doc(db, "users", firebaseUser.uid);
 			const snap = await getDoc(ref);
+			if (!snap.exists()) return;
 			const data = snap.data();
-			if (snap.exists()) setUser({ id: user.uid, ...data });
-			else return
+
+			const fullUser = {
+				uid: firebaseUser.uid,
+				...data,
+				appointment: claims.appt
+			};
+
+			setUser(fullUser);
 
 			let count = 5;
-			if (data.account_type === "Boy") count += 1
-			if ((data.account_type !== "Boy") || (data.account_type === "Boy" && data.appointment !== null)) count += 3
-			if (data.account_type !== "Boy") count += 1
+			if (fullUser.account_type === "Boy") count += 1;
+			if ((fullUser.account_type !== "Boy") || (fullUser.account_type === "Boy" && fullUser.appointment)) count += 3;
+			if (fullUser.account_type !== "Boy") count += 1;
 			setButtons(count);
-		}
+		});
 
 		setCurrentPage(window.location.hash);
 		return () => unsub();
-	}, [navigate, location])
+	}, [navigate, location]);
 
 	useEffect(() => {
 		console.log(acsiiArt);
@@ -78,7 +86,7 @@ const Header = () => {
 				{loggedIn &&
 					<>
 						<button onClick={() => navigate('/user_attendance')}>My Attendance</button>
-						
+
 						{(user.account_type !== "Boy" || user.appointment !== null) &&
 							<button onClick={() => navigate('/user_management')}>Users Management</button>}
 

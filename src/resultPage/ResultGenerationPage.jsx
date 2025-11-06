@@ -53,9 +53,9 @@ const ResultGenerationPage = () => {
 		const boys = [];
 
 		for (const u of allUsers) {
-			if (u.account_type === "Officer") officers.push(u);
-			else if (u.account_type === "Primer") primers.push(u);
-			else if (u.account_type === "Boy" && u.graduated === false) boys.push(u);
+			if (u.t === "Officer") officers.push(u);
+			else if (u.t === "Primer") primers.push(u);
+			else if (u.t === "Boy" && u.g === false) boys.push(u);
 		}
 
 		return { officers, primers, boys };
@@ -91,9 +91,19 @@ const ResultGenerationPage = () => {
 		setInstructor(null);
 		const user = groupedUsers.officers.find(officer => officer.id === id) || groupedUsers.primers.find(primer => primer.id === id)
 		if (!user) return;
-		if (user.credentials === "" || !user.credentials) return showMessage("Instructor must have credentials.");
+		if (user.c === "" || !user.c) return showMessage("Instructor must have credentials.");
 		else setInstructor(user);
 	}
+
+	const convert = (rank, type) => {
+        const OFFICER_RANK_MAP = { O: "OCT", J: "2LT", L: "LTA" };
+		const PRIMER_RANK_MAP = { C: "CLT", S: "SCL" };
+		const BOY_RANK_MAP = { R: "REC", P: "PTE", L: "LCP", C: "CPL", S: "SGT", W: "SSG", O: "WO" };
+
+        if (type === "Officer") return OFFICER_RANK_MAP[rank];
+        if (type === "Primer") return PRIMER_RANK_MAP[rank];
+        if (type === "Boy") return BOY_RANK_MAP[rank];
+    }
 
 	if (loading) return <Loading />
 
@@ -120,10 +130,10 @@ const ResultGenerationPage = () => {
 				<select onChange={(e) => selectInstructor(e.target.value)} defaultValue={""} id='results-instructor'>
 					<option value="" hidden>Select an Instructor</option>
 					{groupedUsers.primers.map((primerAccount) => {
-						return (<option key={primerAccount.id + "-primer-instructor"} value={primerAccount.id}>{primerAccount.rank} {primerAccount.account_name}</option>)
+						return (<option key={primerAccount.id + "-primer-instructor"} value={primerAccount.id}>{convert(primerAccount.r, primerAccount.t)} {primerAccount.n}</option>)
 					})}
 					{groupedUsers.officers.map((officerAccount) => {
-						return (<option key={officerAccount.id + "-officer-instructor"} value={officerAccount.id}>{officerAccount.rank} {officerAccount.account_name}</option>)
+						return (<option key={officerAccount.id + "-officer-instructor"} value={officerAccount.id}>{convert(officerAccount.r, officerAccount.t)} {officerAccount.n}</option>)
 					})}
 				</select>
 
@@ -132,7 +142,7 @@ const ResultGenerationPage = () => {
 					{groupedUsers.boys.map(boyAccount => (
 						<div key={boyAccount.id + "-display"}>
 							<input type='checkbox' id={boyAccount.id} onChange={selectBoy}></input>
-							<label htmlFor={boyAccount.id}><span>Sec {boyAccount.level} {boyAccount.rank} {boyAccount.account_name}</span></label>
+							<label htmlFor={boyAccount.id}><span>Sec {boyAccount.l} {convert(boyAccount.r, boyAccount.t)} {boyAccount.n}</span></label>
 						</div>
 					))}
 				</div>
@@ -143,7 +153,7 @@ const ResultGenerationPage = () => {
 				</Fragment>}
 			</form>
 
-			{award != null && ((award.badge_masteries.length > 0 && mastery != null) || (award.badge_masteries.length === 0 && mastery == null)) && instructor?.account_name != null && boys.length > 0 && <>
+			{award != null && ((award.badge_masteries.length > 0 && mastery != null) || (award.badge_masteries.length === 0 && mastery == null)) && instructor?.n != null && boys.length > 0 && <>
 				<button onClick={() => window.print()}>Generate Results</button>
 				{isApple && <p className={styles['apple-warning']}>It looks like you are using an Apple Device. Please press Share &gt; Print to generate results. Note that format might differ from other browsers.</p>}
 				<ResultPage
