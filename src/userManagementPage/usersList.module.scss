@@ -75,9 +75,10 @@
         width: unset;
 
         >div:first-of-type {
-            background: white;
-            position: sticky;
-            top: 0;
+
+            input, i:first-of-type {
+                display: none;
+            }
         }
     }
 }

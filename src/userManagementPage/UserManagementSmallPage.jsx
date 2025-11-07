@@ -12,7 +12,7 @@ const UserManagementSmallPage = () => {
     const location = useLocation();
     const { userId } = useParams();
     const { user } = useUser();
-    const accountType = user.account_type;
+    const accountType = user.t;
     const appointment = user.appointment;
     const [, setPageState] = useState("form");
 

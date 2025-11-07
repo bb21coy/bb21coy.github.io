@@ -74,7 +74,7 @@ const Header = () => {
 					<i className="fa-solid fa-bars"></i>
 				</button>
 
-				<img src="coy logo.webp" alt='BB Logo' width={"90px"} height={"90px"} onClick={() => navigate(loggedIn ? '/home' : '/login')} />
+				<img src="/coy logo.webp" alt='BB Logo' width={"90px"} height={"90px"} onClick={() => navigate(loggedIn ? '/home' : '/login')} />
 			</div>
 
 			<div data-state={navigationViewable} style={{ height: (40 * buttons) + "px" }} data-header-type={loggedIn ? "home" : "public"}>

@@ -9,7 +9,6 @@ function UserPermissions({ allowedAccountTypes = [], apptAllowed = false, childr
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log(user);
         if (user && user.account_name !== null) setLoading(false);
     }, [user]);
 
