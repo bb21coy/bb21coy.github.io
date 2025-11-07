@@ -8,7 +8,6 @@ import { useUser } from '../general/UserContext'
 import { signOut } from "@firebase/auth";
 import { auth } from "../firebase";
 import { useNavigate } from 'react-router-dom'
-import AdminUsageAnalytics from './UsageAnalytics'
 
 const DashboardPage = () => {
     const navigate = useNavigate()
@@ -110,8 +109,6 @@ const DashboardPage = () => {
                     <div style={{ '--legend': '#1E5945' }}></div>
                     <p>All Users</p>
                 </div>
-
-                {user.t === "Admin" && <AdminUsageAnalytics></AdminUsageAnalytics>}
             </div>
         </div>
     )

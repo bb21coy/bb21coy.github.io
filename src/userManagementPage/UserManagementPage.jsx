@@ -8,11 +8,13 @@ import styles from "./userManagementPage.module.scss"
 import { useUser } from '../general/UserContext'
 import usersListStyles from './usersList.module.scss'
 
+import UserAccountsListSmall from './UserAccountsSmallPage'
+
 // To access current users and create new accounts
 const UserManagementPage = () => {
 	const navigate = useNavigate()
 	const { user } = useUser();
-	const accountType = user.account_type;
+	const accountType = user.t;
 	const appointment = user.appointment;
 	const [pageState, setPageState] = useState("form");
 	const [usersList, setUsersList] = useState([])
@@ -20,7 +22,7 @@ const UserManagementPage = () => {
 
 	useEffect(() => {
 		window.addEventListener("resize", () => setPageSize(window.innerWidth > 800))
-		if (user.account_name !== null && user.account_type === 'Boy' && user.appointment === null) navigate('/home')
+		if (user.account_name !== null && user.t === 'Boy' && user.appointment === null) navigate('/home')
 	}, [navigate])
 
 	// Show the form to create new accounts
@@ -67,7 +69,8 @@ const UserManagementPage = () => {
 							<i onClick={showForm} className='fa-solid fa-user-plus'></i>
 						</div>
 
-						<UserAccountsList setUsersList={setUsersList} usersList={usersList} showUser={showUser} pageState={pageState} />
+						{!pageSize ? <UserAccountsListSmall setUsersList={setUsersList} usersList={usersList} showUser={showUser} pageState={pageState} />
+						: <UserAccountsList setUsersList={setUsersList} usersList={usersList} showUser={showUser} pageState={pageState} />}
 					</div>
 					<hr />
 				</>}

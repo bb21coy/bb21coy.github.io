@@ -35,12 +35,12 @@ const UserInformation = ({ userInfo, showForm }) => {
 		if (form.current) form.current.reset()
 		if (!userInfo) return
 		setEmail(undefined)
-		setAccountRank(userInfo.rank ?? null)
-		setAccountLevel(userInfo.level)
+		setAccountRank(convertRank(userInfo.rank, userInfo.t) ?? null)
+		setAccountLevel(userInfo.l)
 		setAccountClass(userInfo.class1)
-		setAccountGraduated(userInfo.graduated)
-		setAccountHonorific(userInfo.honorifics)
-		setAccountRollCall(userInfo.roll_call)
+		setAccountGraduated(userInfo.g)
+		setAccountHonorific(userInfo.h)
+		setAccountRollCall(userInfo.a)
 		setAccountPastRank((prev) => {
 			let next = { ...prev }
 			for (let i = 1; i <= 5; i++) {
@@ -80,7 +80,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 
 	function setRank(e) {
 		setAccountRank(e.target.value !== "NIL" ? e.target.value : null)
-		if (userInfo.account_type === 'Boy') {
+		if (userInfo.t === 'Boy') {
 			setAccountPastRank((prev) => {
 				let next = { ...prev }
 				next[accountLevel] = e.target.value
@@ -99,7 +99,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 
 	function setLevel(e) {
 		setAccountLevel(e.target.value)
-		if (userInfo.account_type === 'Boy') {
+		if (userInfo.t === 'Boy') {
 			setAccountPastRank((prev) => {
 				let next = { ...prev }
 				next[parseInt(e.target.value)] = accountRank
@@ -126,7 +126,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 			const values = Object.fromEntries(formData.entries());
 			delete values.email
 			delete values.password
-			values.account_type = userInfo.account_type
+			values.t = userInfo.t
 			values.graduated = accountGraduated
 			values.level = parseInt(values.level) || accountLevel
 			values.roll_call = accountRollCall
@@ -135,7 +135,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 				if (values[`class${i}`] === '') values[`class${i}`] = null
 				if (values[`rank${i}`] === '') values[`rank${i}`] = null
 			}
-			if (values.account_type === "Officer") values.class1 = accountClass
+			if (values.t === "Officer") values.class1 = accountClass
 
 			const result = UserSchema.safeParse(values);
 			if (!result.success || !submit) return showMessage(`${result.error.issues[0].path[0].replace("_", " ")}: ${result.error.issues[0].message}`)
@@ -167,17 +167,27 @@ const UserInformation = ({ userInfo, showForm }) => {
 		}
 	}
 
+	const convertRank = (rank, type) => {
+        const OFFICER_RANK_MAP = { O: "OCT", J: "2LT", L: "LTA" };
+        const PRIMER_RANK_MAP = { C: "CLT", S: "SCL" };
+        const BOY_RANK_MAP = { R: "REC", P: "PTE", L: "LCP", C: "CPL", S: "SGT", W: "SSG", O: "WO" };
+
+        if (type === "Officer") return OFFICER_RANK_MAP[rank];
+        if (type === "Primer") return PRIMER_RANK_MAP[rank];
+        if (type === "Boy") return BOY_RANK_MAP[rank];
+    }
+
 	if (!userInfo) return <Loading />
 
 	return (
 		<div className={styles.userInformation}>
-			<h2>User - {userInfo.account_name}</h2>
+			<h2>User - {userInfo.n}</h2>
 
 			<form id='edit-account-form' onSubmit={editAccount} ref={form} key={userInfo.id}>
 				<label htmlFor='name-input'>Full Name:</label>
-				<input id='name-input' name="account_name" defaultValue={userInfo.account_name} placeholder='Enter Full Name' />
+				<input id='name-input' name="account_name" defaultValue={userInfo.n} placeholder='Enter Full Name' />
 
-				{["Officer", "Admin"].includes(user.account_type) && <>
+				{["Officer", "Admin"].includes(user.t) && <>
 					<label htmlFor="email">Email</label>
 					<input id="email" name="email" defaultValue={email} autoComplete='email' placeholder='Enter Email' />
 
@@ -186,24 +196,24 @@ const UserInformation = ({ userInfo, showForm }) => {
 				</>}
 
 				<label htmlFor='account-type-input'>Account Type:</label>
-				<select id="account-type-input" defaultValue={userInfo.account_type} disabled>
-					<option value={userInfo.account_type}>{userInfo.account_type}</option>
+				<select id="account-type-input" defaultValue={userInfo.t} disabled>
+					<option value={userInfo.t}>{userInfo.t}</option>
 				</select>
 
 				<label htmlFor='rank-input'>Rank:</label>
-				<select id="rank-input" name='rank' defaultValue={userInfo.rank || "NIL"} onChange={setRank}>
-					{userInfo.account_type === "Officer" && <>
+				<select id="rank-input" name='rank' defaultValue={convertRank(userInfo.r, userInfo.t) || "NIL"} onChange={setRank}>
+					{userInfo.t === "Officer" && <>
 						<option value="NIL">Not Applicable</option>
 						<option value="OCT">OCT</option>
 						<option value="2LT">2LT</option>
 						<option value="LTA">LTA</option>
 					</>}
-					{userInfo.account_type === "Primer" && <>
+					{userInfo.t === "Primer" && <>
 						<option value="NIL">Not Applicable</option>
 						<option value="CLT">CLT</option>
 						<option value="SCL">SCL</option>
 					</>}
-					{userInfo.account_type === "Boy" && <>
+					{userInfo.t === "Boy" && <>
 						<option value="REC">REC</option>
 						<option value="PTE">PTE</option>
 						<option value="LCP">LCP</option>
@@ -214,7 +224,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 					</>}
 				</select>
 
-				{(["Admin", "Officer"].includes(user.account_type) || userInfo.appointment === 'CSM') && userInfo.graduated === false && <>
+				{(["Admin", "Officer"].includes(user.t) || userInfo.appointment === 'CSM') && userInfo.g === false && <>
 					<label htmlFor='attendance-appearance'>Attendance Appearance:</label>
 					<select id="attendance-appearance" name='roll_call' value={accountRollCall === true ? "Yes" : "No"} data-s={accountRollCall === true ? "Yes" : "No"} onChange={(e) => setAccountRollCall(e.target.value === 'Yes')}>
 						<option value="" disabled hidden>Select Attendance Appearance</option>
@@ -223,14 +233,14 @@ const UserInformation = ({ userInfo, showForm }) => {
 					</select>
 				</>}
 
-				{userInfo.account_type === "Boy" && <>
+				{userInfo.t === "Boy" && <>
 					<label htmlFor='member-id-input'>Member ID:</label>
 					<input name="member_id" id='member-id-input' defaultValue={userInfo.member_id} placeholder='Enter Member ID' />
 				</>}
 
-				{userInfo.account_type === "Boy" && !accountGraduated && <>
+				{userInfo.t === "Boy" && !accountGraduated && <>
 					<label htmlFor='secondary-input'>Secondary:</label>
-					<select id="secondary-input" name='level' onChange={setLevel} defaultValue={userInfo.level || ""}>
+					<select id="secondary-input" name='level' onChange={setLevel} defaultValue={userInfo.l || ""}>
 						<option value="" disabled hidden>Select Level</option>
 						<option value="5">5</option>
 						<option value="4">4</option>
@@ -240,7 +250,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 					</select>
 				</>}
 
-				{userInfo.account_type === "Boy" && (() => {
+				{userInfo.t === "Boy" && (() => {
 					const level = parseInt(accountLevel);
 					if (!isNaN(level)) {
 						return Array.from({ length: level }, (_, i) => (
@@ -252,13 +262,13 @@ const UserInformation = ({ userInfo, showForm }) => {
 					}
 				})()}
 
-				{userInfo.account_type === "Boy" && (() => {
+				{userInfo.t === "Boy" && (() => {
 					const level = parseInt(accountLevel);
 					if (!isNaN(level)) {
 						return Array.from({ length: level - 1 }, (_, i) => (
 							<React.Fragment key={i}>
 								<label htmlFor={`sec-${i + 1}-rank`}>End of Sec {i + 1} Rank:</label>
-								<select id={`sec-${i + 1}-rank`} name={"rank" + (i + 1)} onChange={(e) => setPastRank(i + 1, e)} defaultValue={accountPastRank[i + 1] || ""}>
+								<select id={`sec-${i + 1}-rank`} name={"rank" + (i + 1)} onChange={(e) => setPastRank(i + 1, e)} defaultValue={convertRank(accountPastRank[i + 1], userInfo.t) || ""}>
 									<option value="">-</option>
 									<option value="REC">REC</option>
 									<option value="PTE">PTE</option>
@@ -273,7 +283,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 					}
 				})()}
 
-				{userInfo.account_type === "Boy" && <>
+				{userInfo.t === "Boy" && <>
 					<label htmlFor='graduated-input'>Graduated:</label>
 					<select id="graduated-input" name='graduated' defaultValue={userInfo.graduated ? "Yes" : "No"} onChange={setGraduated}>
 						<option value="Yes">Yes</option>
@@ -296,7 +306,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 					</select>
 				</>}
 
-				{((userInfo.account_type === "Primer" && userInfo.rank === null) || userInfo.account_type === "Officer") && <>
+				{((userInfo.t === "Primer" && userInfo.rank === null) || userInfo.t === "Officer") && <>
 					<label htmlFor='class-input'>Class:</label>
 					<select id="class-input" name='class_1' onChange={(e) => setAccountClass(e.target.value)} value={accountClass || ""} placeholder='Enter Class'>
 						<option value="" hidden disabled>Select Class</option>
@@ -307,7 +317,7 @@ const UserInformation = ({ userInfo, showForm }) => {
 					</select>
 				</>}
 
-				{userInfo.account_type !== "Boy" && <>
+				{userInfo.t !== "Boy" && <>
 					<label htmlFor='credentials-input'>Credentials (For 32A results):</label>
 					<input name="credentials" defaultValue={userInfo.credentials} id='credentials-input' placeholder='Enter Credentials (Optional)' />
 				</>}

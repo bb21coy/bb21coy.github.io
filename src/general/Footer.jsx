@@ -10,8 +10,8 @@ const Footer = () => {
             <div>
                 <p>Affiliated With</p>
                 <div>
-                    <img src="gm.webp" width="50" height="50" alt="Geylang Methodist School (Secondary)" onClick={() => window.open("https://www.geylangmethodistsec.moe.edu.sg", "_blank")} />
-                    <img src="church.png" width="50" height="50" alt="Christalite Methodist Chapel" onClick={() => window.open("https://www.cmch.sg", "_blank")} />
+                    <img src="/gm.webp" width="50" height="50" alt="Geylang Methodist School (Secondary)" onClick={() => window.open("https://www.geylangmethodistsec.moe.edu.sg", "_blank")} />
+                    <img src="/church.png" width="50" height="50" alt="Christalite Methodist Chapel" onClick={() => window.open("https://www.cmch.sg", "_blank")} />
                 </div>
             </div>
             <div>
