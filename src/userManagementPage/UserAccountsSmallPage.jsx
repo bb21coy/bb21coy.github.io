@@ -97,7 +97,7 @@ const UserAccountsListSmall = ({ usersList, setUsersList, showUser, pageState })
                         <div
                             key={i}
                             className={`${styles.card} ${hoveredIndex === i ? styles.active : ""}`}
-                            style={{ top: baseTop + shift, "--height": 20 * users?.length ?? 0 }}
+                            style={{ top: baseTop + shift, "--height": 20 * (users?.length ?? 0) }}
                             onClick={() => setHoveredIndex(prev => prev === i ? null : i)}
                         >
                             <p>{g} <span>{users.length} Users</span></p>
