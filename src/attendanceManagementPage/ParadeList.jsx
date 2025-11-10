@@ -20,9 +20,9 @@ const ParadeList = ({ setPageState, pageState }) => {
     }, [])
 
     useEffect(() => {
-        if (["Admin", "Officer", "Primer", "CSM", "DY CSM", "Admin Sergeant"].includes(user.account_type)) setPageState("form")
+        if (["Admin", "Officer", "Primer", "CSM", "DY CSM", "Admin Sergeant"].includes(user.t || user.appointment)) setPageState("form")
         else {
-            if (parades.length > 0) setPageState(parades[parades.length - 1]?.id)
+            if (parades.length > 0) setPageState(parades[0]?.id)
         }
     }, [user]);
 
