@@ -95,10 +95,10 @@ const LogInPage = () => {
 				<div className={styles.video_container}>
 					<img src="slide 2.webp" alt="Background Image" />
 					<video autoPlay muted loop playsInline className={styles.video_main}>
-						<source src="https://github.com/bb21coy/bb21coy.github.io/releases/download/v1/vid.mp4" type="video/mp4" />
+						<source src="https://github.com/bb21coy/bb21coy.github.io/releases/download/v1/vid_v2.mp4" type="video/mp4" />
 					</video>
 					<video autoPlay muted loop playsInline className={styles.video_overlay}>
-						<source src="https://github.com/bb21coy/bb21coy.github.io/releases/download/v1/vid.mp4" type="video/mp4" />
+						<source src="https://github.com/bb21coy/bb21coy.github.io/releases/download/v1/vid_v2.mp4" type="video/mp4" />
 					</video>
 				</div>
 				<form onSubmit={submitForm} noValidate>
