@@ -71,7 +71,7 @@ const DashboardPage = () => {
 
                 {(user.t !== "Boy" || (user.t === "Boy" && user.appointment)) && <>
                     <DashboardOptions title="User Management" icon="users" url="/user_management" color="252850" description='View and Edit Portal Members, as well update Appointment Holders' />
-                    <DashboardOptions title="Awards Management" icon="file-certificate" url="/awards" color="252850" description="Manage Boys' awards, eligibility, and find award requirements all in one place" />
+                    <DashboardOptions title="Awards Management" icon="file-certificate" url="/award_management" color="252850" description="Manage Boys' awards, eligibility, and find award requirements all in one place" />
                     <DashboardOptions title="Results Generation" icon="file-invoice" url="/generate_result" color="252850" description='Make 32A Submissions easier by automatically generating results' />
                     <DashboardOptions title="Parade & Attendance" icon="file" url="/attendance_management" color="252850" description='Manage parade schedules and record attendance seamlessly' />
                 </>}

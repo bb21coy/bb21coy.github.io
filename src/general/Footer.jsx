@@ -41,7 +41,7 @@ const Footer = () => {
         <footer>
             <div className={styles.top}>
                 <div className={styles.about}>
-                    <div className={styles.logo} onClick={() => navigate(loggedIn ? '/home' : '/login')}>
+                    <div className={styles.logo}>
                         <img src="/bb-crest.png" alt='BB Logo' width={"60px"} height={"60px"} />
                         <div>
                             <p>The boys' brigade</p>

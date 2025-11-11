@@ -71,7 +71,7 @@ createRoot(document.body).render(
 									</UserPermissions>
 								} />
 
-								<Route path='/awards' element={
+								<Route path='/award_management' element={
 									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']} apptAllowed={true}>
 										<AwardsManagementPage />
 									</UserPermissions>
