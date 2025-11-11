@@ -1,10 +1,41 @@
 import styles from "./footer.module.scss"
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useUser } from "./UserContext"
 
 const Footer = () => {
     const { user } = useUser()
     const navigate = useNavigate()
+
+    useEffect(() => {
+		if (!window.googleTranslateElementInit) {
+			window.googleTranslateElementInit = () => {
+				new window.google.translate.TranslateElement(
+					{
+						pageLanguage: "en",
+						includedLanguages: "en,zh-CN,ms,ta",
+						autoDisplay: false,
+					},
+					"google_translate_element"
+				)
+			}
+
+			const script = document.createElement("script")
+			script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+			document.body.appendChild(script);
+
+            window.googleTranslateElementInit = () => {
+                new window.google.translate.TranslateElement(
+                    {
+                        pageLanguage: "en",
+                        includedLanguages: "en,zh-CN,ms,ta",
+                        autoDisplay: false,
+                    },
+                    "google_translate_element"
+                )
+            }
+		}
+	}, [])
 
     return (
         <footer>
@@ -57,6 +88,12 @@ const Footer = () => {
                         <span onClick={() => window.open("https://github.com/yorhagengyue", "_blank")}>Geng Yue</span>
                     </p>
                 </div>
+
+
+                <div>
+                    <div id="google_translate_element"></div>
+                </div>
+                
             </div>
 
             <hr />

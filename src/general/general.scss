@@ -9,8 +9,42 @@
     }
 }
 
+.skiptranslate>iframe {
+    height: 0 !important;
+    border-style: none;
+    box-shadow: none;
+}
+
+.goog-te-gadget {
+    display: grid;
+    grid-template-columns: repeat(2, min-content);
+    align-items: flex-start;
+    gap: 8px 5px;
+
+    >div {
+        grid-column: span 2;
+        padding: 3px 5px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        color: #333;
+        cursor: pointer;
+    }
+
+    span {
+        display: block;
+        font-size: 12px;
+        font-weight: normal;
+        color: #666;
+    }
+}
+
+
 html {
     background: black;
+}
+
+body {
+    top: 0 !important;
 }
 
 main {

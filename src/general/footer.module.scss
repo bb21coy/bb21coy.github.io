@@ -81,10 +81,11 @@ footer {
 
 .middle {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     width: 100%;
     gap: 30px;
     justify-content: space-between;
+    align-items: center;
 
     p[data-icon] {
         font-weight: bold;
@@ -143,6 +144,14 @@ footer {
         div {
             max-width: unset;
             text-align: start;
+        }
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .logo {
+        div {
+            display: none !important;
         }
     }
 }
