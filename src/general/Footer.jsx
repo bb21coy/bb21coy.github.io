@@ -1,26 +1,71 @@
-import "./footer.scss"
+import styles from "./footer.module.scss"
+import { useNavigate } from "react-router-dom"
+import { useUser } from "./UserContext"
 
 const Footer = () => {
+    const { user } = useUser()
+    const navigate = useNavigate()
+
     return (
         <footer>
-            <div>
-                <p>Follow Us!</p>
-                <a href="https://www.instagram.com/bb21coy/" target="_blank" rel="noreferrer" aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>
-            </div>
-            <div>
-                <p>Affiliated With</p>
-                <div>
-                    <img src="/gm.webp" width="50" height="50" alt="Geylang Methodist School (Secondary)" onClick={() => window.open("https://www.geylangmethodistsec.moe.edu.sg", "_blank")} />
-                    <img src="/church.png" width="50" height="50" alt="Christalite Methodist Chapel" onClick={() => window.open("https://www.cmch.sg", "_blank")} />
+            <div className={styles.top}>
+                <div className={styles.about}>
+                    <div className={styles.logo} onClick={() => navigate(loggedIn ? '/home' : '/login')}>
+                        <img src="/bb-crest.png" alt='BB Logo' width={"60px"} height={"60px"} />
+                        <div>
+                            <p>The boys' brigade</p>
+                            <span>21st Singapore Company</span>
+                        </div>
+                    </div>
+                    <p>BB 21st Portal streamlines repetitive tasks like parade notices, attendance, awards tracking, uniform inspections, and 32A result generation.</p>
+                    <a href="https://www.instagram.com/bb21coy/" target="_blank" rel="noreferrer" aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>
+                </div>
+
+                <div className={styles.links}>
+                    <p>Quick Links</p>
+                    {user.t ? <p onClick={() => navigate('/home')}>Dashboard</p> : <p onClick={() => navigate('/login')}>Login</p>}
+                    <p onClick={() => navigate('/parade_notice')}>Parade Notice</p>
+                    <p onClick={() => navigate('/calendar')}>Calendar</p>
+                </div>
+
+                <div className={styles.links}>
+                    <p>Affiliated With</p>
+                    <p onClick={() => window.open("https://www.geylangmethodistsec.moe.edu.sg", "_blank")}>Geylang Methodist School (Secondary)</p>
+                    <p onClick={() => window.open("https://www.cmch.sg", "_blank")}>Christalite Methodist Chapel</p>
+                </div>
+
+                <div className={styles.links}>
+                    <p>Associated Websites</p>
+                    <p onClick={() => window.open("https://www.bb.org.sg", "_blank")}>BB Singapore</p>
+                    <p onClick={() => window.open("https://members.bb.org.sg", "_blank")}>BB Members Portal</p>
                 </div>
             </div>
-            <div>
-                <p>Associated Websites</p>
+
+            <hr />
+
+            <div className={styles.middle}>
                 <div>
-                    <a href="https://www.bb.org.sg/" target="_blank" rel="noreferrer">HQ Website</a>
-                    <a href="https://members.bb.org.sg/cos/o.x?c=/ca3_ca3bbportal/user&func=login" target="_blank" rel="noreferrer">Members Portal</a>
+                    <p data-icon style={{ "--icon": "'\\f3c5'" }}>Location</p>
+                    <p onClick={() => window.open("https://maps.app.goo.gl/gNWas7A5sUHMQJsm9", "_blank")}>2 Geylang East Central, Singapore 389705</p>
                 </div>
-                <p>Developed by Bryan Lee & Dylan Yeo</p>
+
+                <div>
+                    <p data-icon style={{ "--icon": "'\\f121'" }}>Inspired & Developed by</p>
+                    <p>
+                        <span onClick={() => window.open("https://github.com/BryanL2303", "_blank")}>Bryan Lee,</span>{" "}
+                        <span onClick={() => window.open("https://github.com/yaboywf", "_blank")}>Dylan Yeo,</span>{" "}
+                        <span onClick={() => window.open("https://github.com/yorhagengyue", "_blank")}>Geng Yue</span>
+                    </p>
+                </div>
+            </div>
+
+            <hr />
+
+            <div className={styles.bottom}>
+                <p>&copy; 2025 BB 21<sup>st</sup> Singapore Company. All rights reserved.</p>
+                <div>
+					<p>This hope we have as an anchor of the soul, a hope both <strong>sure and stedfast</strong> and one which enters within the veil where Jesus has entered as a forerunner for us... Hebrews 6:19-20a</p>
+				</div>
             </div>
         </footer>
     )

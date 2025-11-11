@@ -10,7 +10,9 @@ const Layout = () => {
 			<div className='error-container'></div>
 
 			<Header />
-			<Outlet />
+			<main>
+				<Outlet />
+			</main>
 			<Footer />
 		</div>
 	);
