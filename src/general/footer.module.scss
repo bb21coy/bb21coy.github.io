@@ -114,6 +114,13 @@ footer {
             cursor: pointer;
         }
     }
+
+    p[data-warning] {
+        margin-left: 0;
+        cursor: unset;
+        color: red;
+        font-size: 10px;
+    }
 }
 
 .bottom {
@@ -126,7 +133,7 @@ footer {
 
     div {
         text-align: end;
-        max-width: 400px;
+        max-width: 450px;
     }
 }
 

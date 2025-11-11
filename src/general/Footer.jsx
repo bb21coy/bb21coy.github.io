@@ -81,7 +81,7 @@ const Footer = () => {
                 </div>
 
                 <div>
-                    <p data-icon style={{ "--icon": "'\\f121'" }}>Inspired & Developed by</p>
+                    <p data-icon style={{ "--icon": "'\\f121'" }}>Inspired and Developed by</p>
                     <p>
                         <span onClick={() => window.open("https://github.com/BryanL2303", "_blank")}>Bryan Lee,</span>{" "}
                         <span onClick={() => window.open("https://github.com/yaboywf", "_blank")}>Dylan Yeo,</span>{" "}
@@ -92,6 +92,7 @@ const Footer = () => {
 
                 <div>
                     <div id="google_translate_element"></div>
+                    <p data-warning>Translation may not be accurate</p>
                 </div>
                 
             </div>
