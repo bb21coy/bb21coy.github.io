@@ -54,7 +54,7 @@ createRoot(document.body).render(
 								} />
 
 								<Route path='/attendance_management' element={
-									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer', 'Boy']}>
+									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']} apptAllowed={true}>
 										<AttendanceManagementPage />
 									</UserPermissions>
 								} />

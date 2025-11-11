@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { handleServerError } from './handleServerError'
 import { useUser } from './UserContext'
@@ -10,9 +10,19 @@ import styles from './header.module.scss'
 const Header = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const [userImage, setUserImage] = useState(null);
 	const { user, setUser, loggedIn, setLoggedIn, navigationViewable, setNavigationViewable } = useUser();
 	const [buttons, setButtons] = useState(2);
-	const [currentPage, setCurrentPage] = useState(window.location.hash);
+	const [currentPage, setCurrentPage] = useState(window.location.pathname);
+	
+	const [submenuPos, setSubmenuPos] = useState({ x: 0, y: 0 });
+	const [activeMenu, setActiveMenu] = useState(null);
+	const baseTabs = {
+		"statistics": { "My Attendance": ["/user_attendance", "'\\f4fd'"], "My Awards": ["/user_awards", "'\\f559'"], "My Inspection Results": ["/user_inspections", "'\\e3c7'"] },
+		"management": { "User Management": ["/user_management", "'\\f0c0'"], "Parades & Attendance": ["/attendance_management", "'\\f15b'"], "Awards Management": ["/awards_management", "'\\f5f3'"], "Result Generation": ["/generate_result", "'\\f570'"], "Uniform Inspection": ["/uniform_inspection", "'\\e3c7'"] },
+		"others": { "Resources": ["/resources", "'\\f02d'"], "Manage Login": ["/manage_login", "'\\f023'"], "Help": ["/help", "'\\003f'"], "Parade Notice": ["/parade_notice", "'\\f15b'"], "Calendar": ["/calendar", "'\\f133'"] }
+	}
+	const [tabs, setTabs] = useState(baseTabs);
 
 	useEffect(() => {
 		const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -23,6 +33,7 @@ const Header = () => {
 				return;
 			}
 
+			setUserImage(firebaseUser.photoURL === "" ? null : firebaseUser.photoURL);
 			setLoggedIn(true);
 			const tokenResult = await firebaseUser.getIdTokenResult();
 			const claims = tokenResult.claims;
@@ -39,14 +50,18 @@ const Header = () => {
 
 			setUser(fullUser);
 
-			let count = 5;
-			if (fullUser.account_type === "Boy") count += 1;
-			if ((fullUser.account_type !== "Boy") || (fullUser.account_type === "Boy" && fullUser.appointment)) count += 3;
-			if (fullUser.account_type !== "Boy") count += 1;
-			setButtons(count);
+			const updatedTabs = JSON.parse(JSON.stringify(baseTabs));
+			if (fullUser.t !== "Boy" && fullUser.t !== "Admin") {
+				delete updatedTabs.statistics["My Awards"]
+				delete updatedTabs.statistics["My Inspection Results"]
+			}
+
+			if (fullUser.t === "Boy" && fullUser.appointment) delete updatedTabs.management["Uniform Inspection"]
+			if (fullUser.t === "Boy" && !fullUser.appointment) delete updatedTabs.management;
+			setTabs(updatedTabs);
 		});
 
-		setCurrentPage(window.location.hash);
+		setCurrentPage(window.location.pathname);
 		return () => unsub();
 	}, [navigate, location]);
 
@@ -67,150 +82,84 @@ const Header = () => {
 		}
 	}
 
+	const handleSubmenuClick = (e, menuKey) => {
+		if (activeMenu === menuKey) {
+			setActiveMenu(null);
+			return;
+		}
+
+		const rect = e.currentTarget.getBoundingClientRect();
+		setSubmenuPos({
+			x: rect.left,
+			y: rect.bottom
+		});
+		setActiveMenu(menuKey);
+	};
+
 	return (
-		<header>
-			<div>
-				<button className={styles["menu-button"]} onClick={() => setNavigationViewable(prevState => !prevState)} aria-label='Menu'>
-					<i className="fa-solid fa-bars"></i>
-				</button>
+		<>
+			<header>
+				<div className={styles.logo} onClick={() => navigate(loggedIn ? '/home' : '/login')}>
+					<img src="/bb-crest.png" alt='BB Logo' width={"60px"} height={"60px"} />
+					<div>
+						<p>The boys' brigade</p>
+						<span>21st Singapore Company</span>
+					</div>
+				</div>
 
-				<img src="/coy logo.webp" alt='BB Logo' width={"90px"} height={"90px"} onClick={() => navigate(loggedIn ? '/home' : '/login')} />
-			</div>
+				<div className={styles.topbar}>
+					{!loggedIn ? <>
+						<div onClick={() => navigate('/calendar')}>Calendar</div>
+						<div onClick={() => navigate('/parade_notice')}>Parade Notice</div>
+						<div onClick={() => navigate('/login')}>Login</div>
+					</> : <>
+						<div data-home onClick={() => { navigate('/home'); setActiveMenu(null) }}>Dashboard</div>
+						{Object.keys(tabs).map((menuKey) => (
+							<div key={menuKey} data-submenu onClick={(e) => handleSubmenuClick(e, menuKey)}>
+								{menuKey.charAt(0).toUpperCase() + menuKey.slice(1)}
+							</div>
+						))}
 
-			<div data-state={navigationViewable} style={{ height: (40 * buttons) + "px" }} data-header-type={loggedIn ? "home" : "public"}>
-				{!loggedIn && <>
-					<button className={styles.login} onClick={() => navigate('/parade_notice')}>Parade Notice</button>
-					<button className={styles.login} onClick={() => navigate('/login')}>Login</button>
-				</>}
+						<div data-image={!!userImage} style={{ background: `url(${userImage}) center/cover no-repeat` }} onClick={() => navigate("/user_profile")}></div>
+						<div data-logout onClick={logOut}>Logout</div>
+					</>}
+					<i className='fa-solid fa-bars' onClick={() => setNavigationViewable(prevState => !prevState)}></i>
+				</div>
+			</header>
 
-				{loggedIn &&
-					<>
-						<button onClick={() => navigate('/user_attendance')}>My Attendance</button>
+			{activeMenu && <div className={styles.sub_menu} style={{ left: submenuPos.x, height: `${4 + (tabs[activeMenu].length * 10) + (tabs[activeMenu].length * 30)}px` }}>
+				{Object.keys(tabs[activeMenu]).map((tab, index) => <button key={index} style={{ "--icon": tabs[activeMenu][tab][1] }} onClick={() => navigate(tabs[activeMenu][tab][0])}>{tab}</button>)}
+			</div>}
 
-						{(user.account_type !== "Boy" || user.appointment !== null) &&
-							<button onClick={() => navigate('/user_management')}>Users Management</button>}
-
-						{(user.account_type === "Officer" || user.appointment?.toLowerCase().includes("tech")) &&
-							<button onClick={() => navigate('/home_editor')}>Home Page Editor</button>}
-
-						<button onClick={() => navigate('/attendance_management')}>Parades & Attendance</button>
-
-						{(user.account_type === "Boy") &&
-							<button onClick={() => navigate('/user_awards')}>My Awards</button>}
-
-						{(user.account_type === "Boy") &&
-							<button onClick={() => navigate('/user_inspections')}>My Inspection Results</button>}
-
-						{(user.account_type !== "Boy" || user.appointment !== null) &&
-							<button onClick={() => navigate('/awards')}>Award Management</button>}
-
-						{(user.account_type !== "Boy" || user.appointment !== null) &&
-							<button onClick={() => navigate('/generate_result')}>Result Generation</button>}
-
-						{user.account_type !== "Boy" &&
-							<button onClick={() => navigate('/uniform_inspection_results')}>Uniform Inspection</button>}
-
-						<button onClick={() => navigate('/user_awards')}>Resources</button>
-						<button onClick={() => navigate('/manage_login')}>Manage Login</button>
-						<button onClick={() => navigate('/help')}>Help</button>
-						<button onClick={logOut}>Logout</button>
-
-						<button aria-label='Open Sidebar' onClick={() => setNavigationViewable(prevState => !prevState)}>
-							<i className='fa-solid fa-bars'></i>
-						</button>
-					</>
-				}
-			</div>
-
-			<div className={styles.sidebar} data-open={navigationViewable}>
+			<div className={styles.sidebar_background} style={{ opacity: navigationViewable ? "1" : "0" }}></div>
+			<div className={styles.sidebar} style={{ right: navigationViewable ? '0' : "-110vw" }}>
 				<div>
-					<h2>Menu</h2>
-					<button aria-label='Close Sidebar' onClick={() => setNavigationViewable(prevState => !prevState)}>
-						<i className='fa-solid fa-xmark'></i>
-					</button>
+					{loggedIn && <div data-image={!!userImage} style={{ background: `url(${userImage}) center/cover no-repeat` }} onClick={() => navigate("/user_profile")}></div>}
+					<i className='fa-solid fa-xmark' onClick={() => setNavigationViewable(prevState => !prevState)}></i>
 				</div>
 
 				<div>
 					{!loggedIn ? <>
-						<button onClick={() => navigate('/parade_notice')}>Parade Notice</button>
-						<button onClick={() => navigate('/login')}>Members Log In</button>
+						<button onClick={() => navigate('/parade_notice')} style={{ "--icon": '"\\f15b"' }}>Parade Notice</button>
+						<button onClick={() => navigate('/calendar')} style={{ "--icon": '"\\f133"' }}>Calendar</button>
+						<hr />
+						<button data-main-button onClick={() => navigate('/login')}>Login</button>
 					</> : <>
-						<button onClick={() => navigate('/home')} className={currentPage === '#/home' ? styles.active : ''}>
-							<i className='fa-solid fa-house'></i>
-							Dashboard
-						</button>
+						<button onClick={() => navigate('/home')} style={{ "--icon": '"\\f015"' }} className={currentPage === '/home' ? styles.active : ''}>Dashboard</button>
 
-						<button onClick={() => navigate('/user_attendance')} className={currentPage === '#/user_attendance' ? styles.active : ''}>
-							<i className='fa-solid fa-user-clock'></i>
-							My Attendance
-						</button>
+						{Object.keys(tabs).map((tab, index) => (
+							<Fragment key={index}>
+								<p>{tab.charAt(0).toUpperCase() + tab.slice(1)}</p>
+								{Object.keys(tabs[tab]).map((t, index) => <button data-sub-button className={currentPage === tabs[tab][t][0] ? styles.active : ''} style={{ "--icon": tabs[tab][t][1] }} key={index} onClick={() => navigate(tabs[tab][t][0])}>{t}</button>)}
+							</Fragment>
+						))}
 
-						{(user.account_type !== "Boy" || user.appointment !== null) &&
-							<button onClick={() => navigate('/user_management')} className={currentPage === '#/user_management' ? styles.active : ''}>
-								<i className='fa-solid fa-users'></i>
-								Users Management
-							</button>}
-
-						{(user.account_type === "Officer" || user.appointment?.toLowerCase().includes("tech")) &&
-							<button onClick={() => navigate('/home_editor')} className={currentPage === '#/home_editor' ? styles.active : ''}>
-								<i className='fa-solid fa-edit'></i>
-								Home Page Editor
-							</button>}
-
-						<button onClick={() => navigate('/attendance_management')} className={currentPage === '#/attendance_management' ? styles.active : ''}>
-							<i className='fa-solid fa-file'></i>
-							Parades & Attendance
-						</button>
-
-						{(user.account_type === "Boy" || user.account_type === "Admin") && <>
-							<button onClick={() => navigate('/user_awards')} className={currentPage === '#/user_awards' ? styles.active : ''}>
-								<i className='fa-solid fa-award'></i>
-								My Awards
-							</button>
-							<button onClick={() => navigate('/user_inspections')} className={currentPage === '#/user_inspections' ? styles.active : ''}>
-								<i className='fa-solid fa-shirt-long-sleeve'></i>
-								My Inspection Results
-							</button>
-						</>}
-
-						{(user.account_type !== "Boy" || user.appointment !== null) && <>
-							<button onClick={() => navigate('/awards')} className={currentPage === '#/awards' ? styles.active : ''}>
-								<img src="awards_tracker.webp" alt="Awards Management Icon" />
-								Awards Management
-							</button>
-							<button onClick={() => navigate('/generate_result')} className={currentPage === '#/generate_result' ? styles.active : ''}>
-								<i className='fa-solid fa-file-invoice'></i>
-								Result Generation
-							</button>
-						</>}
-
-						{user.account_type !== "Boy" &&
-							<button onClick={() => navigate('/uniform_inspection')} className={currentPage === '#/uniform_inspection' ? styles.active : ''}>
-								<i className='fa-solid fa-shirt-long-sleeve'></i>
-								Uniform Inspection
-							</button>}
-
-						<button onClick={() => navigate('/resources')} className={currentPage === '#/resources' ? styles.active : ''}>
-							<i className='fa-solid fa-book'></i>
-							Resources
-						</button>
-
-						<button onClick={() => navigate('/manage_login')} className={currentPage === '#/manage_login' ? styles.active : ''}>
-							<i className='fa-solid fa-lock'></i>
-							Manage Login
-						</button>
-						<button onClick={() => navigate('/help')} className={currentPage === '#/help' ? styles.active : ''}>
-							<i className='fa-solid fa-question'></i>
-							Help
-						</button>
-						<button onClick={logOut} className='log-out--button'>
-							<i className='fa-solid fa-right-from-bracket'></i>
-							Logout
-						</button>
+						<hr />
+						<button data-main-button onClick={logOut}>Logout</button>
 					</>}
 				</div>
 			</div>
-		</header>
+		</>
 	)
 }
 

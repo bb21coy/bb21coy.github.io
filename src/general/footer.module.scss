@@ -1,0 +1,148 @@
+footer {
+    background: #FAF9F6;
+    padding: 3vw 5vw;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+        user-select: none;
+
+        p {
+            font-family: "BBLogo" !important;
+            font-size: 20px;
+            color: #26284B;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        span {
+            letter-spacing: -0.5px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #26284B;
+            font-weight: bold;
+            font-style: italic;
+        }
+    }
+
+    hr {
+        width: 100%;
+        background: #26284B;
+    }
+}
+
+.top {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+
+    .about {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        >p {
+            font-size: 12px;
+            color: grey;
+            line-height: 2;
+        }
+
+        i {
+            font-size: 18px;
+            color: #26284B;
+        }
+    }
+
+    .links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-size: 12px;
+
+        p:not(:first-of-type) {
+            color: grey;
+            cursor: pointer;
+        }
+
+        p:first-of-type {
+            font-weight: bold;
+            font-size: 16px;
+        }
+    }
+}
+
+.middle {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    gap: 30px;
+    justify-content: space-between;
+
+    p[data-icon] {
+        font-weight: bold;
+        font-size: 16px;
+        color: black;
+        margin-left: 0 !important;
+
+        &::before {
+            width: 20px;
+            display: inline-block;
+            text-align: center;
+            content: var(--icon);
+            font: var(--fa-font-regular);
+            color: #26284B;
+            margin-right: 5px;
+        }
+    }
+
+    p {
+        font-size: 12px;
+        color: grey;
+        line-height: 1.5;
+        margin-left: 25px;
+
+        &:last-of-type {
+            cursor: pointer;
+        }
+    }
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 11px;
+    color: grey;
+    align-items: center;
+
+    div {
+        text-align: end;
+        max-width: 400px;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .top, .middle, .bottom {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+    }   
+
+    .bottom {
+        gap: 10px;
+        justify-content: start;
+        align-items: start;
+        
+        div {
+            max-width: unset;
+            text-align: start;
+        }
+    }
+}

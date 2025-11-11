@@ -17,7 +17,7 @@ const ParadeAttendance = ({ parade, users }) => {
 	const [selectedInput, setSelectedInput] = useState();
 
 	async function canTakeAttendance(parade) {
-		if (user.account_name == null || !parade || !parade.date) return setTakingAttendance(false);
+		if (user.n == null || !parade || !parade.date) return setTakingAttendance(false);
 		if (parade.date.toDate().getFullYear() !== new Date().getFullYear()) return setTakingAttendance(false);
 
 		const appointments = (await getDoc(doc(db, "appointments", "HJbxljYligJkryXpA7sh"))).data();
@@ -39,7 +39,8 @@ const ParadeAttendance = ({ parade, users }) => {
 				break;
 			}
 		}
-		if (!rank && user.account_type !== "Admin") {
+
+		if (!rank && user.t !== "Admin") {
 			setParadeAppointment(null);
 			return setTakingAttendance(false)
 		}
@@ -65,10 +66,10 @@ const ParadeAttendance = ({ parade, users }) => {
 
 	const platoonTotals = useMemo(() => {
 		return users
-			.filter(user => (!takingAttendance ? user.id in currentAttendance : user.roll_call))
+			.filter(user => (!takingAttendance ? user.id in currentAttendance : user.a))
 			.reduce((acc, user) => {
-				let platoon = user.level === '5' ? 'Sec 4' : `Sec ${user.level}`;
-				if (platoon === 'Sec null') platoon = user.account_type;
+				let platoon = user.l === '5' ? 'Sec 4' : `Sec ${user.l}`;
+				if (platoon === 'Sec null') platoon = user.t;
 				if (platoon === "Officer") platoon = "Officer/VAL";
 
 				const isPresent = currentAttendance[user.id] === '1';
@@ -121,15 +122,25 @@ const ParadeAttendance = ({ parade, users }) => {
 		document.getElementById(nextId)?.focus();
 	}
 
+	const convertRank = (rank, type) => {
+        const OFFICER_RANK_MAP = { O: "OCT", J: "2LT", L: "LTA" };
+        const PRIMER_RANK_MAP = { C: "CLT", S: "SCL" };
+        const BOY_RANK_MAP = { R: "REC", P: "PTE", L: "LCP", C: "CPL", S: "SGT", W: "SSG", O: "WO" };
+
+        if (type === "Officer") return OFFICER_RANK_MAP[rank];
+        if (type === "Primer") return PRIMER_RANK_MAP[rank];
+        if (type === "Boy") return BOY_RANK_MAP[rank];
+    }
+
 	return (
 		<div className={styles['parade-attendance']}>
 			<div className={styles["flex-block"]}>
 				{Object.keys(levels).flatMap(level => (
 					<table key={level} style={{ "--tablename": `'${level} Attendance:'` }}>
 						<tbody>
-							{users.filter(boy => levels[level].includes(level.includes("Sec") ? boy.level : boy.account_type)).filter(boy => (!takingAttendance ? boy.id in currentAttendance : boy.roll_call)).map(boy => (
+							{users.filter(user => levels[level].includes(level.includes("Sec") ? parseInt(user.l) : user.t)).filter(boy => (!takingAttendance ? boy.id in currentAttendance : boy.a)).map(boy => (
 								<tr key={boy.id}>
-									<td>{boy.rank != 'Teacher' ? boy.rank : boy.honorifics} {boy.account_name}</td>
+									<td>{convertRank(boy.rank, boy.t) != 'Teacher' ? convertRank(boy.rank, boy.t) : boy.h} {boy.n}</td>
 									{!takingAttendance ?
 										<td>{currentAttendance[boy.id] || "-"}</td> :
 										<td>

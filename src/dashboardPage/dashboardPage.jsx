@@ -17,7 +17,7 @@ const DashboardPage = () => {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (user && user.account_name !== null) setLoading(false)
+        if (user && user.n !== null) setLoading(false)
 
         // const parades = await axios.get(`${BASE_URL}/parades`, { headers: { "x-route": "/get_parades_after_today" }, withCredentials: true })
         // setParadesAfterToday(parades.data)
@@ -66,16 +66,16 @@ const DashboardPage = () => {
                     <DashboardOptions title="My Inspection Results" icon="shirt-long-sleeve" url="/user_inspections" color="C1876B" description='View your results from recent inspections' />
                 </>}
 
-                {(user.t === "Officer" || user.appointment?.toLowerCase().includes("tech")) && <DashboardOptions title="Home Page Editor" icon="edit" url="home_editor" color='DC9D00' />}
+                {/* {(user.t === "Officer" || user.appointment?.toLowerCase().includes("tech")) && <DashboardOptions title="Home Page Editor" icon="edit" url="home_editor" color='DC9D00' />} */}
                 {user.t !== "Boy" && <DashboardOptions title="Uniform Inspection" icon="shirt-long-sleeve" url="/uniform_inspection" color="D53032" description='Record uniform inspection results for Boys' />}
 
-                {(user.t !== "Boy" || user.appointment !== null) && <>
+                {(user.t !== "Boy" || (user.t === "Boy" && user.appointment)) && <>
                     <DashboardOptions title="User Management" icon="users" url="/user_management" color="252850" description='View and Edit Portal Members, as well update Appointment Holders' />
-                    <DashboardOptions title="Awards Management" url="/awards" image="awards_tracker.webp" color="252850" description="Manage Boys' awards, eligibility, and find award requirements all in one place" />
+                    <DashboardOptions title="Awards Management" icon="file-certificate" url="/awards" color="252850" description="Manage Boys' awards, eligibility, and find award requirements all in one place" />
                     <DashboardOptions title="Results Generation" icon="file-invoice" url="/generate_result" color="252850" description='Make 32A Submissions easier by automatically generating results' />
+                    <DashboardOptions title="Parade & Attendance" icon="file" url="/attendance_management" color="252850" description='Manage parade schedules and record attendance seamlessly' />
                 </>}
 
-                <DashboardOptions title="Parade & Attendance" icon="file" url="/attendance_management" color="1E5945" description='Manage parade schedules and record attendance seamlessly' />
                 <DashboardOptions title="Resources" icon="book" url="/resources" color="1E5945" description='View Resources for Badgeworks that you are studying for' />
                 <DashboardOptions title="Manage Login" icon="lock" url="/manage_login" color="1E5945" description='Change your password, and link with 3rd Party Providers' />
                 <DashboardOptions title="Help" icon="question" url="/help" color="1E5945" description='Need help? We provides a Step By Step Guide to achieveing your task' />
@@ -89,21 +89,21 @@ const DashboardPage = () => {
 
                 <div>
                     <p>Welcome back,</p>
-                    <h2>{!user ? "" : `${(user.t !== "Admin" && user.r === null) ? account.h : (user.t == "Admin" ? "" : convert(user.r, user.t))} ${user.n}`}</h2>
+                    <h2>{!user ? "" : `${(user.t !== "Admin" && user.r === null) ? user.h : (user.t == "Admin" ? "" : convert(user.r, user.t))} ${user.n}`}</h2>
 
                     <br />
-                    <p>{user?.t}</p>
+                    <p>{user?.t} {user?.t === "Boy" ? ("| " + (user?.appointment ?? "Member")) : ""}</p>
                 </div>
 
                 <PendingTasks accountType={user.t} appointment={user.appointment} userId={userId} paradesAfterToday={paradesAfterToday} styles={styles} />
 
                 <div className={styles['access_levels']}>
-                    <div style={{ '--legend': '#DC9D00' }}></div>
-                    <p>Officers Only</p>
+                    {/* <div style={{ '--legend': '#DC9D00' }}></div> */}
+                    {/* <p>Officers Only</p> */}
                     <div style={{ '--legend': '#D53032' }}></div>
-                    <p>Primers and Officers</p>
+                    <p>Officers and Primers</p>
                     <div style={{ '--legend': '#252850' }}></div>
-                    <p>Boys with Appointments and Above</p>
+                    <p>Boys with Appointment(s) and Above</p>
                     <div style={{ '--legend': '#C1876B' }}></div>
                     <p>Boys Only</p>
                     <div style={{ '--legend': '#1E5945' }}></div>
