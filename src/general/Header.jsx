@@ -127,7 +127,7 @@ const Header = () => {
 				</div>
 			</header>
 
-			{activeMenu && <div className={styles.sub_menu} style={{ left: submenuPos.x, height: `${4 + (tabs[activeMenu].length * 10) + (tabs[activeMenu].length * 30)}px` }}>
+			{activeMenu && <div className={styles.sub_menu} style={{ left: submenuPos.x, top: submenuPos.y + 10, height: `${4 + (tabs[activeMenu].length * 10) + (tabs[activeMenu].length * 30)}px` }}>
 				{Object.keys(tabs[activeMenu]).map((tab, index) => <button key={index} style={{ "--icon": tabs[activeMenu][tab][1] }} onClick={() => navigate(tabs[activeMenu][tab][0])}>{tab}</button>)}
 			</div>}
 

@@ -1,4 +1,5 @@
 import styles from "./footer.module.scss"
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useUser } from "./UserContext"
 
@@ -6,11 +7,41 @@ const Footer = () => {
     const { user } = useUser()
     const navigate = useNavigate()
 
+    useEffect(() => {
+		if (!window.googleTranslateElementInit) {
+			window.googleTranslateElementInit = () => {
+				new window.google.translate.TranslateElement(
+					{
+						pageLanguage: "en",
+						includedLanguages: "en,zh-CN,ms,ta",
+						autoDisplay: false,
+					},
+					"google_translate_element"
+				)
+			}
+
+			const script = document.createElement("script")
+			script.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+			document.body.appendChild(script);
+
+            window.googleTranslateElementInit = () => {
+                new window.google.translate.TranslateElement(
+                    {
+                        pageLanguage: "en",
+                        includedLanguages: "en,zh-CN,ms,ta",
+                        autoDisplay: false,
+                    },
+                    "google_translate_element"
+                )
+            }
+		}
+	}, [])
+
     return (
         <footer>
             <div className={styles.top}>
                 <div className={styles.about}>
-                    <div className={styles.logo} onClick={() => navigate(loggedIn ? '/home' : '/login')}>
+                    <div className={styles.logo}>
                         <img src="/bb-crest.png" alt='BB Logo' width={"60px"} height={"60px"} />
                         <div>
                             <p>The boys' brigade</p>
@@ -50,13 +81,20 @@ const Footer = () => {
                 </div>
 
                 <div>
-                    <p data-icon style={{ "--icon": "'\\f121'" }}>Inspired & Developed by</p>
+                    <p data-icon style={{ "--icon": "'\\f121'" }}>Inspired and Developed by</p>
                     <p>
                         <span onClick={() => window.open("https://github.com/BryanL2303", "_blank")}>Bryan Lee,</span>{" "}
                         <span onClick={() => window.open("https://github.com/yaboywf", "_blank")}>Dylan Yeo,</span>{" "}
                         <span onClick={() => window.open("https://github.com/yorhagengyue", "_blank")}>Geng Yue</span>
                     </p>
                 </div>
+
+
+                <div>
+                    <div id="google_translate_element"></div>
+                    <p data-warning>Translation may not be accurate</p>
+                </div>
+                
             </div>
 
             <hr />
