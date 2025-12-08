@@ -393,6 +393,7 @@
     .resource-page {
         flex-direction: column;
         gap: 10px;
+        width: 100%;
 
         .sidebar {
             margin: 0;
@@ -411,6 +412,8 @@
         }
 
         .content {
+            width: 100%;
+
             table {
                 table-layout: auto;
                 overflow-x: auto;
