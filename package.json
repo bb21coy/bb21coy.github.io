@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "prepare": "husky"
   },
   "dependencies": {
     "@firebase/app": "^0.14.6",
@@ -39,6 +38,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "postcss": "^8.5.6",
     "rollup-plugin-visualizer": "^6.0.5",
     "typescript": "^5.9.3",
