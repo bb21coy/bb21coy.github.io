@@ -5,6 +5,7 @@ import styles from './logInPage.module.scss'
 import "../general/general.scss";
 import { auth } from "../firebase";
 import axios from 'redaxios';
+import Hls from "hls.js";
 import { signInWithEmailAndPassword, onAuthStateChanged, fetchSignInMethodsForEmail, signInWithCredential, signInWithPopup, OAuthProvider, GoogleAuthProvider } from "@firebase/auth";
 
 // To log in, accounts can only be created by existing users
@@ -15,6 +16,8 @@ const LogInPage = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const clientRef = useRef(null);
+	const videoRef1 = useRef(null);
+	const videoRef2 = useRef(null);
 
 	useEffect(() => {
 		const vids = document.querySelectorAll("video");
@@ -40,6 +43,25 @@ const LogInPage = () => {
 
 		return () => unsub();
 	}, [navigate])
+
+	useEffect(() => {
+		if (Hls.isSupported()) {
+			const hls1 = new Hls();
+			hls1.loadSource("/intro_vid/playlist.m3u8");
+			hls1.attachMedia(videoRef1.current);
+
+			const hls2 = new Hls();
+			hls2.loadSource("/intro_vid/playlist.m3u8");
+			hls2.attachMedia(videoRef2.current);
+		} else {
+			if (videoRef1.current.canPlayType("application/vnd.apple.mpegurl")) {
+				videoRef1.current.src = "/intro_vid/playlist.m3u8";
+			}
+			if (videoRef2.current.canPlayType("application/vnd.apple.mpegurl")) {
+				videoRef2.current.src = "/intro_vid/playlist.m3u8";
+			}
+		}
+	}, []);
 
 	const handleClick = () => {
 		clientRef.current.requestAccessToken({ prompt: "consent" });
@@ -94,12 +116,8 @@ const LogInPage = () => {
 
 				<div className={styles.video_container}>
 					<img src="slide 2.webp" alt="Background Image" />
-					<video autoPlay muted loop playsInline className={styles.video_main}>
-						<source src="https://github.com/bb21coy/bb21coy.github.io/releases/download/v1/vid_v2.mp4" type="video/mp4" />
-					</video>
-					<video autoPlay muted loop playsInline className={styles.video_overlay}>
-						<source src="https://github.com/bb21coy/bb21coy.github.io/releases/download/v1/vid_v2.mp4" type="video/mp4" />
-					</video>
+					<video ref={videoRef1} onContextMenu={(e) => e.preventDefault()} autoPlay muted loop playsInline className={styles.video_main} />
+					<video ref={videoRef2} onContextMenu={(e) => e.preventDefault()} autoPlay muted loop playsInline className={styles.video_overlay} />
 				</div>
 				<form onSubmit={submitForm} noValidate>
 					<img src="coy logo.webp" alt='BB Logo' width={"120px"} height={"120px"} />
