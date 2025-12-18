@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 stats.html
+coverage/
+test-results/
+playwright/
+playwright-report/

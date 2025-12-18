@@ -24,9 +24,9 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       port: 5173,
-      hmr: {
-        host: '192.168.0.189'
-      }
+      // hmr: {
+      //   host: '192.168.0.189'
+      // }
     },
     resolve: {
       alias: isProd
@@ -47,6 +47,6 @@ export default defineConfig(({ mode }) => {
           }
         }
       }
-    }
+    },
   }
 })
