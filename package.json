@@ -4,20 +4,23 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "npx playwright test",
+    "coverage": "node generate-coverage.cjs"
   },
   "dependencies": {
     "@firebase/app": "^0.14.6",
     "@firebase/auth": "^1.11.1",
     "@firebase/firestore": "^4.9.2",
+    "appwrite": "^21.5.0",
     "fflate": "^0.8.2",
     "file-saver": "^2.0.5",
-    "gh-pages": "^6.3.0",
-    "gsap": "^3.13.0",
-    "hls.js": "^1.6.15",
+    "jest": "^30.2.0",
+    "mammoth": "^1.11.0",
     "preact": "^10.28.0",
     "prop-types": "^15.8.1",
     "react": "^19.2.1",
@@ -26,24 +29,34 @@
     "read-excel-file": "^6.0.1",
     "redaxios": "^0.5.1",
     "sass": "^1.94.2",
+    "supertest": "^7.1.4",
     "zod": "^4.1.13"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/experimental-ct-react": "^1.57.0",
     "@playwright/test": "^1.57.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "@vitest/coverage-v8": "^4.0.16",
     "autoprefixer": "^10.4.22",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "hls.js": "^1.6.15",
     "husky": "^9.1.7",
+    "jsdom": "^27.3.0",
     "postcss": "^8.5.6",
+    "rollup": "^4.53.3",
     "rollup-plugin-visualizer": "^6.0.5",
     "typescript": "^5.9.3",
     "vite": "^7.2.7",
-    "vite-plugin-sitemap": "^0.8.2"
+    "vite-plugin-sitemap": "^0.8.2",
+    "vitest": "^4.0.16"
   }
 }

@@ -10,7 +10,7 @@ import UserPermissions from './general/UserPermissions';
 import NotFound from "./general/NotFound";
 
 // const HomePage = lazy(() => import('./homePage/HomePage'));
-import App from './general/serverLoading';
+const CalendarPage = lazy(() => import('./calendarPage/Calendar'));
 
 const LogInPage = lazy(() => import('./logInPage/LogInPage'));
 const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
@@ -39,9 +39,9 @@ createRoot(document.body).render(
 				<Suspense fallback={<Loading />}>
 					<UserProvider>
 						<Routes>
-							<Route path="/loading" element={<App />} />
 							<Route path='/login' element={<LogInPage />} />
 							<Route path='/' element={<LogInPage />} />
+							<Route path='/calendar' element={<CalendarPage />} />
 							<Route element={<Layout />}>
 								{/* Temporarily disable home page since its filled with filler data */}
 								{/* <Route path='/' element={<HomePage/>}/> */}
