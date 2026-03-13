@@ -9,6 +9,7 @@ const Layout = () => {
 		<div className="layout">
 			<div className='error-container'></div>
 
+			<div className="tip">We are moving! Check out our new website at <a href="https://portal.bb21coy.workers.dev">portal.bb21coy.workers.dev</a></div>
 			<Header />
 			<main>
 				<Outlet />

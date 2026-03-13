@@ -38,7 +38,6 @@
     }
 }
 
-
 html {
     background: black;
 }
@@ -133,6 +132,20 @@ textarea {
 ::-webkit-scrollbar-thumb {
     background: rgb(183, 183, 183);
     border-radius: 10px;
+}
+
+.tip {
+    background: #26284B;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+
+    a {
+        color: white;
+        text-decoration: underline;
+    }
 }
 
 @media screen and (max-width: 250px) {

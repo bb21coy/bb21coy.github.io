@@ -2,23 +2,23 @@ import type { FC } from "react";
 import { useNavigate } from "react-router-dom"
 import styles from './dashboardPage.module.scss'
 
-interface DashboardOptionsProps {
+type DashboardOptionsProps = {
     title: string;
-    url?: string | null;
-    icon?: string | null;
-    image?: string | null;
-    func?: (() => void) | null;
-    color?: string;
-    description?: string;
+    url: string;
+    icon: string;
+    color: string;
+    description: string;
+    migrating?: boolean;
 }
 
-const DashboardOptions: FC<DashboardOptionsProps> = ({ title=null, url=null, icon=null, image=null, func=null, color="000000", description="" }) => {
+const DashboardOptions: FC<DashboardOptionsProps> = ({ title, url, icon, color, description, migrating = false }) => {
     const navigate = useNavigate()
+    const isMigrating = () => migrating ? window.open(`https://portal.bb21coy.workers.dev${url}`, "_blank") : navigate(url)
 
     return (
-        <div className={styles.route} style={{ '--color': `#${color}` } as React.CSSProperties} onClick={url ? () => navigate(url) : func || undefined}>
+        <div className={styles.route} style={{ '--color': `#${color}` } as React.CSSProperties} onClick={isMigrating}>
             <div>
-                {image ? <div /> : <i className={ `fa-regular fa-${icon}` }></i>}
+                <i className={`fa-regular fa-${icon}`}></i>
             </div>
             <p>{title}</p>
             <p>{description}</p>

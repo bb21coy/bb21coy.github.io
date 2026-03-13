@@ -1,5 +1,3 @@
-import PropTypes from "prop-types";
-
 const PendingTasks = ({ accountType, appointment, userId, paradesAfterToday, styles }) => {
     function daysUntilSaturday() {
         const today = new Date();
@@ -44,14 +42,6 @@ const PendingTasks = ({ accountType, appointment, userId, paradesAfterToday, sty
             </div>
         </div>
     )
-};
-
-PendingTasks.propTypes = {
-    accountType: PropTypes.string,
-    appointment: PropTypes.string,
-    userId: PropTypes.number,
-    paradesAfterToday: PropTypes.array,
-    styles: PropTypes.object
 };
 
 export { PendingTasks };
