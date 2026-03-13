@@ -78,7 +78,6 @@ const DashboardPage = () => {
 
                 <DashboardOptions title="Resources" icon="book" url="/resources" color="1E5945" description='View Resources for Badgeworks that you are studying for' />
                 <DashboardOptions title="Manage Login" icon="lock" url="/manage_login" color="1E5945" description='Change your password, and link with 3rd Party Providers' />
-                <DashboardOptions title="Help" icon="question" url="/help" color="1E5945" description='Need help? We provides a Step By Step Guide to achieveing your task' />
                 <DashboardOptions title="Logout" icon="right-from-bracket" func={logOut} color="1E5945" />
             </div>
 
