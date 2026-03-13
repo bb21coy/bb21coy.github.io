@@ -66,7 +66,6 @@ const DashboardPage = () => {
                     <DashboardOptions title="My Inspection Results" icon="shirt-long-sleeve" url="/user_inspections" color="C1876B" description='View your results from recent inspections' />
                 </>}
 
-                {/* {(user.t === "Officer" || user.appointment?.toLowerCase().includes("tech")) && <DashboardOptions title="Home Page Editor" icon="edit" url="home_editor" color='DC9D00' />} */}
                 {user.t !== "Boy" && <DashboardOptions title="Uniform Inspection" icon="shirt-long-sleeve" url="/uniform_inspection" color="D53032" description='Record uniform inspection results for Boys' />}
 
                 {(user.t !== "Boy" || (user.t === "Boy" && user.appointment)) && <>
@@ -97,8 +96,6 @@ const DashboardPage = () => {
                 <PendingTasks accountType={user.t} appointment={user.appointment} userId={userId} paradesAfterToday={paradesAfterToday} styles={styles} />
 
                 <div className={styles['access_levels']}>
-                    {/* <div style={{ '--legend': '#DC9D00' }}></div> */}
-                    {/* <p>Officers Only</p> */}
                     <div style={{ '--legend': '#D53032' }}></div>
                     <p>Officers and Primers</p>
                     <div style={{ '--legend': '#252850' }}></div>

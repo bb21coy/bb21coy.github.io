@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { showMessage } from "../general/handleServerError";
-import styles from "./uploadFile.module.scss"
 import { db } from "../firebase";
 import { doc, deleteDoc, writeBatch } from "@firebase/firestore";
 import readXlsxFile, { readSheetNames } from "read-excel-file";

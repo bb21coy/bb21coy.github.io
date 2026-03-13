@@ -26,5 +26,3 @@ dist-ssr
 stats.html
 coverage/
 test-results/
-playwright/
-playwright-report/

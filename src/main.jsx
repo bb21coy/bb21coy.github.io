@@ -14,18 +14,15 @@ const CalendarPage = lazy(() => import('./migration/Calendar'));
 
 const LogInPage = lazy(() => import('./logInPage/LogInPage'));
 const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
-const AwardsManagementPage = lazy(() => import('./awardsManagementPage/AwardsManagementPage'));
+const AwardsManagementPage = lazy(() => import('./migration/AwardsManagementPage'));
 const ResultGenerationPage = lazy(() => import('./migration/ResultGenerationPage'));
-const UniformInspectionPage = lazy(() => import('./uniformInspectionPage/UniformInspectionSummary'));
-const UniformInspectionResultPage = lazy(() => import('./uniformInspectionPage/UniformInspectionResultPage'));
-const UniformInspectionForm = lazy(() => import('./uniformInspectionPage/UniformInspectionForm'));
+const UniformInspectionPage = lazy(() => import('./migration/UniformInspectionSummary'));
 const UserManagementPage = lazy(() => import('./migration/UserManagementPage'));
 const ResetPasswordPage = lazy(() => import('./userManagementPage/ResetPasswordPage'));
 const DashboardPage = lazy(() => import('./dashboardPage/dashboardPage'));
 const ParadeNoticePage = lazy(() => import('./attendanceManagementPage/ParadeNoticePage'));
 const UserAwards = lazy(() => import('./migration/UserAwards'));
-const HomeEditorPage = lazy(() => import('./homePage/HomeEditorPage'));
-const UniformInspectionUser = lazy(() => import('./uniformInspectionPage/UniformInspectionUser'));
+const UniformInspectionUser = lazy(() => import('./migration/UniformInspectionUser'));
 const ResourcePage = lazy(() => import('./migration/ResourcePage'));
 const UserAttendance = lazy(() => import('./attendanceManagementPage/UserAttendance'));
 
@@ -40,8 +37,6 @@ createRoot(document.body).render(
 							<Route path='/' element={<LogInPage />} />
 							<Route path='/calendar' element={<CalendarPage />} />
 							<Route element={<Layout />}>
-								{/* Temporarily disable home page since its filled with filler data */}
-								{/* <Route path='/' element={<HomePage/>}/> */}
 								<Route path='/parade_notice' element={<ParadeNoticePage />} />
 								
 								<Route path='/home' element={
@@ -86,18 +81,6 @@ createRoot(document.body).render(
 									</UserPermissions>
 								} />
 
-								<Route path='/view_uniform_inspection/:id' element={
-									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']}>
-										<UniformInspectionResultPage />
-									</UserPermissions>
-								} />
-
-								<Route path='/uniform_inspection_form' element={
-									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']}>
-										<UniformInspectionForm />
-									</UserPermissions>
-								} />
-
 								<Route path='/user_inspections' element={
 									<UserPermissions allowedAccountTypes={['Admin', 'Boy']}>
 										<UniformInspectionUser />
@@ -111,13 +94,7 @@ createRoot(document.body).render(
 								} />
 
 								<Route path='/manage_login' element={<ResetPasswordPage />} />
-								
-								<Route path='/home_editor' element={
-									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']} apptAllowed={true}>
-										<HomeEditorPage />
-									</UserPermissions>
-								} />
-								
+
 								<Route path='/resources' element={<ResourcePage />} />
 								<Route path="*" element={<NotFound />} />
 							</Route>
