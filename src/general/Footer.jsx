@@ -56,7 +56,7 @@ const Footer = () => {
                     <p>Quick Links</p>
                     {user.t ? <p onClick={() => navigate('/home')}>Dashboard</p> : <p onClick={() => navigate('/login')}>Login</p>}
                     <p onClick={() => navigate('/parade_notice')}>Parade Notice</p>
-                    <p onClick={() => navigate('/calendar')}>Calendar</p>
+                    <p onClick={() => window.open("https://portal.bb21coy.workers.dev/calendar", "_blank")}>Calendar</p>
                 </div>
 
                 <div className={styles.links}>
@@ -69,6 +69,7 @@ const Footer = () => {
                     <p>Associated Websites</p>
                     <p onClick={() => window.open("https://www.bb.org.sg", "_blank")}>BB Singapore</p>
                     <p onClick={() => window.open("https://members.bb.org.sg", "_blank")}>BB Members Portal</p>
+                    <p onClick={() => window.open("https://portal.bb21coy.workers.dev", "_blank")}>BB 21st Portal (New)</p>
                 </div>
             </div>
 

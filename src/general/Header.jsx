@@ -109,7 +109,7 @@ const Header = () => {
 
 				<div className={styles.topbar}>
 					{!loggedIn ? <>
-						<div onClick={() => navigate('/calendar')}>Calendar</div>
+						<div onClick={() => window.open("https://portal.bb21coy.workers.dev/calendar", "_blank")}>Calendar</div>
 						<div onClick={() => navigate('/parade_notice')}>Parade Notice</div>
 						<div onClick={() => navigate('/login')}>Login</div>
 					</> : <>
@@ -134,14 +134,14 @@ const Header = () => {
 			<div className={styles.sidebar_background} style={{ opacity: navigationViewable ? "1" : "0" }}></div>
 			<div className={styles.sidebar} style={{ right: navigationViewable ? '0' : "-110vw" }}>
 				<div>
-					{loggedIn && <div data-image={!!userImage} style={{ background: `url(${userImage}) center/cover no-repeat` }} onClick={() => navigate("/user_profile")}></div>}
+					{loggedIn && <div data-image={!!userImage} style={{ background: `url(${userImage}) center/cover no-repeat` }}></div>}
 					<i className='fa-solid fa-xmark' onClick={() => setNavigationViewable(prevState => !prevState)}></i>
 				</div>
 
 				<div>
 					{!loggedIn ? <>
 						<button onClick={() => navigate('/parade_notice')} style={{ "--icon": '"\\f15b"' }}>Parade Notice</button>
-						<button onClick={() => navigate('/calendar')} style={{ "--icon": '"\\f133"' }}>Calendar</button>
+						<button onClick={() => window.open("https://portal.bb21coy.workers.dev/calendar", "_blank")} style={{ "--icon": '"\\f133"' }}>Calendar</button>
 						<hr />
 						<button data-main-button onClick={() => navigate('/login')}>Login</button>
 					</> : <>
