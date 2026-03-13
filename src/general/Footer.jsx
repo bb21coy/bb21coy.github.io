@@ -69,6 +69,7 @@ const Footer = () => {
                     <p>Associated Websites</p>
                     <p onClick={() => window.open("https://www.bb.org.sg", "_blank")}>BB Singapore</p>
                     <p onClick={() => window.open("https://members.bb.org.sg", "_blank")}>BB Members Portal</p>
+                    <p onClick={() => window.open("https://portal.bb21coy.workers.dev", "_blank")}>BB 21st Portal (New)</p>
                 </div>
             </div>
 
