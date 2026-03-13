@@ -10,26 +10,23 @@ import UserPermissions from './general/UserPermissions';
 import NotFound from "./general/NotFound";
 
 // const HomePage = lazy(() => import('./homePage/HomePage'));
-const CalendarPage = lazy(() => import('./calendarPage/Calendar'));
+const CalendarPage = lazy(() => import('./migration/Calendar'));
 
 const LogInPage = lazy(() => import('./logInPage/LogInPage'));
 const AttendanceManagementPage = lazy(() => import('./attendanceManagementPage/AttendanceManagementPage'));
 const AwardsManagementPage = lazy(() => import('./awardsManagementPage/AwardsManagementPage'));
-const ResultPage = lazy(() => import('./resultPage/ResultPage'));
-const ResultGenerationPage = lazy(() => import('./resultPage/ResultGenerationPage'));
+const ResultGenerationPage = lazy(() => import('./migration/ResultGenerationPage'));
 const UniformInspectionPage = lazy(() => import('./uniformInspectionPage/UniformInspectionSummary'));
 const UniformInspectionResultPage = lazy(() => import('./uniformInspectionPage/UniformInspectionResultPage'));
 const UniformInspectionForm = lazy(() => import('./uniformInspectionPage/UniformInspectionForm'));
-const UserManagementPage = lazy(() => import('./userManagementPage/UserManagementPage'));
-const UserManagementSmallPage = lazy(() => import('./userManagementPage/UserManagementSmallPage'));
+const UserManagementPage = lazy(() => import('./migration/UserManagementPage'));
 const ResetPasswordPage = lazy(() => import('./userManagementPage/ResetPasswordPage'));
 const DashboardPage = lazy(() => import('./dashboardPage/dashboardPage'));
 const ParadeNoticePage = lazy(() => import('./attendanceManagementPage/ParadeNoticePage'));
-const UserAwards = lazy(() => import('./awardsManagementPage/UserAwards'));
-const HelpPage = lazy(() => import('./helpPage/HelpPage'));
+const UserAwards = lazy(() => import('./migration/UserAwards'));
 const HomeEditorPage = lazy(() => import('./homePage/HomeEditorPage'));
 const UniformInspectionUser = lazy(() => import('./uniformInspectionPage/UniformInspectionUser'));
-const ResourcePage = lazy(() => import('./resourcePage/ResourcePage'));
+const ResourcePage = lazy(() => import('./migration/ResourcePage'));
 const UserAttendance = lazy(() => import('./attendanceManagementPage/UserAttendance'));
 
 createRoot(document.body).render(
@@ -83,12 +80,6 @@ createRoot(document.body).render(
 									</UserPermissions>
 								} />
 
-								<Route path='/view_result/:id' element={
-									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']}>
-										<ResultPage />
-									</UserPermissions>
-								} />
-
 								<Route path='/uniform_inspection' element={
 									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']}>
 										<UniformInspectionPage />
@@ -119,14 +110,7 @@ createRoot(document.body).render(
 									</UserPermissions>
 								} />
 
-								<Route path='/user_management/:userId' element={
-									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']} apptAllowed={true}>
-										<UserManagementSmallPage />
-									</UserPermissions>
-								} />
-
 								<Route path='/manage_login' element={<ResetPasswordPage />} />
-								<Route path='/help' element={<HelpPage />} />
 								
 								<Route path='/home_editor' element={
 									<UserPermissions allowedAccountTypes={['Admin', 'Officer', 'Primer']} apptAllowed={true}>
